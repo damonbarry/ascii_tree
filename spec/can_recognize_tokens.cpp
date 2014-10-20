@@ -41,7 +41,7 @@ namespace algo { namespace spec
             Assert::IsTrue(testTokens.empty());
 		}
 
-        TEST_METHOD(should_recognize_a_token)
+        TEST_METHOD(should_recognize_a_token_in_a_string)
         {
             test_tokens testTokens;
             testTokens.from_string("s");
