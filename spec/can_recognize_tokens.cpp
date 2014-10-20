@@ -11,12 +11,18 @@ namespace algo
     template<class Traits>
     class tokens
     {
-        vector<typename Traits::type> tokens_;
+        typedef vector<typename Traits::type> token_vector;
+        token_vector tokens_;
+
     public:
+        typedef typename token_vector::iterator iterator;
+
         tokens() {}
         explicit tokens(size_t count) : tokens_(count) {}
         bool empty() const { return tokens_.size() == 0; }
         size_t size() const { return tokens_.size(); }
+        iterator begin() { return tokens_.begin(); }
+        iterator end() { return tokens_.end(); }
         void from_string(string s)
         {
             auto newTokens = Traits::tokenize(s);
@@ -27,10 +33,11 @@ namespace algo
 
 namespace algo { namespace spec
 {
+    struct s {};
+
     template<size_t N>
     struct test_token_traits
     {
-        struct s {};
         typedef s type;
         static array<s, N> tokenize(const string&) { return array<s, N>(); }
     };
@@ -69,5 +76,13 @@ namespace algo { namespace spec
             Assert::AreEqual(5U, testTokens.size());
         }
 
-	};
+        TEST_METHOD(should_be_able_to_enumerate_tokens)
+        {
+            test_tokens<0> testTokens(3);
+            size_t i = 0;
+            for (s tok : testTokens) { ++i; }
+            Assert::AreEqual(3U, i);
+        }
+
+    };
 }}
