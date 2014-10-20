@@ -7,28 +7,29 @@ using namespace std;
 
 namespace algo
 {
-    template<class T, class Tokenize>
+    template<class Traits>
     class tokens
     {
-        vector<T> tokens_;
-        Tokenize tokenize_;
+        vector<typename Traits::type> tokens_;
     public:
-        explicit tokens(Tokenize fn) : tokenize_(fn) {}
         bool empty() const { return tokens_.size() == 0; }
         void from_string(string s)
         {
-            tokens_.push_back(tokenize_(s));
+            tokens_.push_back(Traits::tokenize(s));
         }
     };
-
-    template<class T, class Tokenize>
-    tokens<T, Tokenize> make_tokens(Tokenize&& fn) { return tokens<T, Tokenize>(std::forward<Tokenize>(fn)); }
 }
 
 namespace algo { namespace spec
 {
-    struct s {};
-    auto alwaysReturnAToken = [](string&){ return s(); };
+    struct test_token_traits
+    {
+        struct s {};
+        typedef s type;
+        static s tokenize(const string&) { return s(); }
+    };
+
+    typedef tokens<test_token_traits> test_tokens;
 
     TEST_CLASS(can_recognize_tokens)
 	{
@@ -36,13 +37,13 @@ namespace algo { namespace spec
 
         TEST_METHOD(should_not_have_any_tokens_when_default_constructed)
 		{
-            auto testTokens = make_tokens<s>(alwaysReturnAToken);
+            test_tokens testTokens;
             Assert::IsTrue(testTokens.empty());
 		}
 
         TEST_METHOD(should_recognize_a_token)
         {
-            auto testTokens = make_tokens<s>(alwaysReturnAToken);
+            test_tokens testTokens;
             testTokens.from_string("s");
             Assert::IsFalse(testTokens.empty());
         }
