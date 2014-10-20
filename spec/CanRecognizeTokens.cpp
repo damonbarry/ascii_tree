@@ -4,7 +4,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace algo { namespace spec
 {		
-	TEST_CLASS(UnitTest1)
+    TEST_CLASS(CanRecognizeTokens)
 	{
 	public:
 		

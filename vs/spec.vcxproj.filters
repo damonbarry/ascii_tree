@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\spec\unittest1.cpp">
+    <ClCompile Include="..\spec\CanRecognizeTokens.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
