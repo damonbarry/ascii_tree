@@ -13,6 +13,8 @@ namespace algo
     {
         vector<typename Traits::type> tokens_;
     public:
+        tokens() {}
+        explicit tokens(size_t count) : tokens_(count) {}
         bool empty() const { return tokens_.size() == 0; }
         size_t size() const { return tokens_.size(); }
         void from_string(string s)
@@ -58,6 +60,13 @@ namespace algo { namespace spec
             test_tokens<3> testTokens;
             testTokens.from_string("irrelevant");
             Assert::AreEqual(3U, testTokens.size());
+        }
+
+        TEST_METHOD(should_accumulate_tokens_from_successive_strings)
+        {
+            test_tokens<2> testTokens(3);
+            testTokens.from_string("irrelevant");
+            Assert::AreEqual(5U, testTokens.size());
         }
 
 	};
