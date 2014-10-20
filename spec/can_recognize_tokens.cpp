@@ -13,11 +13,11 @@ namespace algo
 
 namespace algo { namespace spec
 {		
-    TEST_CLASS(CanRecognizeTokens)
+    TEST_CLASS(can_recognize_tokens)
 	{
 	public:
 		
-        TEST_METHOD(ShouldNotHaveAnyTokensWhenDefaultConstructed)
+        TEST_METHOD(should_not_have_any_tokens_when_default_constructed)
 		{
             tokens testSubject;
             Assert::IsTrue(testSubject.empty());
