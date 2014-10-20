@@ -22,10 +22,14 @@ namespace algo
         explicit tokens(size_t count) : tokens_(count) {}
         bool empty() const { return tokens_.size() == 0; }
         size_t size() const { return tokens_.size(); }
+
         iterator begin() { return tokens_.begin(); }
         const_iterator begin() const { return tokens_.begin(); }
+        const_iterator cbegin() const { return tokens_.cbegin(); }
         iterator end() { return tokens_.end(); }
         const_iterator end() const { return tokens_.end(); }
+        const_iterator cend() const { return tokens_.cend(); }
+
         void from_string(string s)
         {
             auto newTokens = Traits::tokenize(s);
@@ -92,6 +96,15 @@ namespace algo { namespace spec
             const test_tokens<0> testTokens(3);
             size_t i = 0;
             for (const s tok : testTokens) { ++i; }
+            Assert::AreEqual(3U, i);
+        }
+
+        TEST_METHOD(should_be_able_to_enumerate_const_tokens_from_a_non_const_container)
+        {
+            typedef test_tokens<0>::const_iterator const_iter;
+            test_tokens<0> testTokens(3);
+            size_t i = 0;
+            for (const_iter it = testTokens.cbegin(); it != testTokens.cend(); ++it) { ++i; }
             Assert::AreEqual(3U, i);
         }
 
