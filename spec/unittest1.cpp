@@ -2,7 +2,7 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace spec
+namespace algo { namespace spec
 {		
 	TEST_CLASS(UnitTest1)
 	{
@@ -14,4 +14,4 @@ namespace spec
 		}
 
 	};
-}
+}}
