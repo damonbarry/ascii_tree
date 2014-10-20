@@ -16,13 +16,16 @@ namespace algo
 
     public:
         typedef typename token_vector::iterator iterator;
+        typedef typename token_vector::const_iterator const_iterator;
 
         tokens() {}
         explicit tokens(size_t count) : tokens_(count) {}
         bool empty() const { return tokens_.size() == 0; }
         size_t size() const { return tokens_.size(); }
         iterator begin() { return tokens_.begin(); }
+        const_iterator begin() const { return tokens_.begin(); }
         iterator end() { return tokens_.end(); }
+        const_iterator end() const { return tokens_.end(); }
         void from_string(string s)
         {
             auto newTokens = Traits::tokenize(s);
@@ -81,6 +84,14 @@ namespace algo { namespace spec
             test_tokens<0> testTokens(3);
             size_t i = 0;
             for (s tok : testTokens) { ++i; }
+            Assert::AreEqual(3U, i);
+        }
+
+        TEST_METHOD(should_be_able_to_enumerate_const_tokens_from_a_const_container)
+        {
+            const test_tokens<0> testTokens(3);
+            size_t i = 0;
+            for (const s tok : testTokens) { ++i; }
             Assert::AreEqual(3U, i);
         }
 
