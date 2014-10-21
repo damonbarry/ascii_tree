@@ -25,6 +25,7 @@ namespace algo
         bool empty() const { return tokens_.size() == 0; }
         size_t size() const { return tokens_.size(); }
         token_type& operator[](size_t i) { return tokens_[i]; };
+        const token_type& operator[](size_t i) const { return const_cast<tokens&>(*this)[i]; };
 
         iterator begin() { return tokens_.begin(); }
         const_iterator begin() const { return tokens_.begin(); }
@@ -117,6 +118,12 @@ namespace algo { namespace spec
             Assert::AreEqual("one", testTokens[0].val.c_str());
             Assert::AreEqual("two", testTokens[1].val.c_str());
             Assert::AreEqual("three", testTokens[2].val.c_str());
+        }
+
+        TEST_METHOD(should_be_able_to_access_tokens_from_a_const_container_by_ther_index)
+        {
+            const test_tokens<0> testTokens = { { "one" } };
+            Assert::AreEqual("one", testTokens[0].val.c_str());
         }
 
     };
