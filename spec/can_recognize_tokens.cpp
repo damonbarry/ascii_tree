@@ -57,14 +57,14 @@ namespace algo { namespace spec
     using test_tokens = tokens<test_token_traits<N>>;
 
     TEST_CLASS(can_recognize_tokens)
-	{
-	public:
+    {
+    public:
 
         TEST_METHOD(should_not_have_any_tokens_when_default_constructed)
-		{
+        {
             test_tokens<0> testTokens;
             Assert::IsTrue(testTokens.empty());
-		}
+        }
 
         TEST_METHOD(should_recognize_a_token_in_a_string)
         {
