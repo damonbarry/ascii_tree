@@ -70,7 +70,7 @@ namespace algo { namespace spec
         {
             test_tokens<1> testTokens;
             testTokens.from_string("irrelevant");
-            Assert::IsFalse(testTokens.empty());
+            Assert::AreEqual(1U, testTokens.size());
         }
 
         TEST_METHOD(should_recognize_more_than_one_token_in_a_string)
