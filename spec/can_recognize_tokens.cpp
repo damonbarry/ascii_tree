@@ -17,11 +17,14 @@ namespace algo
     public:
         typedef typename token_vector::iterator iterator;
         typedef typename token_vector::const_iterator const_iterator;
+        typedef typename Traits::type token_type;
 
         tokens() {}
         explicit tokens(size_t count) : tokens_(count) {}
+        tokens(std::initializer_list<token_type> init) : tokens_(init) {}
         bool empty() const { return tokens_.size() == 0; }
         size_t size() const { return tokens_.size(); }
+        token_type& operator[](size_t i) { return tokens_[i]; };
 
         iterator begin() { return tokens_.begin(); }
         const_iterator begin() const { return tokens_.begin(); }
@@ -40,7 +43,7 @@ namespace algo
 
 namespace algo { namespace spec
 {
-    struct s {};
+    struct s { string val; };
 
     template<size_t N>
     struct test_token_traits
@@ -106,6 +109,14 @@ namespace algo { namespace spec
             size_t i = 0;
             for (const_iter it = testTokens.cbegin(); it != testTokens.cend(); ++it) { ++i; }
             Assert::AreEqual(3U, i);
+        }
+
+        TEST_METHOD(should_be_able_to_access_tokens_by_their_index)
+        {
+            test_tokens<0> testTokens = { { "one" }, { "two" }, { "three" } };
+            Assert::AreEqual("one", testTokens[0].val.c_str());
+            Assert::AreEqual("two", testTokens[1].val.c_str());
+            Assert::AreEqual("three", testTokens[2].val.c_str());
         }
 
     };
