@@ -18,5 +18,8 @@
     <ClCompile Include="..\spec\can_recognize_tokens.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\spec\can_recognize_ascii_tree_tokens.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
