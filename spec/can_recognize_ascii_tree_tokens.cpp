@@ -9,8 +9,9 @@ namespace algo
 {
     struct token
     {
-        enum toktype { root_node };
+        enum toktype { root_node, named_node };
         toktype type;
+        string name;
     };
 
     bool operator==(const token& lhs, const token& rhs)
@@ -22,7 +23,21 @@ namespace algo
     {
         static vector<token> tokenize(const string& s)
         {
-            return vector<token>(s.empty() ? 0 : 1);
+            if (s.empty())
+            {
+                return vector<token>();
+            }
+            else if (s == "[*]")
+            {
+                token newtok = { token::root_node, "" };
+                return vector<token>(1, newtok);
+            }
+            else
+            {
+                string name = s.substr(1, s.size() - 2);
+                token newtok = { token::named_node, name };
+                return vector<token>(1, newtok);
+            }
         }
     };
 }
@@ -30,7 +45,10 @@ namespace algo
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
 {
     template<>
-    wstring ToString<algo::token::toktype>(const algo::token::toktype&) { return L"root_node"; }
+    wstring ToString<algo::token::toktype>(const algo::token::toktype& type)
+    {
+        return (type == algo::token::root_node) ? L"root_node" : L"named_node";
+    }
 }}}
 
 namespace algo { namespace spec
@@ -51,5 +69,12 @@ namespace algo { namespace spec
             Assert::AreEqual(token::root_node, tokens.front().type);
         }
 
-	};
+        TEST_METHOD(should_recognize_a_named_node)
+        {
+            auto tokens = ascii_tree::tokenize("[a]");
+            Assert::AreEqual(token::named_node, tokens.front().type);
+            Assert::AreEqual("a", tokens.front().name.c_str());
+        }
+
+    };
 }}
