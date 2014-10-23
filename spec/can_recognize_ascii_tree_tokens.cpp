@@ -7,19 +7,22 @@ using namespace std;
 
 namespace algo
 {
-    struct root_node {};
+    struct token
+    {
+        enum toktype { root_node };
+        toktype type;
+    };
 
-    bool operator==(const root_node& lhs, const root_node& rhs)
+    bool operator==(const token& lhs, const token& rhs)
     {
         return true;
     }
 
     struct ascii_tree
     {
-        typedef root_node type;
-        static vector<type> tokenize(const string& s)
+        static vector<token> tokenize(const string& s)
         {
-            return vector<type>(s.empty() ? 0 : 1);
+            return vector<token>(s.empty() ? 0 : 1);
         }
     };
 }
@@ -27,7 +30,7 @@ namespace algo
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
 {
     template<>
-    wstring ToString<algo::root_node>(const algo::root_node&) { return L"root_node"; }
+    wstring ToString<algo::token::toktype>(const algo::token::toktype&) { return L"root_node"; }
 }}}
 
 namespace algo { namespace spec
@@ -45,7 +48,7 @@ namespace algo { namespace spec
 		TEST_METHOD(should_recognize_a_root_node)
 		{
             auto tokens = ascii_tree::tokenize("[*]");
-            Assert::AreEqual(root_node(), tokens.front());
+            Assert::AreEqual(token::root_node, tokens.front().type);
         }
 
 	};
