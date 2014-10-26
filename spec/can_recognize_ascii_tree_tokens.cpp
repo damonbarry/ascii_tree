@@ -23,13 +23,17 @@ namespace algo
     {
         static vector<token> tokenize(const string& s)
         {
-            bool rootNodeCandidate = false;
+            enum { none, open_square_brace, asterisk, edge_name } prev = none;
 
             for (auto ch : s)
             {
-                if (ch == ']')
+                if (ch == '[')
                 {
-                    if (rootNodeCandidate)
+                    prev = open_square_brace;
+                }
+                else if (ch == ']')
+                {
+                    if (prev == asterisk)
                     {
                         token newtok = { token::root_node, "" };
                         return vector<token>(1, newtok);
@@ -43,11 +47,20 @@ namespace algo
                 }
                 else if (ch == '*')
                 {
-                    rootNodeCandidate = true;
+                    prev = asterisk;
+                }
+                else
+                {
+                    if (prev == none)
+                    {
+                        prev = edge_name;
+                    }
                 }
             }
 
-            return vector<token>();
+            return (prev == edge_name)
+                ? vector<token>(1, token { token::edge_name, s })
+                : vector<token>();
         }
     };
 }
@@ -93,6 +106,13 @@ namespace algo { namespace spec
         {
             auto tokens = ascii_tree::tokenize("[a]");
             Assert::AreEqual(token::named_node, tokens.front().type);
+            Assert::AreEqual("a", tokens.front().name.c_str());
+        }
+
+        TEST_METHOD(should_recognize_an_edge_name)
+        {
+            auto tokens = ascii_tree::tokenize("a");
+            Assert::AreEqual(token::edge_name, tokens.front().type);
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
 
