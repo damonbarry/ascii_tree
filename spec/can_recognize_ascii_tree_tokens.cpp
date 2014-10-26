@@ -9,7 +9,7 @@ namespace algo
 {
     struct token
     {
-        enum toktype { root_node, named_node };
+        enum toktype { root_node, named_node, edge_name };
         toktype type;
         string name;
     };
@@ -23,21 +23,31 @@ namespace algo
     {
         static vector<token> tokenize(const string& s)
         {
-            if (s.empty())
+            bool rootNodeCandidate = false;
+
+            for (auto ch : s)
             {
-                return vector<token>();
+                if (ch == ']')
+                {
+                    if (rootNodeCandidate)
+                    {
+                        token newtok = { token::root_node, "" };
+                        return vector<token>(1, newtok);
+                    }
+                    else
+                    {
+                        string name = s.substr(1, s.size() - 2);
+                        token newtok = { token::named_node, name };
+                        return vector<token>(1, newtok);
+                    }
+                }
+                else if (ch == '*')
+                {
+                    rootNodeCandidate = true;
+                }
             }
-            else if (s == "[*]")
-            {
-                token newtok = { token::root_node, "" };
-                return vector<token>(1, newtok);
-            }
-            else
-            {
-                string name = s.substr(1, s.size() - 2);
-                token newtok = { token::named_node, name };
-                return vector<token>(1, newtok);
-            }
+
+            return vector<token>();
         }
     };
 }
@@ -47,7 +57,17 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
     template<>
     wstring ToString<algo::token::toktype>(const algo::token::toktype& type)
     {
-        return (type == algo::token::root_node) ? L"root_node" : L"named_node";
+        switch (type)
+        {
+        case algo::token::root_node:
+            return L"root_node";
+        case algo::token::named_node:
+            return L"named_node";
+        case algo::token::edge_name:
+            return L"edge_name";
+        default:
+            return L"unknown token";
+        }
     }
 }}}
 
