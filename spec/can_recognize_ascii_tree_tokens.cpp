@@ -93,10 +93,6 @@ namespace algo
             {
                 tokens.emplace_back(token { token::edge_name, s });
             }
-            else if (prev == dash)
-            {
-                tokens.emplace_back(token { token::horizontal_edge, s.substr(marker, marked_length) });
-            }
 
             return tokens;
         }
@@ -187,16 +183,29 @@ namespace algo { namespace spec
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
 
-        TEST_METHOD(should_recognize_more_than_one_ascii_tree_token)
+        TEST_METHOD(should_recognize_a_root_node_with_an_edge)
         {
             auto expected_tokens =
             {
-                token { token::root_node, "" }, 
-                token { token::horizontal_edge, "a" }, 
+                token { token::root_node, "" },
+                token { token::horizontal_edge, "a" }
+            };
+
+            auto tokens = ascii_tree::tokenize("[*]-a-");
+
+            auto mismatch_pair = std::mismatch(expected_tokens.begin(), expected_tokens.end(), tokens.begin());
+            Assert::IsTrue(expected_tokens.end() == mismatch_pair.first && tokens.end() == mismatch_pair.second);
+        }
+
+        TEST_METHOD(should_recognize_an_edge_with_a_named_node)
+        {
+            auto expected_tokens =
+            {
+                token { token::horizontal_edge, "a" },
                 token { token::named_node, "b" }
             };
 
-            auto tokens = ascii_tree::tokenize("[*]-a-[b]");
+            auto tokens = ascii_tree::tokenize("-a-[b]");
 
             auto mismatch_pair = std::mismatch(expected_tokens.begin(), expected_tokens.end(), tokens.begin());
             Assert::IsTrue(expected_tokens.end() == mismatch_pair.first && tokens.end() == mismatch_pair.second);
