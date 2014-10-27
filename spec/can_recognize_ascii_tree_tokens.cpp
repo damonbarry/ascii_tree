@@ -1,6 +1,8 @@
 #include "CppUnitTest.h"
+#include <cctype>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
@@ -16,17 +18,22 @@ namespace algo
 
     bool operator==(const token& lhs, const token& rhs)
     {
-        return true;
+        return lhs.type == rhs.type
+            && lhs.name == rhs.name;
     }
 
     struct ascii_tree
     {
         static vector<token> tokenize(const string& s)
         {
-            enum { none, open_square_brace, asterisk, dash, edge_name } prev = none;
+            vector<token> tokens;
+            enum { none, open_square_brace, close_square_brace, asterisk, dash, name_char } prev = none;
+            size_t marker = 0, marked_length = 0;
 
-            for (auto ch : s)
+            for (size_t i = 0; i < s.size(); ++i)
             {
+                auto ch = s[i];
+
                 if (ch == '[')
                 {
                     prev = open_square_brace;
@@ -35,15 +42,14 @@ namespace algo
                 {
                     if (prev == asterisk)
                     {
-                        token newtok = { token::root_node, "" };
-                        return vector<token>(1, newtok);
+                        tokens.emplace_back(token { token::root_node, "" });
                     }
                     else
                     {
-                        string name = s.substr(1, s.size() - 2);
-                        token newtok = { token::named_node, name };
-                        return vector<token>(1, newtok);
+                        tokens.emplace_back(token { token::named_node, s.substr(marker, marked_length) });
                     }
+
+                    prev = close_square_brace;
                 }
                 else if (ch == '*')
                 {
@@ -51,41 +57,48 @@ namespace algo
                 }
                 else if (ch == '-')
                 {
-                    if (prev == dash)
+                    if (prev == name_char)
                     {
-                        string name = s.substr(2, s.size() - 4);
-                        token newtok = { token::horizontal_edge, name };
-                        return vector<token>(1, newtok);
+                        tokens.emplace_back(token { token::horizontal_edge, s.substr(marker, marked_length) });
                     }
+
                     prev = dash;
                 }
                 else if (ch == '/')
                 {
-                    token newtok = { token::ascending_edge_part, "" };
-                    return vector<token>(1, newtok);
+                    tokens.emplace_back(token { token::ascending_edge_part, "" });
                 }
                 else if (ch == '\\')
                 {
-                    token newtok = { token::descending_edge_part, "" };
-                    return vector<token>(1, newtok);
+                    tokens.emplace_back(token { token::descending_edge_part, "" });
                 }
                 else if (ch == '|')
                 {
-                    token newtok = { token::vertical_edge_part, "" };
-                    return vector<token>(1, newtok);
+                    tokens.emplace_back(token { token::vertical_edge_part, "" });
                 }
-                else
+                else if (isalnum(ch) || ch == '_')
                 {
-                    if (prev == none)
+                    if (prev != name_char)
                     {
-                        prev = edge_name;
+                        marker = i;
+                        marked_length = 0;
                     }
+
+                    prev = name_char;
+                    ++marked_length;
                 }
             }
 
-            return (prev == edge_name)
-                ? vector<token>(1, token { token::edge_name, s })
-                : vector<token>();
+            if (prev == name_char)
+            {
+                tokens.emplace_back(token { token::edge_name, s });
+            }
+            else if (prev == dash)
+            {
+                tokens.emplace_back(token { token::horizontal_edge, s.substr(marker, marked_length) });
+            }
+
+            return tokens;
         }
     };
 }
@@ -167,11 +180,26 @@ namespace algo { namespace spec
             Assert::AreEqual(token::vertical_edge_part, tokens.front().type);
         }
 
-        TEST_METHOD(should_recognize_an_horizontal_edge_part)
+        TEST_METHOD(should_recognize_a_horizontal_edge)
         {
-            auto tokens = ascii_tree::tokenize("--a--");
+            auto tokens = ascii_tree::tokenize("-a-");
             Assert::AreEqual(token::horizontal_edge, tokens.front().type);
             Assert::AreEqual("a", tokens.front().name.c_str());
+        }
+
+        TEST_METHOD(should_recognize_more_than_one_ascii_tree_token)
+        {
+            auto expected_tokens =
+            {
+                token { token::root_node, "" }, 
+                token { token::horizontal_edge, "a" }, 
+                token { token::named_node, "b" }
+            };
+
+            auto tokens = ascii_tree::tokenize("[*]-a-[b]");
+
+            auto mismatch_pair = std::mismatch(expected_tokens.begin(), expected_tokens.end(), tokens.begin());
+            Assert::IsTrue(expected_tokens.end() == mismatch_pair.first && tokens.end() == mismatch_pair.second);
         }
 
     };
