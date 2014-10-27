@@ -9,7 +9,7 @@ namespace algo
 {
     struct token
     {
-        enum toktype { root_node, named_node, edge_name, horizontal_edge, ascending_edge_part };
+        enum toktype { root_node, named_node, edge_name, horizontal_edge, ascending_edge_part, descending_edge_part };
         toktype type;
         string name;
     };
@@ -64,6 +64,11 @@ namespace algo
                     token newtok = { token::ascending_edge_part, "" };
                     return vector<token>(1, newtok);
                 }
+                else if (ch == '\\')
+                {
+                    token newtok = { token::descending_edge_part, "" };
+                    return vector<token>(1, newtok);
+                }
                 else
                 {
                     if (prev == none)
@@ -97,6 +102,8 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
             return L"horizontal_edge";
         case algo::token::ascending_edge_part:
             return L"ascending_edge_part";
+        case algo::token::descending_edge_part:
+            return L"descending_edge_part";
         default:
             return L"unknown token";
         }
@@ -135,10 +142,16 @@ namespace algo { namespace spec
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
 
-        TEST_METHOD(should_recognize_an_asceding_edge_part)
+        TEST_METHOD(should_recognize_an_ascending_edge_part)
         {
             auto tokens = ascii_tree::tokenize("/");
             Assert::AreEqual(token::ascending_edge_part, tokens.front().type);
+        }
+
+        TEST_METHOD(should_recognize_a_descending_edge_part)
+        {
+            auto tokens = ascii_tree::tokenize("\\");
+            Assert::AreEqual(token::descending_edge_part, tokens.front().type);
         }
 
         TEST_METHOD(should_recognize_an_horizontal_edge)
