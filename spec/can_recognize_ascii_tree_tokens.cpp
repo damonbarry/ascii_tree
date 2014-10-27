@@ -9,7 +9,7 @@ namespace algo
 {
     struct token
     {
-        enum toktype { root_node, named_node, edge_name };
+        enum toktype { root_node, named_node, edge_name, horizontal_edge };
         toktype type;
         string name;
     };
@@ -23,7 +23,7 @@ namespace algo
     {
         static vector<token> tokenize(const string& s)
         {
-            enum { none, open_square_brace, asterisk, edge_name } prev = none;
+            enum { none, open_square_brace, asterisk, dash, edge_name } prev = none;
 
             for (auto ch : s)
             {
@@ -48,6 +48,16 @@ namespace algo
                 else if (ch == '*')
                 {
                     prev = asterisk;
+                }
+                else if (ch == '-')
+                {
+                    if (prev == dash)
+                    {
+                        string name = s.substr(2, s.size() - 4);
+                        token newtok = { token::horizontal_edge, name };
+                        return vector<token>(1, newtok);
+                    }
+                    prev = dash;
                 }
                 else
                 {
@@ -78,6 +88,8 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
             return L"named_node";
         case algo::token::edge_name:
             return L"edge_name";
+        case algo::token::horizontal_edge:
+            return L"horizontal_edge";
         default:
             return L"unknown token";
         }
@@ -113,6 +125,13 @@ namespace algo { namespace spec
         {
             auto tokens = ascii_tree::tokenize("a");
             Assert::AreEqual(token::edge_name, tokens.front().type);
+            Assert::AreEqual("a", tokens.front().name.c_str());
+        }
+
+        TEST_METHOD(should_recognize_an_horizontal_edge)
+        {
+            auto tokens = ascii_tree::tokenize("--a--");
+            Assert::AreEqual(token::horizontal_edge, tokens.front().type);
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
 
