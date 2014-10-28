@@ -1,8 +1,9 @@
 #include "CppUnitTest.h"
+#include <algorithm>
+#include <sstream>
 #include <cctype>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
@@ -240,7 +241,17 @@ namespace algo { namespace spec
             auto tokens = ascii_tree::tokenize("[*]-a-");
 
             auto mismatch_pair = std::mismatch(expected_tokens.begin(), expected_tokens.end(), tokens.begin());
-            Assert::IsTrue(expected_tokens.end() == mismatch_pair.first && tokens.end() == mismatch_pair.second);
+
+            if (mismatch_pair.first != expected_tokens.end() || mismatch_pair.second != tokens.end())
+            {
+                wstring expectedName(mismatch_pair.first->name.begin(), mismatch_pair.first->name.end());
+                wstring actualName(mismatch_pair.second->name.begin(), mismatch_pair.second->name.end());
+
+                wstring message = L"Expected: " + ToString(mismatch_pair.first->type) + L" \"" + expectedName + L"\" "
+                    + L"Actual: " + ToString(mismatch_pair.second->type) + L" \"" + actualName + L"\"";
+
+                Assert::Fail(message.c_str());
+            }
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_named_node)
