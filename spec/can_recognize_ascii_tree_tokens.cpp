@@ -152,9 +152,9 @@ namespace algo { namespace spec
 
         TEST_METHOD(should_recognize_a_named_node)
         {
-            auto tokens = ascii_tree::tokenize("[a]");
+            auto tokens = ascii_tree::tokenize("[_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]");
             Assert::AreEqual(token::named_node, tokens.front().type);
-            Assert::AreEqual("a", tokens.front().name.c_str());
+            Assert::AreEqual("_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", tokens.front().name.c_str());
         }
 
         TEST_METHOD(should_recognize_a_named_node_with_spaces)
