@@ -129,8 +129,8 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
 
 namespace algo { namespace spec
 {
-	TEST_CLASS(can_recognize_ascii_tree_tokens)
-	{
+    TEST_CLASS(can_recognize_ascii_tree_tokens)
+    {
         void tokens_should_match_(std::initializer_list<token> expected, vector<token>& actual)
         {
             auto mismatch_pair = std::mismatch(expected.begin(), expected.end(), actual.begin());
@@ -148,15 +148,15 @@ namespace algo { namespace spec
         }
 
     public:
-		
+        
         TEST_METHOD(should_not_recognize_any_tokens_in_an_empty_string)
         {
             auto tokens = ascii_tree::tokenize("");
             Assert::IsTrue(tokens.empty());
         }
 
-		TEST_METHOD(should_recognize_a_root_node)
-		{
+        TEST_METHOD(should_recognize_a_root_node)
+        {
             auto tokens = ascii_tree::tokenize("[*]");
             Assert::AreEqual(token::root_node, tokens.front().type);
         }
