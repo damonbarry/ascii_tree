@@ -288,5 +288,11 @@ namespace algo { namespace spec
             tokens_should_match_({ { token::root_node, "" }, { token::edge_name, "a" } }, tokens);
         }
 
+        TEST_METHOD(should_recognize_a_named_node_next_to_a_root_node)
+        {
+            auto tokens = ascii_tree::tokenize("[a][*]");
+            tokens_should_match_({ { token::named_node, "a" }, { token::root_node, "" } }, tokens);
+        }
+
     };
 }}
