@@ -131,7 +131,7 @@ namespace algo { namespace spec
 {
 	TEST_CLASS(can_recognize_ascii_tree_tokens)
 	{
-        void TokensShouldMatch_(std::initializer_list<token> expected, vector<token>& actual)
+        void tokens_should_match_(std::initializer_list<token> expected, vector<token>& actual)
         {
             auto mismatch_pair = std::mismatch(expected.begin(), expected.end(), actual.begin());
 
@@ -248,41 +248,20 @@ namespace algo { namespace spec
 
         TEST_METHOD(should_recognize_a_root_node_next_to_a_named_node)
         {
-            auto expected_tokens =
-            {
-                token { token::root_node, "" },
-                token { token::named_node, "a" }
-            };
-
             auto tokens = ascii_tree::tokenize("[*][a]");
-
-            TokensShouldMatch_(expected_tokens, tokens);
+            tokens_should_match_({ { token::root_node, "" }, { token::named_node, "a" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_root_node_next_to_a_horizontal_edge)
         {
-            auto expected_tokens =
-            {
-                token { token::root_node, "" },
-                token { token::horizontal_edge, "a" }
-            };
-
             auto tokens = ascii_tree::tokenize("[*]-a-");
-
-            TokensShouldMatch_(expected_tokens, tokens);
+            tokens_should_match_({ { token::root_node, "" }, { token::horizontal_edge, "a" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_named_node)
         {
-            auto expected_tokens =
-            {
-                token { token::horizontal_edge, "a" },
-                token { token::named_node, "b" }
-            };
-
             auto tokens = ascii_tree::tokenize("-a-[b]");
-
-            TokensShouldMatch_(expected_tokens, tokens);
+            tokens_should_match_({ { token::horizontal_edge, "a" }, { token::named_node, "b" } }, tokens);
         }
 
     };
