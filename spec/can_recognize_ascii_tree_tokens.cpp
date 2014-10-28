@@ -185,9 +185,21 @@ namespace algo { namespace spec
             Assert::AreEqual(token::ascending_edge_part, tokens.front().type);
         }
 
+        TEST_METHOD(should_recognize_an_ascending_edge_part_with_spaces)
+        {
+            auto tokens = ascii_tree::tokenize(" / ");
+            Assert::AreEqual(token::ascending_edge_part, tokens.front().type);
+        }
+
         TEST_METHOD(should_recognize_a_descending_edge_part)
         {
             auto tokens = ascii_tree::tokenize("\\");
+            Assert::AreEqual(token::descending_edge_part, tokens.front().type);
+        }
+
+        TEST_METHOD(should_recognize_a_descending_edge_part_with_spaces)
+        {
+            auto tokens = ascii_tree::tokenize(" \\ ");
             Assert::AreEqual(token::descending_edge_part, tokens.front().type);
         }
 
@@ -197,9 +209,22 @@ namespace algo { namespace spec
             Assert::AreEqual(token::vertical_edge_part, tokens.front().type);
         }
 
+        TEST_METHOD(should_recognize_a_vertical_edge_part_with_spaces)
+        {
+            auto tokens = ascii_tree::tokenize(" | ");
+            Assert::AreEqual(token::vertical_edge_part, tokens.front().type);
+        }
+
         TEST_METHOD(should_recognize_a_horizontal_edge)
         {
             auto tokens = ascii_tree::tokenize("-a-");
+            Assert::AreEqual(token::horizontal_edge, tokens.front().type);
+            Assert::AreEqual("a", tokens.front().name.c_str());
+        }
+
+        TEST_METHOD(should_recognize_a_horizontal_edge_with_spaces)
+        {
+            auto tokens = ascii_tree::tokenize(" - a - ");
             Assert::AreEqual(token::horizontal_edge, tokens.front().type);
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
