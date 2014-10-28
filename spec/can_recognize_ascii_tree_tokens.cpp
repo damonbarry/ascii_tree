@@ -183,7 +183,7 @@ namespace algo { namespace spec
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
 
-        TEST_METHOD(should_recognize_a_root_node_with_an_edge)
+        TEST_METHOD(should_recognize_a_root_node_next_to_a_horizontal_edge)
         {
             auto expected_tokens =
             {
@@ -197,7 +197,7 @@ namespace algo { namespace spec
             Assert::IsTrue(expected_tokens.end() == mismatch_pair.first && tokens.end() == mismatch_pair.second);
         }
 
-        TEST_METHOD(should_recognize_an_edge_with_a_named_node)
+        TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_named_node)
         {
             auto expected_tokens =
             {
