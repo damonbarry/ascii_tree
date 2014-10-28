@@ -131,7 +131,23 @@ namespace algo { namespace spec
 {
 	TEST_CLASS(can_recognize_ascii_tree_tokens)
 	{
-	public:
+        void TokensShouldMatch_(std::initializer_list<token> expected, vector<token>& actual)
+        {
+            auto mismatch_pair = std::mismatch(expected.begin(), expected.end(), actual.begin());
+
+            if (mismatch_pair.first != expected.end() || mismatch_pair.second != actual.end())
+            {
+                wstring expectedName(mismatch_pair.first->name.begin(), mismatch_pair.first->name.end());
+                wstring actualName(mismatch_pair.second->name.begin(), mismatch_pair.second->name.end());
+
+                wstring message = L"Expected: " + ToString(mismatch_pair.first->type) + L" \"" + expectedName + L"\" "
+                    + L"Actual: " + ToString(mismatch_pair.second->type) + L" \"" + actualName + L"\"";
+
+                Assert::Fail(message.c_str());
+            }
+        }
+
+    public:
 		
         TEST_METHOD(should_not_recognize_any_tokens_in_an_empty_string)
         {
@@ -240,18 +256,7 @@ namespace algo { namespace spec
 
             auto tokens = ascii_tree::tokenize("[*]-a-");
 
-            auto mismatch_pair = std::mismatch(expected_tokens.begin(), expected_tokens.end(), tokens.begin());
-
-            if (mismatch_pair.first != expected_tokens.end() || mismatch_pair.second != tokens.end())
-            {
-                wstring expectedName(mismatch_pair.first->name.begin(), mismatch_pair.first->name.end());
-                wstring actualName(mismatch_pair.second->name.begin(), mismatch_pair.second->name.end());
-
-                wstring message = L"Expected: " + ToString(mismatch_pair.first->type) + L" \"" + expectedName + L"\" "
-                    + L"Actual: " + ToString(mismatch_pair.second->type) + L" \"" + actualName + L"\"";
-
-                Assert::Fail(message.c_str());
-            }
+            TokensShouldMatch_(expected_tokens, tokens);
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_named_node)
@@ -264,8 +269,7 @@ namespace algo { namespace spec
 
             auto tokens = ascii_tree::tokenize("-a-[b]");
 
-            auto mismatch_pair = std::mismatch(expected_tokens.begin(), expected_tokens.end(), tokens.begin());
-            Assert::IsTrue(expected_tokens.end() == mismatch_pair.first && tokens.end() == mismatch_pair.second);
+            TokensShouldMatch_(expected_tokens, tokens);
         }
 
     };
