@@ -246,6 +246,19 @@ namespace algo { namespace spec
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
 
+        TEST_METHOD(should_recognize_a_root_node_next_to_a_named_node)
+        {
+            auto expected_tokens =
+            {
+                token { token::root_node, "" },
+                token { token::named_node, "a" }
+            };
+
+            auto tokens = ascii_tree::tokenize("[*][a]");
+
+            TokensShouldMatch_(expected_tokens, tokens);
+        }
+
         TEST_METHOD(should_recognize_a_root_node_next_to_a_horizontal_edge)
         {
             auto expected_tokens =
