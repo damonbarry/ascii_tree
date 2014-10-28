@@ -270,5 +270,11 @@ namespace algo { namespace spec
             tokens_should_match_({ { token::root_node, "" }, { token::descending_edge_part, "" } }, tokens);
         }
 
+        TEST_METHOD(should_recognize_a_root_node_next_to_an_ascending_edge_part)
+        {
+            auto tokens = ascii_tree::tokenize("[*]/");
+            tokens_should_match_({ { token::root_node, "" }, { token::ascending_edge_part, "" } }, tokens);
+        }
+
     };
 }}
