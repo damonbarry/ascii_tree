@@ -91,7 +91,7 @@ namespace algo
 
             if (prev == name_char)
             {
-                tokens.emplace_back(token { token::edge_name, s });
+                tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
             }
 
             return tokens;
@@ -152,9 +152,10 @@ namespace algo { namespace spec
 
         TEST_METHOD(should_recognize_a_named_node)
         {
-            auto tokens = ascii_tree::tokenize("[_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]");
+            const string all_chars = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            auto tokens = ascii_tree::tokenize("[" + all_chars + "]");
             Assert::AreEqual(token::named_node, tokens.front().type);
-            Assert::AreEqual("_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", tokens.front().name.c_str());
+            Assert::AreEqual(all_chars.c_str(), tokens.front().name.c_str());
         }
 
         TEST_METHOD(should_recognize_a_named_node_with_spaces)
@@ -167,6 +168,13 @@ namespace algo { namespace spec
         TEST_METHOD(should_recognize_an_edge_name)
         {
             auto tokens = ascii_tree::tokenize("a");
+            Assert::AreEqual(token::edge_name, tokens.front().type);
+            Assert::AreEqual("a", tokens.front().name.c_str());
+        }
+
+        TEST_METHOD(should_recognize_an_edge_name_with_spaces)
+        {
+            auto tokens = ascii_tree::tokenize(" a ");
             Assert::AreEqual(token::edge_name, tokens.front().type);
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
