@@ -157,6 +157,13 @@ namespace algo { namespace spec
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
 
+        TEST_METHOD(should_recognize_a_named_node_with_spaces)
+        {
+            auto tokens = ascii_tree::tokenize(" [ a ]");
+            Assert::AreEqual(token::named_node, tokens.front().type);
+            Assert::AreEqual("a", tokens.front().name.c_str());
+        }
+
         TEST_METHOD(should_recognize_an_edge_name)
         {
             auto tokens = ascii_tree::tokenize("a");
