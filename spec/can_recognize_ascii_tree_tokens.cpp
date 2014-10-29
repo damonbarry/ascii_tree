@@ -258,12 +258,6 @@ namespace algo { namespace spec
             tokens_should_match_({ { token::root_node, "" }, { token::horizontal_edge, "a" } }, tokens);
         }
 
-        TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_named_node)
-        {
-            auto tokens = ascii_tree::tokenize("-a-[b]");
-            tokens_should_match_({ { token::horizontal_edge, "a" }, { token::named_node, "b" } }, tokens);
-        }
-
         TEST_METHOD(should_recognize_a_root_node_next_to_a_descending_edge_part)
         {
             auto tokens = ascii_tree::tokenize("[*]\\");
@@ -328,6 +322,18 @@ namespace algo { namespace spec
         {
             auto tokens = ascii_tree::tokenize("[a]b");
             tokens_should_match_({ { token::named_node, "a" }, { token::edge_name, "b" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_root_node)
+        {
+            auto tokens = ascii_tree::tokenize("-a-[*]");
+            tokens_should_match_({ { token::horizontal_edge, "a" }, { token::root_node, "" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_named_node)
+        {
+            auto tokens = ascii_tree::tokenize("-a-[b]");
+            tokens_should_match_({ { token::horizontal_edge, "a" }, { token::named_node, "b" } }, tokens);
         }
 
     };
