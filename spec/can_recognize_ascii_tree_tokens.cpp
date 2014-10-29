@@ -72,7 +72,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_recognize_a_root_node_with_spaces)
         {
-            auto tokens = tokenize(" [ * ]");
+            auto tokens = tokenize(" [ * ] ");
             tokens_should_match_({ { token::root_node, "" } }, tokens);
         }
 
@@ -85,7 +85,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_recognize_a_named_node_with_spaces)
         {
-            auto tokens = tokenize(" [ a ]");
+            auto tokens = tokenize(" [ a ] ");
             tokens_should_match_({ { token::named_node, "a" } }, tokens);
         }
 
@@ -97,7 +97,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_recognize_an_edge_name_with_spaces)
         {
-            auto tokens = tokenize("( a )");
+            auto tokens = tokenize(" ( a ) ");
             tokens_should_match_({ { token::edge_name, "a" } }, tokens);
         }
 
