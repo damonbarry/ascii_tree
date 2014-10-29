@@ -143,14 +143,14 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_recognize_a_horizontal_edge)
         {
-            auto tokens = tokenize("-a-");
+            auto tokens = tokenize("-(a)-");
             Assert::AreEqual(token::horizontal_edge, tokens.front().type);
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_with_spaces)
         {
-            auto tokens = tokenize(" - a - ");
+            auto tokens = tokenize(" - ( a ) - ");
             Assert::AreEqual(token::horizontal_edge, tokens.front().type);
             Assert::AreEqual("a", tokens.front().name.c_str());
         }

@@ -26,7 +26,7 @@ namespace ascii_tree
         enum {
             none, open_square_brace, close_square_brace, asterisk, dash,
             open_paren, close_paren, name_char, slash, backslash, pipe
-        } prev = none;
+        } prev_ch = none, prev_prev_ch = none;
         size_t marker = 0, marked_length = 0;
 
         for (size_t i = 0; i < s.size(); ++i)
@@ -35,11 +35,11 @@ namespace ascii_tree
 
             if (ch == '[')
             {
-                prev = open_square_brace;
+                prev_ch = open_square_brace;
             }
             else if (ch == ']')
             {
-                if (prev == asterisk)
+                if (prev_ch == asterisk)
                 {
                     tokens.emplace_back(token { token::root_node, "" });
                 }
@@ -48,54 +48,63 @@ namespace ascii_tree
                     tokens.emplace_back(token { token::named_node, s.substr(marker, marked_length) });
                 }
 
-                prev = close_square_brace;
+                prev_ch = close_square_brace;
             }
             else if (ch == '*')
             {
-                prev = asterisk;
+                prev_ch = asterisk;
             }
             else if (ch == '-')
             {
-                if (prev == name_char)
+                if (prev_ch == name_char)
                 {
                     tokens.emplace_back(token { token::horizontal_edge, s.substr(marker, marked_length) });
                 }
 
-                prev = dash;
+                prev_ch = dash;
             }
             else if (ch == '/')
             {
                 tokens.emplace_back(token { token::ascending_edge_part, "" });
-                prev = slash;
+                prev_ch = slash;
             }
             else if (ch == '\\')
             {
                 tokens.emplace_back(token { token::descending_edge_part, "" });
-                prev = backslash;
+                prev_ch = backslash;
             }
             else if (ch == '|')
             {
                 tokens.emplace_back(token { token::vertical_edge_part, "" });
-                prev = pipe;
+                prev_ch = pipe;
             }
             else if (ch == '(')
             {
-                prev = open_paren;
+                if (prev_ch == dash) { prev_prev_ch = dash; }
+                prev_ch = open_paren;
             }
             else if (ch == ')')
             {
-                tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
-                prev = close_paren;
+                if (prev_prev_ch == dash)
+                {
+                    tokens.emplace_back(token { token::horizontal_edge, s.substr(marker, marked_length) });
+                }
+                else
+                {
+                    tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
+                }
+
+                prev_ch = close_paren;
             }
             else if (isalnum(ch) || ch == '_')
             {
-                if (prev != name_char)
+                if (prev_ch != name_char)
                 {
                     marker = i;
                     marked_length = 0;
                 }
 
-                prev = name_char;
+                prev_ch = name_char;
                 ++marked_length;
             }
         }
