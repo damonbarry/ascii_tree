@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FF0723F0-74F1-47AA-8458-834E980D0619}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>algo.spec</RootNamespace>
+    <RootNamespace>ascii_tree.spec</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
