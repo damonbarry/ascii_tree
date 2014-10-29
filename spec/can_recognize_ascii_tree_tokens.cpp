@@ -28,7 +28,7 @@ namespace algo
         static vector<token> tokenize(const string& s)
         {
             vector<token> tokens;
-            enum { none, open_square_brace, close_square_brace, asterisk, dash, name_char } prev = none;
+            enum { none, open_square_brace, close_square_brace, asterisk, dash, name_char, slash, backslash, pipe } prev = none;
             size_t marker = 0, marked_length = 0;
 
             for (size_t i = 0; i < s.size(); ++i)
@@ -37,6 +37,11 @@ namespace algo
 
                 if (ch == '[')
                 {
+                    if (prev == name_char)
+                    {
+                        tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
+                    }
+
                     prev = open_square_brace;
                 }
                 else if (ch == ']')
@@ -67,15 +72,33 @@ namespace algo
                 }
                 else if (ch == '/')
                 {
+                    if (prev == name_char)
+                    {
+                        tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
+                    }
+
                     tokens.emplace_back(token { token::ascending_edge_part, "" });
+                    prev = slash;
                 }
                 else if (ch == '\\')
                 {
+                    if (prev == name_char)
+                    {
+                        tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
+                    }
+
                     tokens.emplace_back(token { token::descending_edge_part, "" });
+                    prev = backslash;
                 }
                 else if (ch == '|')
                 {
+                    if (prev == name_char)
+                    {
+                        tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
+                    }
+
                     tokens.emplace_back(token { token::vertical_edge_part, "" });
+                    prev = pipe;
                 }
                 else if (isalnum(ch) || ch == '_')
                 {
@@ -443,6 +466,42 @@ namespace algo { namespace spec
             auto tokens = ascii_tree::tokenize("|a");
             tokens_should_match_({ { token::vertical_edge_part, "" }, { token::edge_name, "a" } }, tokens);
         }
+
+        TEST_METHOD(should_recognize_an_edge_name_next_to_a_root_node)
+        {
+            auto tokens = ascii_tree::tokenize("a[*]");
+            tokens_should_match_({ { token::edge_name, "a" }, { token::root_node, "" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_an_edge_name_next_to_a_named_node)
+        {
+            auto tokens = ascii_tree::tokenize("a[b]");
+            tokens_should_match_({ { token::edge_name, "a" }, { token::named_node, "b" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_an_edge_name_next_to_a_descending_edge_part)
+        {
+            auto tokens = ascii_tree::tokenize("a\\");
+            tokens_should_match_({ { token::edge_name, "a" }, { token::descending_edge_part, "" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_an_edge_name_next_to_an_ascending_edge_part)
+        {
+            auto tokens = ascii_tree::tokenize("a/");
+            tokens_should_match_({ { token::edge_name, "a" }, { token::ascending_edge_part, "" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_an_edge_name_next_to_a_vertical_edge_part)
+        {
+            auto tokens = ascii_tree::tokenize("a|");
+            tokens_should_match_({ { token::edge_name, "a" }, { token::vertical_edge_part, "" } }, tokens);
+        }
+
+        //TEST_METHOD(should_recognize_an_edge_name_next_to_an_edge_name)
+        //{
+        //    auto tokens = ascii_tree::tokenize("a b");
+        //    tokens_should_match_({ { token::edge_name, "a" }, { token::edge_name, "b" } }, tokens);
+        //}
 
     };
 }}
