@@ -324,5 +324,11 @@ namespace algo { namespace spec
             tokens_should_match_({ { token::named_node, "a" }, { token::vertical_edge_part, "" } }, tokens);
         }
 
+        TEST_METHOD(should_recognize_a_named_node_next_to_an_edge_name)
+        {
+            auto tokens = ascii_tree::tokenize("[a]b");
+            tokens_should_match_({ { token::named_node, "a" }, { token::edge_name, "b" } }, tokens);
+        }
+
     };
 }}
