@@ -6,7 +6,7 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
 
-namespace algo
+namespace ascii_tree
 {
     template<class Traits>
     class tokens
@@ -42,7 +42,7 @@ namespace algo
     };
 }
 
-namespace algo { namespace spec
+namespace ascii_tree { namespace spec
 {
     struct s { string val; };
 

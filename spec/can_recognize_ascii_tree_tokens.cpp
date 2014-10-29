@@ -134,7 +134,7 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
     }
 }}}
 
-namespace algo { namespace spec
+namespace ascii_tree { namespace spec
 {
     TEST_CLASS(can_recognize_ascii_tree_tokens)
     {
