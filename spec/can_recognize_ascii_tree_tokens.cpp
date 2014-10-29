@@ -67,92 +67,86 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_a_root_node)
         {
             auto tokens = tokenize("[*]");
-            Assert::AreEqual(token::root_node, tokens.front().type);
+            tokens_should_match_({ { token::root_node, "" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_root_node_with_spaces)
         {
             auto tokens = tokenize(" [ * ]");
-            Assert::AreEqual(token::root_node, tokens.front().type);
+            tokens_should_match_({ { token::root_node, "" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_named_node)
         {
             const string all_chars = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             auto tokens = tokenize("[" + all_chars + "]");
-            Assert::AreEqual(token::named_node, tokens.front().type);
-            Assert::AreEqual(all_chars.c_str(), tokens.front().name.c_str());
+            tokens_should_match_({ { token::named_node, all_chars.c_str() } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_named_node_with_spaces)
         {
             auto tokens = tokenize(" [ a ]");
-            Assert::AreEqual(token::named_node, tokens.front().type);
-            Assert::AreEqual("a", tokens.front().name.c_str());
+            tokens_should_match_({ { token::named_node, "a" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_an_edge_name)
         {
             auto tokens = tokenize("(a)");
-            Assert::AreEqual(token::edge_name, tokens.front().type);
-            Assert::AreEqual("a", tokens.front().name.c_str());
+            tokens_should_match_({ { token::edge_name, "a" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_an_edge_name_with_spaces)
         {
             auto tokens = tokenize("( a )");
-            Assert::AreEqual(token::edge_name, tokens.front().type);
-            Assert::AreEqual("a", tokens.front().name.c_str());
+            tokens_should_match_({ { token::edge_name, "a" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_an_ascending_edge_part)
         {
             auto tokens = tokenize("/");
-            Assert::AreEqual(token::ascending_edge_part, tokens.front().type);
+            tokens_should_match_({ { token::ascending_edge_part, "" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_an_ascending_edge_part_with_spaces)
         {
             auto tokens = tokenize(" / ");
-            Assert::AreEqual(token::ascending_edge_part, tokens.front().type);
+            tokens_should_match_({ { token::ascending_edge_part, "" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_descending_edge_part)
         {
             auto tokens = tokenize("\\");
-            Assert::AreEqual(token::descending_edge_part, tokens.front().type);
+            tokens_should_match_({ { token::descending_edge_part, "" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_descending_edge_part_with_spaces)
         {
             auto tokens = tokenize(" \\ ");
-            Assert::AreEqual(token::descending_edge_part, tokens.front().type);
+            tokens_should_match_({ { token::descending_edge_part, "" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_vertical_edge_part)
         {
             auto tokens = tokenize("|");
-            Assert::AreEqual(token::vertical_edge_part, tokens.front().type);
+            tokens_should_match_({ { token::vertical_edge_part, "" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_vertical_edge_part_with_spaces)
         {
             auto tokens = tokenize(" | ");
-            Assert::AreEqual(token::vertical_edge_part, tokens.front().type);
+            tokens_should_match_({ { token::vertical_edge_part, "" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge)
         {
             auto tokens = tokenize("-(a)-");
-            Assert::AreEqual(token::horizontal_edge, tokens.front().type);
-            Assert::AreEqual("a", tokens.front().name.c_str());
+            tokens_should_match_({ { token::horizontal_edge, "a" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_with_spaces)
         {
             auto tokens = tokenize(" - ( a ) - ");
-            Assert::AreEqual(token::horizontal_edge, tokens.front().type);
-            Assert::AreEqual("a", tokens.front().name.c_str());
+            tokens_should_match_({ { token::horizontal_edge, "a" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_with_uninterrupted_sequences_of_dashes)
