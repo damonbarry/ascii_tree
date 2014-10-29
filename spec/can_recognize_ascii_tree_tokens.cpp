@@ -36,6 +36,19 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
     }
 }}}
 
+namespace
+{
+    class tokens_assertions
+    {
+        const vector<token>& tokens_;
+    public:
+        explicit tokens_assertions(const vector<token>& tokens) : tokens_(tokens) {}
+        void should_be_empty() { Assert::IsTrue(tokens_.empty()); }
+    };
+
+    tokens_assertions _(const vector<token>& tokens) { return tokens_assertions(tokens); }
+}
+
 namespace ascii_tree { namespace spec
 {
     TEST_CLASS(can_recognize_ascii_tree_tokens)
@@ -61,7 +74,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_not_recognize_any_tokens_in_an_empty_string)
         {
             auto tokens = tokenize("");
-            Assert::IsTrue(tokens.empty());
+            _(tokens).should_be_empty();
         }
 
         TEST_METHOD(should_recognize_a_root_node)
