@@ -8,7 +8,7 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
 
-namespace algo
+namespace ascii_tree
 {
     struct token
     {
@@ -23,111 +23,110 @@ namespace algo
             && lhs.name == rhs.name;
     }
 
-    namespace ascii_tree
+    static vector<token> tokenize(const string& s)
     {
-        static vector<token> tokenize(const string& s)
+        vector<token> tokens;
+        enum { none, open_square_brace, close_square_brace, asterisk, dash, 
+            open_paren, close_paren, name_char, slash, backslash, pipe } prev = none;
+        size_t marker = 0, marked_length = 0;
+
+        for (size_t i = 0; i < s.size(); ++i)
         {
-            vector<token> tokens;
-            enum { none, open_square_brace, close_square_brace, asterisk, dash, 
-                open_paren, close_paren, name_char, slash, backslash, pipe } prev = none;
-            size_t marker = 0, marked_length = 0;
+            auto ch = s[i];
 
-            for (size_t i = 0; i < s.size(); ++i)
+            if (ch == '[')
             {
-                auto ch = s[i];
-
-                if (ch == '[')
-                {
-                    prev = open_square_brace;
-                }
-                else if (ch == ']')
-                {
-                    if (prev == asterisk)
-                    {
-                        tokens.emplace_back(token { token::root_node, "" });
-                    }
-                    else
-                    {
-                        tokens.emplace_back(token { token::named_node, s.substr(marker, marked_length) });
-                    }
-
-                    prev = close_square_brace;
-                }
-                else if (ch == '*')
-                {
-                    prev = asterisk;
-                }
-                else if (ch == '-')
-                {
-                    if (prev == name_char)
-                    {
-                        tokens.emplace_back(token { token::horizontal_edge, s.substr(marker, marked_length) });
-                    }
-
-                    prev = dash;
-                }
-                else if (ch == '/')
-                {
-                    tokens.emplace_back(token { token::ascending_edge_part, "" });
-                    prev = slash;
-                }
-                else if (ch == '\\')
-                {
-                    tokens.emplace_back(token { token::descending_edge_part, "" });
-                    prev = backslash;
-                }
-                else if (ch == '|')
-                {
-                    tokens.emplace_back(token { token::vertical_edge_part, "" });
-                    prev = pipe;
-                }
-                else if (ch == '(')
-                {
-                    prev = open_paren;
-                }
-                else if (ch == ')')
-                {
-                    tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
-                    prev = close_paren;
-                }
-                else if (isalnum(ch) || ch == '_')
-                {
-                    if (prev != name_char)
-                    {
-                        marker = i;
-                        marked_length = 0;
-                    }
-
-                    prev = name_char;
-                    ++marked_length;
-                }
+                prev = open_square_brace;
             }
+            else if (ch == ']')
+            {
+                if (prev == asterisk)
+                {
+                    tokens.emplace_back(token { token::root_node, "" });
+                }
+                else
+                {
+                    tokens.emplace_back(token { token::named_node, s.substr(marker, marked_length) });
+                }
 
-            return tokens;
+                prev = close_square_brace;
+            }
+            else if (ch == '*')
+            {
+                prev = asterisk;
+            }
+            else if (ch == '-')
+            {
+                if (prev == name_char)
+                {
+                    tokens.emplace_back(token { token::horizontal_edge, s.substr(marker, marked_length) });
+                }
+
+                prev = dash;
+            }
+            else if (ch == '/')
+            {
+                tokens.emplace_back(token { token::ascending_edge_part, "" });
+                prev = slash;
+            }
+            else if (ch == '\\')
+            {
+                tokens.emplace_back(token { token::descending_edge_part, "" });
+                prev = backslash;
+            }
+            else if (ch == '|')
+            {
+                tokens.emplace_back(token { token::vertical_edge_part, "" });
+                prev = pipe;
+            }
+            else if (ch == '(')
+            {
+                prev = open_paren;
+            }
+            else if (ch == ')')
+            {
+                tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
+                prev = close_paren;
+            }
+            else if (isalnum(ch) || ch == '_')
+            {
+                if (prev != name_char)
+                {
+                    marker = i;
+                    marked_length = 0;
+                }
+
+                prev = name_char;
+                ++marked_length;
+            }
         }
-    };
+
+        return tokens;
+    }
 }
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
 {
+    using namespace ascii_tree;
+
     template<>
-    wstring ToString<algo::token::toktype>(const algo::token::toktype& type)
+    wstring ToString<token::toktype>(const token::toktype& type)
     {
         switch (type)
         {
-        case algo::token::root_node:
+        case token::root_node:
             return L"root_node";
-        case algo::token::named_node:
+        case token::named_node:
             return L"named_node";
-        case algo::token::edge_name:
+        case token::edge_name:
             return L"edge_name";
-        case algo::token::horizontal_edge:
+        case token::horizontal_edge:
             return L"horizontal_edge";
-        case algo::token::ascending_edge_part:
+        case token::ascending_edge_part:
             return L"ascending_edge_part";
-        case algo::token::descending_edge_part:
+        case token::descending_edge_part:
             return L"descending_edge_part";
-        case algo::token::vertical_edge_part:
+        case token::vertical_edge_part:
             return L"vertical_edge_part";
         default:
             return L"unknown token";
