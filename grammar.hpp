@@ -99,7 +99,7 @@ namespace ascii_tree
             }
             else if (ch == '-')
             {
-                if (prev_ch == name_char)
+                if (prev_ch == close_paren)
                 {
                     tokens.emplace_back(token { token::horizontal_edge, s.substr(marker, marked_length) });
                 }
@@ -128,11 +128,7 @@ namespace ascii_tree
             }
             else if (ch == ')')
             {
-                if (prev_prev_ch == dash)
-                {
-                    tokens.emplace_back(token { token::horizontal_edge, s.substr(marker, marked_length) });
-                }
-                else
+                if (prev_prev_ch == none)
                 {
                     tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
                 }

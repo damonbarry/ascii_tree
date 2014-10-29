@@ -163,7 +163,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_recognize_a_root_node_next_to_a_horizontal_edge)
         {
-            auto tokens = tokenize("[*]-a-");
+            auto tokens = tokenize("[*]-(a)-");
             tokens_should_match_({ { token::root_node, "" }, { token::horizontal_edge, "a" } }, tokens);
         }
 
@@ -205,7 +205,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_recognize_a_named_node_next_to_a_horizontal_edge)
         {
-            auto tokens = tokenize("[a]-b-");
+            auto tokens = tokenize("[a]-(b)-");
             tokens_should_match_({ { token::named_node, "a" }, { token::horizontal_edge, "b" } }, tokens);
         }
 
@@ -235,13 +235,13 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_root_node)
         {
-            auto tokens = tokenize("-a-[*]");
+            auto tokens = tokenize("-(a)-[*]");
             tokens_should_match_({ { token::horizontal_edge, "a" }, { token::root_node, "" } }, tokens);
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_named_node)
         {
-            auto tokens = tokenize("-a-[b]");
+            auto tokens = tokenize("-(a)-[b]");
             tokens_should_match_({ { token::horizontal_edge, "a" }, { token::named_node, "b" } }, tokens);
         }
 
