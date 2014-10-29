@@ -5,6 +5,49 @@
 #include <string>
 #include <vector>
 
+#if 0
+
+GRAMMAR
+========
+
+tokens:           token
+                  tokens token
+
+token:            node
+                  horizontal-edge
+                  edge-part
+
+node:             root-node
+                  named-node
+
+root-node:        '[' '*' ']'
+
+named-node:       '[' node-name ']'
+
+node-name:        name-chars
+
+name-chars:       name-char
+                  name-chars name-char
+
+name-char:        alnum
+                  '_'
+
+alnum:            one of: [A-Za-z0-9]
+
+horizontal-edge:  edge-chars edge-name edge-chars
+
+edge-chars:       '-'
+                  edge-chars '-'
+
+edge-name:        '(' name-chars ')'
+
+edge-part:        '\'
+                  '|'
+                  '/'
+                  edge-name
+
+#endif
+
 namespace ascii_tree
 {
     struct token
