@@ -23,7 +23,7 @@ namespace algo
             && lhs.name == rhs.name;
     }
 
-    struct ascii_tree
+    namespace ascii_tree
     {
         static vector<token> tokenize(const string& s)
         {
