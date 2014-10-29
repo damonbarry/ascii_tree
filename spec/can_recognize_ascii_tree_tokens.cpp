@@ -372,5 +372,41 @@ namespace algo { namespace spec
             tokens_should_match_({ { token::descending_edge_part, "" }, { token::edge_name, "a" } }, tokens);
         }
 
+        TEST_METHOD(should_recognize_an_ascending_edge_part_next_to_a_root_node)
+        {
+            auto tokens = ascii_tree::tokenize("/[*]");
+            tokens_should_match_({ { token::ascending_edge_part, "" }, { token::root_node, "" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_an_ascending_edge_part_next_to_a_named_node)
+        {
+            auto tokens = ascii_tree::tokenize("/[a]");
+            tokens_should_match_({ { token::ascending_edge_part, "" }, { token::named_node, "a" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_an_ascending_edge_part_next_to_a_descending_edge_part)
+        {
+            auto tokens = ascii_tree::tokenize("/\\");
+            tokens_should_match_({ { token::ascending_edge_part, "" }, { token::descending_edge_part, "" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_an_ascending_edge_part_next_to_an_ascending_edge_part)
+        {
+            auto tokens = ascii_tree::tokenize("//");
+            tokens_should_match_({ { token::ascending_edge_part, "" }, { token::ascending_edge_part, "" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_an_ascending_edge_part_next_to_a_vertical_edge_part)
+        {
+            auto tokens = ascii_tree::tokenize("/|");
+            tokens_should_match_({ { token::ascending_edge_part, "" }, { token::vertical_edge_part, "" } }, tokens);
+        }
+
+        TEST_METHOD(should_recognize_an_ascending_edge_part_next_to_an_edge_name)
+        {
+            auto tokens = ascii_tree::tokenize("/a");
+            tokens_should_match_({ { token::ascending_edge_part, "" }, { token::edge_name, "a" } }, tokens);
+        }
+
     };
 }}
