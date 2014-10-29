@@ -155,6 +155,12 @@ namespace ascii_tree { namespace spec
             Assert::AreEqual("a", tokens.front().name.c_str());
         }
 
+        TEST_METHOD(should_recognize_a_horizontal_edge_with_uninterrupted_sequences_of_dashes)
+        {
+            auto tokens = tokenize("---(a)--");
+            tokens_should_match_({ { token::horizontal_edge, "a" } }, tokens);
+        }
+
         TEST_METHOD(should_recognize_a_root_node_next_to_a_named_node)
         {
             auto tokens = tokenize("[*][a]");
