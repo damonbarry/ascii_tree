@@ -1,6 +1,7 @@
 #if !defined(ASCII_TREE_GRAMMAR_H)
 #define ASCII_TREE_GRAMMAR_H
 
+#include <cctype>
 #include <string>
 #include <vector>
 
