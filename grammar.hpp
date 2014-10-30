@@ -1,6 +1,7 @@
 #if !defined(ASCII_TREE_GRAMMAR_H)
 #define ASCII_TREE_GRAMMAR_H
 
+#include <utility>
 #include <cctype>
 #include <string>
 #include <vector>
@@ -55,6 +56,8 @@ namespace ascii_tree
         enum toktype { root_node, named_node, edge_name, horizontal_edge, ascending_edge_part, descending_edge_part, vertical_edge_part };
         toktype type;
         std::string name;
+
+        token(toktype type, std::string&& name) : type(type), name(std::move(name)) {}
     };
 
     inline bool operator==(const token& lhs, const token& rhs)
