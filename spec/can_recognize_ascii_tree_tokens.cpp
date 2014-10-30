@@ -73,6 +73,11 @@ namespace
     {
         explicit named_node(string&& name) : token(token::named_node, std::move(name)) {}
     };
+
+    struct edge_name : public token
+    {
+        explicit edge_name(string&& name) : token(token::edge_name, std::move(name)) {}
+    };
 }
 
 namespace ascii_tree { namespace spec
@@ -115,13 +120,13 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_an_edge_name)
         {
             auto tokens = tokenize("(a)");
-            _(tokens).should_equal({ { token::edge_name, "a" } });
+            _(tokens).should_equal({ edge_name("a") });
         }
 
         TEST_METHOD(should_recognize_an_edge_name_with_spaces)
         {
             auto tokens = tokenize(" ( a ) ");
-            _(tokens).should_equal({ { token::edge_name, "a" } });
+            _(tokens).should_equal({ edge_name("a") });
         }
 
         TEST_METHOD(should_recognize_an_ascending_edge_part)
@@ -211,7 +216,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_a_root_node_next_to_an_edge_name)
         {
             auto tokens = tokenize("[*](a)");
-            _(tokens).should_equal({ root_node(), { token::edge_name, "a" } });
+            _(tokens).should_equal({ root_node(), edge_name("a") });
         }
 
         TEST_METHOD(should_recognize_a_named_node_next_to_a_root_node)
@@ -253,7 +258,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_a_named_node_next_to_an_edge_name)
         {
             auto tokens = tokenize("[a](b)");
-            _(tokens).should_equal({ named_node("a"), { token::edge_name, "b" } });
+            _(tokens).should_equal({ named_node("a"), edge_name("b") });
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_root_node)
@@ -301,7 +306,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_a_descending_edge_part_next_to_an_edge_name)
         {
             auto tokens = tokenize("\\(a)");
-            _(tokens).should_equal({ { token::descending_edge_part, "" }, { token::edge_name, "a" } });
+            _(tokens).should_equal({ { token::descending_edge_part, "" }, edge_name("a") });
         }
 
         TEST_METHOD(should_recognize_an_ascending_edge_part_next_to_a_root_node)
@@ -337,7 +342,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_an_ascending_edge_part_next_to_an_edge_name)
         {
             auto tokens = tokenize("/(a)");
-            _(tokens).should_equal({ { token::ascending_edge_part, "" }, { token::edge_name, "a" } });
+            _(tokens).should_equal({ { token::ascending_edge_part, "" }, edge_name("a") });
         }
 
         TEST_METHOD(should_recognize_a_vertical_edge_part_next_to_a_root_node)
@@ -373,43 +378,43 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_a_vertical_edge_part_next_to_an_edge_name)
         {
             auto tokens = tokenize("|(a)");
-            _(tokens).should_equal({ { token::vertical_edge_part, "" }, { token::edge_name, "a" } });
+            _(tokens).should_equal({ { token::vertical_edge_part, "" }, edge_name("a") });
         }
 
         TEST_METHOD(should_recognize_an_edge_name_next_to_a_root_node)
         {
             auto tokens = tokenize("(a)[*]");
-            _(tokens).should_equal({ { token::edge_name, "a" }, root_node() });
+            _(tokens).should_equal({ edge_name("a"), root_node() });
         }
 
         TEST_METHOD(should_recognize_an_edge_name_next_to_a_named_node)
         {
             auto tokens = tokenize("(a)[b]");
-            _(tokens).should_equal({ { token::edge_name, "a" }, named_node("b") });
+            _(tokens).should_equal({ edge_name("a"), named_node("b") });
         }
 
         TEST_METHOD(should_recognize_an_edge_name_next_to_a_descending_edge_part)
         {
             auto tokens = tokenize("(a)\\");
-            _(tokens).should_equal({ { token::edge_name, "a" }, { token::descending_edge_part, "" } });
+            _(tokens).should_equal({ edge_name("a"), { token::descending_edge_part, "" } });
         }
 
         TEST_METHOD(should_recognize_an_edge_name_next_to_an_ascending_edge_part)
         {
             auto tokens = tokenize("(a)/");
-            _(tokens).should_equal({ { token::edge_name, "a" }, { token::ascending_edge_part, "" } });
+            _(tokens).should_equal({ edge_name("a"), { token::ascending_edge_part, "" } });
         }
 
         TEST_METHOD(should_recognize_an_edge_name_next_to_a_vertical_edge_part)
         {
             auto tokens = tokenize("(a)|");
-            _(tokens).should_equal({ { token::edge_name, "a" }, { token::vertical_edge_part, "" } });
+            _(tokens).should_equal({ edge_name("a"), { token::vertical_edge_part, "" } });
         }
 
         TEST_METHOD(should_recognize_an_edge_name_next_to_an_edge_name)
         {
             auto tokens = tokenize("(a)(b)");
-            _(tokens).should_equal({ { token::edge_name, "a" }, { token::edge_name, "b" } });
+            _(tokens).should_equal({ edge_name("a"), edge_name("b") });
         }
 
     };
