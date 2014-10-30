@@ -78,6 +78,11 @@ namespace
     {
         explicit edge_name(string&& name) : token(token::edge_name, std::move(name)) {}
     };
+
+    struct horizontal_edge : public token
+    {
+        explicit horizontal_edge(string&& name) : token(token::horizontal_edge, std::move(name)) {}
+    };
 }
 
 namespace ascii_tree { namespace spec
@@ -168,19 +173,19 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_a_horizontal_edge)
         {
             auto tokens = tokenize("-(a)-");
-            _(tokens).should_equal({ { token::horizontal_edge, "a" } });
+            _(tokens).should_equal({ horizontal_edge("a") });
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_with_spaces)
         {
             auto tokens = tokenize(" - ( a ) - ");
-            _(tokens).should_equal({ { token::horizontal_edge, "a" } });
+            _(tokens).should_equal({ horizontal_edge("a") });
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_with_uninterrupted_sequences_of_dashes)
         {
             auto tokens = tokenize("---(a)--");
-            _(tokens).should_equal({ { token::horizontal_edge, "a" } });
+            _(tokens).should_equal({ horizontal_edge("a") });
         }
 
         TEST_METHOD(should_recognize_a_root_node_next_to_a_named_node)
@@ -192,7 +197,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_a_root_node_next_to_a_horizontal_edge)
         {
             auto tokens = tokenize("[*]-(a)-");
-            _(tokens).should_equal({ root_node(), { token::horizontal_edge, "a" } });
+            _(tokens).should_equal({ root_node(), horizontal_edge("a") });
         }
 
         TEST_METHOD(should_recognize_a_root_node_next_to_a_descending_edge_part)
@@ -234,7 +239,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_a_named_node_next_to_a_horizontal_edge)
         {
             auto tokens = tokenize("[a]-(b)-");
-            _(tokens).should_equal({ named_node("a"), { token::horizontal_edge, "b" } });
+            _(tokens).should_equal({ named_node("a"), horizontal_edge("b") });
         }
 
         TEST_METHOD(should_recognize_a_named_node_next_to_a_descending_edge_part)
@@ -264,13 +269,13 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_root_node)
         {
             auto tokens = tokenize("-(a)-[*]");
-            _(tokens).should_equal({ { token::horizontal_edge, "a" }, root_node() });
+            _(tokens).should_equal({ horizontal_edge("a"), root_node() });
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge_next_to_a_named_node)
         {
             auto tokens = tokenize("-(a)-[b]");
-            _(tokens).should_equal({ { token::horizontal_edge, "a" }, named_node("b") });
+            _(tokens).should_equal({ horizontal_edge("a"), named_node("b") });
         }
 
         TEST_METHOD(should_recognize_a_descending_edge_part_next_to_a_root_node)
