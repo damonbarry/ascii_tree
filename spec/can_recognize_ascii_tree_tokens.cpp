@@ -1,7 +1,6 @@
 #include "grammar.hpp"
 #include <CppUnitTest.h>
 #include <algorithm>
-#include <utility>
 #include <string>
 #include <vector>
 
@@ -63,41 +62,6 @@ namespace
     };
 
     tokens_assertions _(const vector<token>& tokens) { return tokens_assertions(tokens); }
-
-    struct root_node : public token
-    {
-        root_node() : token(token::root_node, "") {}
-    };
-
-    struct named_node : public token
-    {
-        explicit named_node(string&& name) : token(token::named_node, std::move(name)) {}
-    };
-
-    struct edge_name : public token
-    {
-        explicit edge_name(string&& name) : token(token::edge_name, std::move(name)) {}
-    };
-
-    struct horizontal_edge : public token
-    {
-        explicit horizontal_edge(string&& name) : token(token::horizontal_edge, std::move(name)) {}
-    };
-
-    struct ascending_edge_part : public token
-    {
-        ascending_edge_part() : token(token::ascending_edge_part, "") {}
-    };
-    
-    struct descending_edge_part : public token
-    {
-        descending_edge_part() : token(token::descending_edge_part, "") {}
-    };
-
-    struct vertical_edge_part : public token
-    {
-        vertical_edge_part() : token(token::vertical_edge_part, "") {}
-    };
 }
 
 namespace ascii_tree { namespace spec

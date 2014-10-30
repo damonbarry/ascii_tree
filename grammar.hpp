@@ -60,6 +60,41 @@ namespace ascii_tree
         token(toktype type, std::string&& name) : type(type), name(std::move(name)) {}
     };
 
+    struct root_node : public token
+    {
+        root_node() : token(token::root_node, "") {}
+    };
+
+    struct named_node : public token
+    {
+        explicit named_node(std::string&& name) : token(token::named_node, std::move(name)) {}
+    };
+
+    struct edge_name : public token
+    {
+        explicit edge_name(std::string&& name) : token(token::edge_name, std::move(name)) {}
+    };
+
+    struct horizontal_edge : public token
+    {
+        explicit horizontal_edge(std::string&& name) : token(token::horizontal_edge, std::move(name)) {}
+    };
+
+    struct ascending_edge_part : public token
+    {
+        ascending_edge_part() : token(token::ascending_edge_part, "") {}
+    };
+
+    struct descending_edge_part : public token
+    {
+        descending_edge_part() : token(token::descending_edge_part, "") {}
+    };
+
+    struct vertical_edge_part : public token
+    {
+        vertical_edge_part() : token(token::vertical_edge_part, "") {}
+    };
+
     inline bool operator==(const token& lhs, const token& rhs)
     {
         return lhs.type == rhs.type
@@ -87,11 +122,11 @@ namespace ascii_tree
             {
                 if (prev_ch == asterisk)
                 {
-                    tokens.emplace_back(token { token::root_node, "" });
+                    tokens.emplace_back(root_node());
                 }
                 else
                 {
-                    tokens.emplace_back(token { token::named_node, s.substr(marker, marked_length) });
+                    tokens.emplace_back(named_node(s.substr(marker, marked_length)));
                 }
 
                 prev_ch = close_square_brace;
@@ -104,24 +139,24 @@ namespace ascii_tree
             {
                 if (prev_ch == close_paren)
                 {
-                    tokens.emplace_back(token { token::horizontal_edge, s.substr(marker, marked_length) });
+                    tokens.emplace_back(horizontal_edge(s.substr(marker, marked_length)));
                 }
 
                 prev_ch = dash;
             }
             else if (ch == '/')
             {
-                tokens.emplace_back(token { token::ascending_edge_part, "" });
+                tokens.emplace_back(ascending_edge_part());
                 prev_ch = slash;
             }
             else if (ch == '\\')
             {
-                tokens.emplace_back(token { token::descending_edge_part, "" });
+                tokens.emplace_back(descending_edge_part());
                 prev_ch = backslash;
             }
             else if (ch == '|')
             {
-                tokens.emplace_back(token { token::vertical_edge_part, "" });
+                tokens.emplace_back(vertical_edge_part());
                 prev_ch = pipe;
             }
             else if (ch == '(')
@@ -133,7 +168,7 @@ namespace ascii_tree
             {
                 if (prev_prev_ch == none)
                 {
-                    tokens.emplace_back(token { token::edge_name, s.substr(marker, marked_length) });
+                    tokens.emplace_back(edge_name(s.substr(marker, marked_length)));
                 }
 
                 prev_ch = close_paren;
