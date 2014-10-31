@@ -80,6 +80,12 @@ namespace ascii_tree { namespace spec
             }
         }
 
+        TEST_METHOD(should_recognize_a_dash)
+        {
+            terminal term = to_terminal('-');
+            Assert::AreEqual(dash, term);
+        }
+
         //TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         //{
         //    grammar g("*");
