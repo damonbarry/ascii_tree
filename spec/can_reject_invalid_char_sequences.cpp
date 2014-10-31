@@ -27,10 +27,6 @@ namespace ascii_tree { namespace spec
                         L"value of ascii_tree_parse_exception::pos is wrong");
                     throw;
                 }
-                catch (...)
-                {
-                    throw;
-                }
             });
         }
 
@@ -40,7 +36,7 @@ namespace ascii_tree { namespace spec
         {
             expect_parse_exception_(ascii_tree_parse_exception("[]", 1), [&]
             {
-                auto tokens = tokenize("[]");
+                tokenize("[]");
             });
         }
 
@@ -48,7 +44,15 @@ namespace ascii_tree { namespace spec
         {
             expect_parse_exception_(ascii_tree_parse_exception("[!]", 1), [&]
             {
-                auto tokens = tokenize("[!]");
+                tokenize("[!]");
+            });
+        }
+
+        TEST_METHOD(should_reject_two_open_square_braces_in_a_row)
+        {
+            expect_parse_exception_({"[[", 1}, [&]
+            {
+                tokenize("[[");
             });
         }
 

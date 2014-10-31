@@ -97,6 +97,11 @@ namespace ascii_tree
 
             if (ch == '[')
             {
+                if (prev_ch == open_square_brace)
+                {
+                    throw ascii_tree_parse_exception(s, i);
+                }
+
                 prev_ch = open_square_brace;
             }
             else if (ch == ']')
