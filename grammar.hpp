@@ -51,6 +51,14 @@ edge-part:        '\'
 
 namespace ascii_tree
 {
+    struct ascii_tree_parse_exception
+    {
+        const std::string s;
+        const size_t pos;
+
+        ascii_tree_parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
+    };
+
     struct token
     {
         enum toktype { root_node, named_node, edge_name, horizontal_edge, ascending_edge_part, descending_edge_part, vertical_edge_part };
@@ -96,6 +104,10 @@ namespace ascii_tree
                 if (prev_ch == asterisk)
                 {
                     tokens.emplace_back(root_node());
+                }
+                else if (prev_ch == open_square_brace)
+                {
+                    throw ascii_tree_parse_exception(s, i);
                 }
                 else
                 {
