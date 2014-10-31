@@ -60,40 +60,13 @@ namespace ascii_tree
         token(toktype type, std::string&& name) : type(type), name(std::move(name)) {}
     };
 
-    struct root_node : public token
-    {
-        root_node() : token(token::root_node, "") {}
-    };
-
-    struct named_node : public token
-    {
-        explicit named_node(std::string&& name) : token(token::named_node, std::move(name)) {}
-    };
-
-    struct edge_name : public token
-    {
-        explicit edge_name(std::string&& name) : token(token::edge_name, std::move(name)) {}
-    };
-
-    struct horizontal_edge : public token
-    {
-        explicit horizontal_edge(std::string&& name) : token(token::horizontal_edge, std::move(name)) {}
-    };
-
-    struct ascending_edge_part : public token
-    {
-        ascending_edge_part() : token(token::ascending_edge_part, "") {}
-    };
-
-    struct descending_edge_part : public token
-    {
-        descending_edge_part() : token(token::descending_edge_part, "") {}
-    };
-
-    struct vertical_edge_part : public token
-    {
-        vertical_edge_part() : token(token::vertical_edge_part, "") {}
-    };
+    inline token root_node() { return token(token::root_node, ""); }
+    inline token named_node(std::string&& name) { return token(token::named_node, std::move(name)); }
+    inline token edge_name(std::string&& name) { return token(token::edge_name, std::move(name)); }
+    inline token horizontal_edge(std::string&& name) { return token(token::horizontal_edge, std::move(name)); }
+    inline token ascending_edge_part() { return token(token::ascending_edge_part, ""); }
+    inline token descending_edge_part() { return token(token::descending_edge_part, ""); }
+    inline token vertical_edge_part() { return token(token::vertical_edge_part, ""); }
 
     inline bool operator==(const token& lhs, const token& rhs)
     {
