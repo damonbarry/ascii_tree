@@ -86,6 +86,18 @@ namespace ascii_tree { namespace spec
             Assert::AreEqual(dash, term);
         }
 
+        TEST_METHOD(should_recognize_a_opening_paren)
+        {
+            terminal term = to_terminal('(');
+            Assert::AreEqual(open_paren, term);
+        }
+
+        TEST_METHOD(should_recognize_a_closing_paren)
+        {
+            terminal term = to_terminal(')');
+            Assert::AreEqual(close_paren, term);
+        }
+
         //TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         //{
         //    grammar g("*");
