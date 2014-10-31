@@ -51,14 +51,6 @@ edge-part:        '\'
 
 namespace ascii_tree
 {
-    struct ascii_tree_parse_exception
-    {
-        const std::string s;
-        const size_t pos;
-
-        ascii_tree_parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
-    };
-
     struct token
     {
         enum toktype { root_node, named_node, edge_name, horizontal_edge, ascending_edge_part, descending_edge_part, vertical_edge_part };
@@ -68,6 +60,12 @@ namespace ascii_tree
         token(toktype type, std::string&& name) : type(type), name(std::move(name)) {}
     };
 
+    inline bool operator==(const token& lhs, const token& rhs)
+    {
+        return lhs.type == rhs.type
+            && lhs.name == rhs.name;
+    }
+
     inline token root_node() { return token(token::root_node, ""); }
     inline token named_node(std::string&& name) { return token(token::named_node, std::move(name)); }
     inline token edge_name(std::string&& name) { return token(token::edge_name, std::move(name)); }
@@ -76,16 +74,18 @@ namespace ascii_tree
     inline token descending_edge_part() { return token(token::descending_edge_part, ""); }
     inline token vertical_edge_part() { return token(token::vertical_edge_part, ""); }
 
-    inline bool operator==(const token& lhs, const token& rhs)
-    {
-        return lhs.type == rhs.type
-            && lhs.name == rhs.name;
-    }
-
     enum Terminals
     {
         none, open_square_brace, close_square_brace, asterisk, dash,
         open_paren, close_paren, name_char, slash, backslash, pipe
+    };
+
+    struct ascii_tree_parse_exception
+    {
+        const std::string s;
+        const size_t pos;
+
+        ascii_tree_parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
     };
 
     inline std::vector<token> tokenize(const std::string& s)
