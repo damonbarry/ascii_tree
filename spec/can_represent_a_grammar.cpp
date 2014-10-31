@@ -47,7 +47,7 @@ namespace ascii_tree { namespace spec
     TEST_CLASS(can_represent_a_grammar)
     {
     public:
-        TEST_METHOD(should_recognize_an_open_square_brace)
+        TEST_METHOD(should_recognize_an_opening_square_brace)
         {
             terminal term = to_terminal('[');
             Assert::AreEqual(open_square_brace, term);
@@ -57,6 +57,12 @@ namespace ascii_tree { namespace spec
         {
             terminal term = to_terminal('*');
             Assert::AreEqual(asterisk, term);
+        }
+
+        TEST_METHOD(should_recognize_a_closing_square_brace)
+        {
+            terminal term = to_terminal(']');
+            Assert::AreEqual(close_square_brace, term);
         }
 
         //TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
