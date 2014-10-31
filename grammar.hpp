@@ -169,6 +169,10 @@ namespace ascii_tree
                 prev_ch = name_char;
                 ++marked_length;
             }
+            else if (ch != ' ')
+            {
+                throw ascii_tree_parse_exception(s, i);
+            }
         }
 
         return tokens;
