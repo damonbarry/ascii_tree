@@ -65,6 +65,21 @@ namespace ascii_tree { namespace spec
             Assert::AreEqual(close_square_brace, term);
         }
 
+        TEST_METHOD(should_recognize_a_name_char)
+        {
+            string name_chars =
+                "_"
+                "1234567890"
+                "abcdefghijklmnopqrstuvwxyz"
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            for (auto ch : name_chars)
+            {
+                terminal term = to_terminal(ch);
+                Assert::AreEqual(name_char, term, wstring(&ch, &ch + 1).c_str());
+            }
+        }
+
         //TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         //{
         //    grammar g("*");

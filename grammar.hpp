@@ -85,6 +85,7 @@ namespace ascii_tree
         if (ch == '[') return open_square_brace;
         else if (ch == '*') return asterisk;
         else if (ch == ']') return close_square_brace;
+        else if (isalnum(ch) || ch == '_') return name_char;
         return none;
     }
 
