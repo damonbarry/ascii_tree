@@ -98,6 +98,24 @@ namespace ascii_tree { namespace spec
             Assert::AreEqual(close_paren, term);
         }
 
+        TEST_METHOD(should_recognize_a_backslash)
+        {
+            terminal term = to_terminal('\\');
+            Assert::AreEqual(backslash, term);
+        }
+
+        TEST_METHOD(should_recognize_a_pipe)
+        {
+            terminal term = to_terminal('|');
+            Assert::AreEqual(pipe, term);
+        }
+
+        TEST_METHOD(should_recognize_a_slash)
+        {
+            terminal term = to_terminal('/');
+            Assert::AreEqual(slash, term);
+        }
+
         //TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         //{
         //    grammar g("*");

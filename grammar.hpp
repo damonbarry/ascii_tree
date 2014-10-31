@@ -89,6 +89,9 @@ namespace ascii_tree
         else if (ch == '-') return dash;
         else if (ch == '(') return open_paren;
         else if (ch == ')') return close_paren;
+        else if (ch == '\\') return backslash;
+        else if (ch == '|') return pipe;
+        else if (ch == '/') return slash;
         return none;
     }
 
