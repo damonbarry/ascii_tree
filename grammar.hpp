@@ -82,13 +82,16 @@ namespace ascii_tree
             && lhs.name == rhs.name;
     }
 
+    enum Terminals
+    {
+        none, open_square_brace, close_square_brace, asterisk, dash,
+        open_paren, close_paren, name_char, slash, backslash, pipe
+    };
+
     inline std::vector<token> tokenize(const std::string& s)
     {
         std::vector<token> tokens;
-        enum {
-            none, open_square_brace, close_square_brace, asterisk, dash,
-            open_paren, close_paren, name_char, slash, backslash, pipe
-        } prev_ch = none, prev_prev_ch = none;
+        Terminals prev_ch = none, prev_prev_ch = none;
         size_t marker = 0, marked_length = 0;
 
         for (size_t i = 0; i < s.size(); ++i)
