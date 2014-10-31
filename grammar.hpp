@@ -77,7 +77,7 @@ namespace ascii_tree
     enum terminal
     {
         none, open_square_brace, close_square_brace, asterisk, dash,
-        open_paren, close_paren, name_char, slash, backslash, pipe
+        open_paren, close_paren, name_char, slash, backslash, pipe, space
     };
 
     inline terminal to_terminal(char ch)
@@ -92,6 +92,7 @@ namespace ascii_tree
         else if (ch == '\\') return backslash;
         else if (ch == '|') return pipe;
         else if (ch == '/') return slash;
+        else if (ch == ' ') return space;
         return none;
     }
 
@@ -123,18 +124,18 @@ namespace ascii_tree
 
         for (size_t i = 0; i < s.size(); ++i)
         {
-            auto ch = s[i];
+            auto term = to_terminal(s[i]);
 
-            if (ch == '[')
+            if (term == open_square_brace)
             {
                 if (prev_ch == open_square_brace)
                 {
                     throw ascii_tree_parse_exception(s, i);
                 }
 
-                prev_ch = open_square_brace;
+                prev_ch = term;
             }
-            else if (ch == ']')
+            else if (term == close_square_brace)
             {
                 if (prev_ch == asterisk)
                 {
@@ -149,51 +150,51 @@ namespace ascii_tree
                     tokens.emplace_back(named_node(s.substr(marker, marked_length)));
                 }
 
-                prev_ch = close_square_brace;
+                prev_ch = term;
             }
-            else if (ch == '*')
+            else if (term == asterisk)
             {
-                prev_ch = asterisk;
+                prev_ch = term;
             }
-            else if (ch == '-')
+            else if (term == dash)
             {
                 if (prev_ch == close_paren)
                 {
                     tokens.emplace_back(horizontal_edge(s.substr(marker, marked_length)));
                 }
 
-                prev_ch = dash;
+                prev_ch = term;
             }
-            else if (ch == '/')
+            else if (term == slash)
             {
                 tokens.emplace_back(ascending_edge_part());
-                prev_ch = slash;
+                prev_ch = term;
             }
-            else if (ch == '\\')
+            else if (term == backslash)
             {
                 tokens.emplace_back(descending_edge_part());
-                prev_ch = backslash;
+                prev_ch = term;
             }
-            else if (ch == '|')
+            else if (term == pipe)
             {
                 tokens.emplace_back(vertical_edge_part());
-                prev_ch = pipe;
+                prev_ch = term;
             }
-            else if (ch == '(')
+            else if (term == open_paren)
             {
                 if (prev_ch == dash) { prev_prev_ch = dash; }
-                prev_ch = open_paren;
+                prev_ch = term;
             }
-            else if (ch == ')')
+            else if (term == close_paren)
             {
                 if (prev_prev_ch == none)
                 {
                     tokens.emplace_back(edge_name(s.substr(marker, marked_length)));
                 }
 
-                prev_ch = close_paren;
+                prev_ch = term;
             }
-            else if (isalnum(ch) || ch == '_')
+            else if (term == name_char)
             {
                 if (prev_ch != name_char)
                 {
@@ -201,10 +202,10 @@ namespace ascii_tree
                     marked_length = 0;
                 }
 
-                prev_ch = name_char;
+                prev_ch = term;
                 ++marked_length;
             }
-            else if (ch != ' ')
+            else if (term != space)
             {
                 throw ascii_tree_parse_exception(s, i);
             }
