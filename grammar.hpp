@@ -74,11 +74,29 @@ namespace ascii_tree
     inline token descending_edge_part() { return token(token::descending_edge_part, ""); }
     inline token vertical_edge_part() { return token(token::vertical_edge_part, ""); }
 
-    enum Terminals
+    enum terminal
     {
         none, open_square_brace, close_square_brace, asterisk, dash,
         open_paren, close_paren, name_char, slash, backslash, pipe
     };
+
+    inline terminal to_terminal(char ch)
+    {
+        if (ch == '[') return open_square_brace;
+        return none;
+    }
+
+    //class grammar
+    //{
+    //    const std::string s_;
+    //    std::string::const_iterator it_;
+    //public:
+    //    explicit grammar(const std::string& s) : s_(s), it_(s_.begin()) {}
+    //    bool accept(terminal term)
+    //    {
+    //        
+    //    }
+    //};
 
     struct ascii_tree_parse_exception
     {
@@ -91,7 +109,7 @@ namespace ascii_tree
     inline std::vector<token> tokenize(const std::string& s)
     {
         std::vector<token> tokens;
-        Terminals prev_ch = none, prev_prev_ch = none;
+        terminal prev_ch = none, prev_prev_ch = none;
         size_t marker = 0, marked_length = 0;
 
         for (size_t i = 0; i < s.size(); ++i)
