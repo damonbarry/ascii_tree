@@ -83,6 +83,7 @@ namespace ascii_tree
     inline terminal to_terminal(char ch)
     {
         if (ch == '[') return open_square_brace;
+        else if (ch == '*') return asterisk;
         return none;
     }
 

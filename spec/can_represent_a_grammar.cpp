@@ -53,6 +53,12 @@ namespace ascii_tree { namespace spec
             Assert::AreEqual(open_square_brace, term);
         }
 
+        TEST_METHOD(should_recognize_an_asterisk)
+        {
+            terminal term = to_terminal('*');
+            Assert::AreEqual(asterisk, term);
+        }
+
         //TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         //{
         //    grammar g("*");
