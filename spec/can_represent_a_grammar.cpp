@@ -135,5 +135,12 @@ namespace ascii_tree { namespace spec
             Assert::IsTrue(accepted);
         }
 
+        TEST_METHOD(should_not_accept_a_terminal_which_does_not_match_the_expected_value)
+        {
+            grammar g("*");
+            bool accepted = g.accept(pipe);
+            Assert::IsFalse(accepted);
+        }
+
     };
 }}
