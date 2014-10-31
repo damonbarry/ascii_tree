@@ -96,17 +96,18 @@ namespace ascii_tree
         return none;
     }
 
-    //class grammar
-    //{
-    //    const std::string s_;
-    //    std::string::const_iterator it_;
-    //public:
-    //    explicit grammar(const std::string& s) : s_(s), it_(s_.begin()) {}
-    //    bool accept(terminal term)
-    //    {
-    //        
-    //    }
-    //};
+    class grammar
+    {
+        const std::string s_;
+        std::string::const_iterator it_;
+    public:
+        explicit grammar(const std::string& s) : s_(s), it_(s_.begin()) {}
+        bool accept(terminal term)
+        {
+            terminal next_term = to_terminal(*it_);
+            return term == next_term;
+        }
+    };
 
     struct ascii_tree_parse_exception
     {

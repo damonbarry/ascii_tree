@@ -128,12 +128,12 @@ namespace ascii_tree { namespace spec
             Assert::AreEqual(none, term);
         }
 
-        //TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
-        //{
-        //    grammar g("*");
-        //    bool accepted = g.accept(asterisk);
-        //    Assert::IsTrue(accepted);
-        //}
+        TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
+        {
+            grammar g("*");
+            bool accepted = g.accept(asterisk);
+            Assert::IsTrue(accepted);
+        }
 
     };
 }}
