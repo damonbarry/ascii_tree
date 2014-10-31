@@ -122,6 +122,12 @@ namespace ascii_tree { namespace spec
             Assert::AreEqual(space, term);
         }
 
+        TEST_METHOD(should_not_recognize_an_invalid_char)
+        {
+            terminal term = to_terminal('~');
+            Assert::AreEqual(none, term);
+        }
+
         //TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         //{
         //    grammar g("*");
