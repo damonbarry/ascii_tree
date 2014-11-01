@@ -118,16 +118,33 @@ namespace ascii_tree
         bool accept(terminal term)
         {
             terminal next_term = to_terminal(*it_);
-            return term == next_term;
+            if (term == next_term)
+            {
+                ++it_;
+                return true;
+            }
+
+            return false;
         }
 
         void expect(terminal term)
         {
             terminal next_term = to_terminal(*it_);
-            if (term != next_term)
+            if (term == next_term)
+            {
+                ++it_;
+            }
+            else
             {
                 throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
             }
+        }
+
+        void root_node()
+        {
+            expect(open_square_brace);
+            expect(asterisk);
+            expect(close_square_brace);
         }
     };
 

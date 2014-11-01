@@ -161,5 +161,11 @@ namespace ascii_tree { namespace spec
             });
         }
 
+        TEST_METHOD(grammar_should_recognize_a_root_node)
+        {
+            grammar g("[*]");
+            should_not_throw([&]{ g.root_node(); });
+        }
+
     };
 }}
