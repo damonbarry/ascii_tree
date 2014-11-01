@@ -179,5 +179,11 @@ namespace ascii_tree { namespace spec
             should_not_throw([&]{ g.edge_name(); });
         }
 
+        TEST_METHOD(grammar_should_recognize_ascending_edge_part)
+        {
+            grammar g("/");
+            should_not_throw([&]{ g.ascending_edge_part(); });
+        }
+
     };
 }}

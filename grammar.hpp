@@ -155,6 +155,11 @@ namespace ascii_tree
             while (accept(name_char)) {}
             expect(close_paren);
         }
+
+        void ascending_edge_part()
+        {
+            expect(slash);
+        }
     };
 
     inline std::vector<token> tokenize(const std::string& s)
