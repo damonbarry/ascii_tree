@@ -165,6 +165,11 @@ namespace ascii_tree
         {
             expect(backslash);
         }
+
+        void vertical_edge_part()
+        {
+            expect(pipe);
+        }
     };
 
     inline std::vector<token> tokenize(const std::string& s)
