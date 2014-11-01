@@ -129,12 +129,7 @@ namespace ascii_tree
 
         void expect(terminal term)
         {
-            terminal next_term = to_terminal(*it_);
-            if (term == next_term)
-            {
-                ++it_;
-            }
-            else
+            if (!accept(term))
             {
                 throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
             }
