@@ -141,6 +141,13 @@ namespace ascii_tree
             expect(asterisk);
             expect(close_square_brace);
         }
+
+        void named_node()
+        {
+            expect(open_square_brace);
+            while (accept(name_char)) {}
+            expect(close_square_brace);
+        }
     };
 
     inline std::vector<token> tokenize(const std::string& s)
