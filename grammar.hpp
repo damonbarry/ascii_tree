@@ -96,6 +96,14 @@ namespace ascii_tree
         return none;
     }
 
+    struct ascii_tree_parse_exception
+    {
+        const std::string s;
+        const size_t pos;
+
+        ascii_tree_parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
+    };
+
     class grammar
     {
         const std::string s_;
@@ -107,14 +115,9 @@ namespace ascii_tree
             terminal next_term = to_terminal(*it_);
             return term == next_term;
         }
-    };
-
-    struct ascii_tree_parse_exception
-    {
-        const std::string s;
-        const size_t pos;
-
-        ascii_tree_parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
+        void expect(terminal term)
+        {
+        }
     };
 
     inline std::vector<token> tokenize(const std::string& s)

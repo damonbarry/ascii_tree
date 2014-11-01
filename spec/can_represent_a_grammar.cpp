@@ -1,4 +1,5 @@
 #include "grammar.hpp"
+#include "test_helpers.hpp"
 #include <CppUnitTest.h>
 #include <string>
 
@@ -140,6 +141,15 @@ namespace ascii_tree { namespace spec
             grammar g("*");
             bool accepted = g.accept(pipe);
             Assert::IsFalse(accepted);
+        }
+
+        TEST_METHOD(expect_should_not_throw_when_a_terminal_matches_the_expected_value)
+        {
+            should_not_throw([&]
+            {
+                grammar g("*");
+                g.expect(asterisk);
+            });
         }
 
     };
