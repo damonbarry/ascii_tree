@@ -148,6 +148,13 @@ namespace ascii_tree
             while (accept(name_char)) {}
             expect(close_square_brace);
         }
+
+        void edge_name()
+        {
+            expect(open_paren);
+            while (accept(name_char)) {}
+            expect(close_paren);
+        }
     };
 
     inline std::vector<token> tokenize(const std::string& s)

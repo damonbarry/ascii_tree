@@ -173,5 +173,11 @@ namespace ascii_tree { namespace spec
             should_not_throw([&]{ g.named_node(); });
         }
 
+        TEST_METHOD(grammar_should_recognize_an_edge_name)
+        {
+            grammar g("(abc)");
+            should_not_throw([&]{ g.edge_name(); });
+        }
+
     };
 }}
