@@ -152,5 +152,14 @@ namespace ascii_tree { namespace spec
             });
         }
 
+        TEST_METHOD(expect_should_throw_when_a_terminal_does_not_match_the_expected_value)
+        {
+            should_throw(ascii_tree_parse_exception("*", 0), [&]
+            {
+                grammar g("*");
+                g.expect(pipe);
+            });
+        }
+
     };
 }}

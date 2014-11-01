@@ -1,6 +1,7 @@
 #if !defined(ASCII_TREE_GRAMMAR_H)
 #define ASCII_TREE_GRAMMAR_H
 
+#include <iterator>
 #include <utility>
 #include <cctype>
 #include <string>
@@ -117,6 +118,11 @@ namespace ascii_tree
         }
         void expect(terminal term)
         {
+            terminal next_term = to_terminal(*it_);
+            if (term != next_term)
+            {
+                throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
+            }
         }
     };
 
