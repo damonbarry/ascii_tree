@@ -173,6 +173,14 @@ namespace ascii_tree { namespace spec
             should_not_throw([&]{ g.named_node(); });
         }
 
+        TEST_METHOD(grammar_should_reject_an_empty_node_when_it_expects_a_named_node)
+        {
+            grammar g("[]");
+            should_throw(ascii_tree_parse_exception("[]", 1), [&]{
+                g.named_node();
+            });
+        }
+
         TEST_METHOD(grammar_should_recognize_an_edge_name)
         {
             grammar g("(abc)");

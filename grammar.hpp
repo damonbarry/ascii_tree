@@ -147,6 +147,7 @@ namespace ascii_tree
         void named_node()
         {
             expect(open_square_brace);
+            expect(name_char);
             while (accept(name_char)) {}
             expect(close_square_brace);
         }
