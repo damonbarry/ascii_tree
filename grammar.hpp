@@ -117,6 +117,8 @@ namespace ascii_tree
 
         bool accept(terminal term)
         {
+            if (it_ == s_.end()) { return false; }
+
             terminal next_term = to_terminal(*it_);
             if (term == next_term)
             {
@@ -169,6 +171,13 @@ namespace ascii_tree
         void vertical_edge_part()
         {
             expect(pipe);
+        }
+
+        void horizontal_edge()
+        {
+            while (accept(dash)) {}
+            while (accept(name_char)) {}
+            while (accept(dash)) {}
         }
     };
 

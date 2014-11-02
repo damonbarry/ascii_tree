@@ -197,5 +197,11 @@ namespace ascii_tree { namespace spec
             should_not_throw([&]{ g.vertical_edge_part(); });
         }
 
+        TEST_METHOD(gramar_should_recognize_a_horizontal_edge)
+        {
+            grammar g("---xyz--");
+            should_not_throw([&]{ g.horizontal_edge(); });
+        }
+
     };
 }}
