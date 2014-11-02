@@ -118,6 +118,12 @@ namespace ascii_tree
             if (it_ == s_.end()) { return false; }
 
             terminal next_term = to_terminal(*it_);
+            while (next_term == space)
+            {
+                if (++it_ == s_.end()) { return false; }
+                next_term = to_terminal(*it_);
+            }
+
             if (term == next_term)
             {
                 ++it_;

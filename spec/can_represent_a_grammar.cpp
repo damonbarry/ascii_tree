@@ -167,6 +167,12 @@ namespace ascii_tree { namespace spec
             should_not_throw([&]{ g.root_node(); });
         }
 
+        TEST_METHOD(grammar_should_recognize_a_root_node_with_spaces)
+        {
+            grammar g(" [ * ] ");
+            should_not_throw([&]{ g.root_node(); });
+        }
+
         TEST_METHOD(grammar_should_recognize_a_named_node)
         {
             grammar g("[abc]");
