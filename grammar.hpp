@@ -25,9 +25,7 @@ token:                  root-node
 
 root-node:              '[' '*' ']'
 
-named-node:             '[' node-name ']'
-
-node-name:              name-chars
+named-node:             '[' name-chars ']'
 
 name-chars:             name-char
                         name-chars name-char
@@ -179,8 +177,10 @@ namespace ascii_tree
         {
             expect(dash);
             while (accept(dash)) {}
+            expect(open_paren);
             expect(name_char);
             while (accept(name_char)) {}
+            expect(close_paren);
             expect(dash);
             while (accept(dash)) {}
         }
