@@ -143,6 +143,13 @@ namespace ascii_tree { namespace spec
             Assert::IsFalse(accepted);
         }
 
+        TEST_METHOD(should_accept_a_terminal_with_preceeding_spaces)
+        {
+            grammar g("   *");
+            bool accepted = g.accept(asterisk);
+            Assert::IsTrue(accepted);
+        }
+
         TEST_METHOD(expect_should_not_throw_when_a_terminal_matches_the_expected_value)
         {
             should_not_throw([&]
@@ -164,12 +171,6 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(grammar_should_recognize_a_root_node)
         {
             grammar g("[*]");
-            should_not_throw([&]{ g.root_node(); });
-        }
-
-        TEST_METHOD(grammar_should_recognize_a_root_node_with_spaces)
-        {
-            grammar g(" [ * ] ");
             should_not_throw([&]{ g.root_node(); });
         }
 
