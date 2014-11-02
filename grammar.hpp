@@ -12,41 +12,41 @@
 GRAMMAR
 ========
 
-tokens:           token
-                  tokens token
+tokens:                 token
+                        tokens token
 
-token:            node
-                  horizontal-edge
-                  edge-part
+token:                  root-node
+                        named-node
+                        horizontal-edge
+                        descending-edge-part
+                        vertical-edge-part
+                        ascending-edge-part
+                        edge-name
 
-node:             root-node
-                  named-node
+root-node:              '[' '*' ']'
 
-root-node:        '[' '*' ']'
+named-node:             '[' node-name ']'
 
-named-node:       '[' node-name ']'
+node-name:              name-chars
 
-node-name:        name-chars
+name-chars:             name-char
+                        name-chars name-char
 
-name-chars:       name-char
-                  name-chars name-char
+name-char:              alnum
+                        '_'
 
-name-char:        alnum
-                  '_'
+alnum:                  one of: [A-Za-z0-9]
 
-alnum:            one of: [A-Za-z0-9]
+horizontal-edge:        edge-chars edge-name edge-chars
 
-horizontal-edge:  edge-chars edge-name edge-chars
+edge-chars:             '-'
+                        edge-chars '-'
 
-edge-chars:       '-'
-                  edge-chars '-'
+descending-edge-part    '\'
+vertical-edge-part      '|'
+ascending-edge-part     '/'
+edge-name:              '(' name-chars ')'
 
-edge-name:        '(' name-chars ')'
-
-edge-part:        '\'
-                  '|'
-                  '/'
-                  edge-name
 
 #endif
 
