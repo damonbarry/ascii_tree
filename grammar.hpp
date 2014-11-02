@@ -155,6 +155,7 @@ namespace ascii_tree
         void edge_name()
         {
             expect(open_paren);
+            expect(name_char);
             while (accept(name_char)) {}
             expect(close_paren);
         }

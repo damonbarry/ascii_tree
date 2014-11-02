@@ -187,6 +187,14 @@ namespace ascii_tree { namespace spec
             should_not_throw([&]{ g.edge_name(); });
         }
 
+        TEST_METHOD(grammar_should_reject_an_empty_edge_name)
+        {
+            grammar g("()");
+            should_throw(ascii_tree_parse_exception("()", 1), [&]{
+                g.edge_name();
+            });
+        }
+
         TEST_METHOD(grammar_should_recognize_an_ascending_edge_part)
         {
             grammar g("/");
