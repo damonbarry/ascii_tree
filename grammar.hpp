@@ -177,8 +177,11 @@ namespace ascii_tree
 
         void horizontal_edge()
         {
+            expect(dash);
             while (accept(dash)) {}
+            expect(name_char);
             while (accept(name_char)) {}
+            expect(dash);
             while (accept(dash)) {}
         }
     };

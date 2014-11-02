@@ -219,5 +219,12 @@ namespace ascii_tree { namespace spec
             should_not_throw([&]{ g.horizontal_edge(); });
         }
 
+        TEST_METHOD(grammar_should_reject_a_nameless_horizontal_edge)
+        {
+            grammar g("--");
+            should_throw(ascii_tree_parse_exception("--", 2), [&]{
+                g.horizontal_edge();
+            });
+        }
     };
 }}
