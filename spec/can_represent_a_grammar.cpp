@@ -50,19 +50,19 @@ namespace ascii_tree { namespace spec
     public:
         TEST_METHOD(should_recognize_an_opening_square_brace)
         {
-            terminal term = to_terminal('[');
+            terminal term = terminal_traits::to_terminal('[');
             Assert::AreEqual(open_square_brace, term);
         }
 
         TEST_METHOD(should_recognize_an_asterisk)
         {
-            terminal term = to_terminal('*');
+            terminal term = terminal_traits::to_terminal('*');
             Assert::AreEqual(asterisk, term);
         }
 
         TEST_METHOD(should_recognize_a_closing_square_brace)
         {
-            terminal term = to_terminal(']');
+            terminal term = terminal_traits::to_terminal(']');
             Assert::AreEqual(close_square_brace, term);
         }
 
@@ -76,76 +76,76 @@ namespace ascii_tree { namespace spec
 
             for (auto ch : name_chars)
             {
-                terminal term = to_terminal(ch);
+                terminal term = terminal_traits::to_terminal(ch);
                 Assert::AreEqual(name_char, term, wstring(&ch, &ch + 1).c_str());
             }
         }
 
         TEST_METHOD(should_recognize_a_dash)
         {
-            terminal term = to_terminal('-');
+            terminal term = terminal_traits::to_terminal('-');
             Assert::AreEqual(dash, term);
         }
 
         TEST_METHOD(should_recognize_a_opening_paren)
         {
-            terminal term = to_terminal('(');
+            terminal term = terminal_traits::to_terminal('(');
             Assert::AreEqual(open_paren, term);
         }
 
         TEST_METHOD(should_recognize_a_closing_paren)
         {
-            terminal term = to_terminal(')');
+            terminal term = terminal_traits::to_terminal(')');
             Assert::AreEqual(close_paren, term);
         }
 
         TEST_METHOD(should_recognize_a_backslash)
         {
-            terminal term = to_terminal('\\');
+            terminal term = terminal_traits::to_terminal('\\');
             Assert::AreEqual(backslash, term);
         }
 
         TEST_METHOD(should_recognize_a_pipe)
         {
-            terminal term = to_terminal('|');
+            terminal term = terminal_traits::to_terminal('|');
             Assert::AreEqual(pipe, term);
         }
 
         TEST_METHOD(should_recognize_a_slash)
         {
-            terminal term = to_terminal('/');
+            terminal term = terminal_traits::to_terminal('/');
             Assert::AreEqual(slash, term);
         }
 
         TEST_METHOD(should_recognize_a_space)
         {
-            terminal term = to_terminal(' ');
+            terminal term = terminal_traits::to_terminal(' ');
             Assert::AreEqual(space, term);
         }
 
         TEST_METHOD(should_not_recognize_an_invalid_char)
         {
-            terminal term = to_terminal('~');
+            terminal term = terminal_traits::to_terminal('~');
             Assert::AreEqual(none, term);
         }
 
         TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         {
-            parser p("*");
+            parser<terminal_traits> p("*");
             bool accepted = p.accept(asterisk);
             Assert::IsTrue(accepted);
         }
 
         TEST_METHOD(should_not_accept_a_terminal_which_does_not_match_the_expected_value)
         {
-            parser p("*");
+            parser<terminal_traits> p("*");
             bool accepted = p.accept(pipe);
             Assert::IsFalse(accepted);
         }
 
         TEST_METHOD(should_accept_a_terminal_with_preceeding_spaces)
         {
-            parser p("   *");
+            parser<terminal_traits> p("   *");
             bool accepted = p.accept(asterisk);
             Assert::IsTrue(accepted);
         }
@@ -154,7 +154,7 @@ namespace ascii_tree { namespace spec
         {
             should_not_throw([&]
             {
-                parser p("*");
+                parser<terminal_traits> p("*");
                 p.expect(asterisk);
             });
         }
@@ -163,7 +163,7 @@ namespace ascii_tree { namespace spec
         {
             should_throw(ascii_tree_parse_exception("*", 0), [&]
             {
-                parser p("*");
+                parser<terminal_traits> p("*");
                 p.expect(pipe);
             });
         }

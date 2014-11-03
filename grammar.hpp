@@ -79,21 +79,26 @@ namespace ascii_tree
         open_paren, close_paren, name_char, slash, backslash, pipe, space
     };
 
-    inline terminal to_terminal(char ch)
+    struct terminal_traits
     {
-        if (ch == '[') return open_square_brace;
-        else if (ch == '*') return asterisk;
-        else if (ch == ']') return close_square_brace;
-        else if (isalnum(ch) || ch == '_') return name_char;
-        else if (ch == '-') return dash;
-        else if (ch == '(') return open_paren;
-        else if (ch == ')') return close_paren;
-        else if (ch == '\\') return backslash;
-        else if (ch == '|') return pipe;
-        else if (ch == '/') return slash;
-        else if (ch == ' ') return space;
-        return none;
-    }
+        typedef terminal type;
+
+        static terminal terminal_traits::to_terminal(char ch)
+        {
+            if (ch == '[') return open_square_brace;
+            else if (ch == '*') return asterisk;
+            else if (ch == ']') return close_square_brace;
+            else if (isalnum(ch) || ch == '_') return name_char;
+            else if (ch == '-') return dash;
+            else if (ch == '(') return open_paren;
+            else if (ch == ')') return close_paren;
+            else if (ch == '\\') return backslash;
+            else if (ch == '|') return pipe;
+            else if (ch == '/') return slash;
+            else if (ch == ' ') return space;
+            return none;
+        }
+    };
 
     struct ascii_tree_parse_exception
     {
@@ -103,8 +108,11 @@ namespace ascii_tree
         ascii_tree_parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
     };
 
+    template<class TerminalTraits>
     class parser
     {
+        typedef typename TerminalTraits::type terminal;
+
         const std::string s_;
         std::string::const_iterator it_;
 
@@ -113,7 +121,7 @@ namespace ascii_tree
             eat_spaces();
             if (it_ == s_.end()) { return s_.end(); }
 
-            terminal next_term = to_terminal(*it_);
+            terminal next_term = TerminalTraits::to_terminal(*it_);
             return (term == next_term) ? it_++ : s_.end();
         }
 
@@ -127,13 +135,13 @@ namespace ascii_tree
         std::string::const_iterator eat_spaces()
         {
             if (it_ == s_.end()) { return s_.end(); }
-            while (to_terminal(*it_) == space && ++it_ != s_.end()) {}
+            while (TerminalTraits::to_terminal(*it_) == space && ++it_ != s_.end()) {}
             return it_;
         }
 
         void uneat_spaces()
         {
-            while (to_terminal(*(it_ - 1)) == space) { --it_; }
+            while (TerminalTraits::to_terminal(*(it_ - 1)) == space) { --it_; }
         }
 
         position save_position()
@@ -180,7 +188,7 @@ namespace ascii_tree
 
     class grammar
     {
-        parser p_;
+        parser<terminal_traits> p_;
 
         std::string expect_name_chars_()
         {
