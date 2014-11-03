@@ -103,5 +103,12 @@ namespace ascii_tree { namespace spec
                 p.expect(two);
             });
         }
+
+        TEST_METHOD(substr_should_return_the_string_starting_from_the_given_position)
+        {
+            parser<test_traits> p("12121", 4);
+            string str = p.substr(p.save_position() - 3);
+            Assert::AreEqual("212", str.c_str());
+        }
     };
 }}
