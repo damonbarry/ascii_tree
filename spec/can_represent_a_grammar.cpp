@@ -131,22 +131,22 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         {
-            grammar g("*");
-            bool accepted = g.accept(asterisk);
+            parser p("*");
+            bool accepted = p.accept(asterisk);
             Assert::IsTrue(accepted);
         }
 
         TEST_METHOD(should_not_accept_a_terminal_which_does_not_match_the_expected_value)
         {
-            grammar g("*");
-            bool accepted = g.accept(pipe);
+            parser p("*");
+            bool accepted = p.accept(pipe);
             Assert::IsFalse(accepted);
         }
 
         TEST_METHOD(should_accept_a_terminal_with_preceeding_spaces)
         {
-            grammar g("   *");
-            bool accepted = g.accept(asterisk);
+            parser p("   *");
+            bool accepted = p.accept(asterisk);
             Assert::IsTrue(accepted);
         }
 
@@ -154,8 +154,8 @@ namespace ascii_tree { namespace spec
         {
             should_not_throw([&]
             {
-                grammar g("*");
-                g.expect(asterisk);
+                parser p("*");
+                p.expect(asterisk);
             });
         }
 
@@ -163,8 +163,8 @@ namespace ascii_tree { namespace spec
         {
             should_throw(ascii_tree_parse_exception("*", 0), [&]
             {
-                grammar g("*");
-                g.expect(pipe);
+                parser p("*");
+                p.expect(pipe);
             });
         }
 

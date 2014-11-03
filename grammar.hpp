@@ -103,61 +103,53 @@ namespace ascii_tree
         ascii_tree_parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
     };
 
-    class grammar
+    class parser
     {
         const std::string s_;
         std::string::const_iterator it_;
 
-        std::string::const_iterator eat_spaces_()
-        {
-            if (it_ == s_.end()) { return s_.end(); }
-            while (to_terminal(*it_) == space && ++it_ != s_.end()) {}
-            return it_;
-        }
-
         std::string::const_iterator accept_(terminal term)
         {
-            eat_spaces_();
+            eat_spaces();
             if (it_ == s_.end()) { return s_.end(); }
 
             terminal next_term = to_terminal(*it_);
             return (term == next_term) ? it_++ : s_.end();
         }
 
-        std::string expect_name_chars_()
-        {
-            auto begin = expect(name_char);
-            while (accept(name_char)) {}
-            while (to_terminal(*(it_ - 1)) == space) { --it_; } // strip trailing spaces
-            return std::string(begin, it_);
-        }
-
-        bool at_end_()
-        {
-            return it_ == s_.end();
-        }
-
+    public:
         typedef std::string::const_iterator position;
 
-        position save_position_()
+        explicit parser(const std::string& s)
+            : s_(s), it_(s_.begin())
+        {}
+
+        std::string::const_iterator eat_spaces()
+        {
+            if (it_ == s_.end()) { return s_.end(); }
+            while (to_terminal(*it_) == space && ++it_ != s_.end()) {}
+            return it_;
+        }
+
+        void uneat_spaces()
+        {
+            while (to_terminal(*(it_ - 1)) == space) { --it_; }
+        }
+
+        position save_position()
         {
             return it_;
         }
 
-        void restore_position_(const position& pos)
+        void restore_position(const position& pos)
         {
             it_ = pos;
         }
 
-        void error_()
+        bool at_end()
         {
-            throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
+            return it_ == s_.end();
         }
-
-    public:
-        explicit grammar(const std::string& s)
-            : s_(s), it_(s_.begin())
-        {}
 
         bool accept(terminal term)
         {
@@ -175,108 +167,136 @@ namespace ascii_tree
             return it;
         }
 
+        std::string substr(std::string::const_iterator start)
+        {
+            return std::string(start, it_);
+        }
+
+        void error()
+        {
+            throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
+        }
+    };
+
+    class grammar
+    {
+        parser p_;
+
+        std::string expect_name_chars_()
+        {
+            auto begin = p_.expect(name_char);
+            while (p_.accept(name_char)) {}
+            p_.uneat_spaces();
+            return p_.substr(begin);
+        }
+
+    public:
+        explicit grammar(const std::string& s)
+            : p_(s)
+        {}
+
         token root_node()
         {
-            expect(open_square_brace);
-            expect(asterisk);
-            expect(close_square_brace);
+            p_.expect(open_square_brace);
+            p_.expect(asterisk);
+            p_.expect(close_square_brace);
             return ascii_tree::root_node();
         }
 
         token named_node()
         {
-            expect(open_square_brace);
+            p_.expect(open_square_brace);
             auto name = expect_name_chars_();
-            expect(close_square_brace);
+            p_.expect(close_square_brace);
             return ascii_tree::named_node(std::move(name));
         }
 
         token edge_name()
         {
-            expect(open_paren);
+            p_.expect(open_paren);
             auto name = expect_name_chars_();
-            expect(close_paren);
+            p_.expect(close_paren);
             return ascii_tree::edge_name(std::move(name));
         }
 
         token ascending_edge_part()
         {
-            expect(slash);
+            p_.expect(slash);
             return ascii_tree::ascending_edge_part();
         }
 
         token descending_edge_part()
         {
-            expect(backslash);
+            p_.expect(backslash);
             return ascii_tree::descending_edge_part();
         }
 
         token vertical_edge_part()
         {
-            expect(pipe);
+            p_.expect(pipe);
             return ascii_tree::vertical_edge_part();
         }
 
         token horizontal_edge()
         {
-            expect(dash);
-            while (accept(dash)) {}
-            expect(open_paren);
+            p_.expect(dash);
+            while (p_.accept(dash)) {}
+            p_.expect(open_paren);
             auto name = expect_name_chars_();
-            expect(close_paren);
-            expect(dash);
-            while (accept(dash)) {}
+            p_.expect(close_paren);
+            p_.expect(dash);
+            while (p_.accept(dash)) {}
             return ascii_tree::horizontal_edge(std::move(name));
         }
 
         std::vector<token> tokens()
         {
             std::vector<token> tokens;
-            while (eat_spaces_(), !at_end_())
+            while (p_.eat_spaces(), !p_.at_end())
             {
-                auto pos = save_position_();
+                auto pos = p_.save_position();
 
-                if (accept(open_square_brace))
+                if (p_.accept(open_square_brace))
                 {
-                    if (accept(asterisk))
+                    if (p_.accept(asterisk))
                     {
-                        restore_position_(pos);
+                        p_.restore_position(pos);
                         tokens.emplace_back(root_node());
                     }
                     else
                     {
-                        restore_position_(pos);
+                        p_.restore_position(pos);
                         tokens.emplace_back(named_node());
                     }
                 }
-                else if (accept(dash))
+                else if (p_.accept(dash))
                 {
-                    restore_position_(pos);
+                    p_.restore_position(pos);
                     tokens.emplace_back(horizontal_edge());
                 }
-                else if (accept(backslash))
+                else if (p_.accept(backslash))
                 {
-                    restore_position_(pos);
+                    p_.restore_position(pos);
                     tokens.emplace_back(descending_edge_part());
                 }
-                else if (accept(pipe))
+                else if (p_.accept(pipe))
                 {
-                    restore_position_(pos);
+                    p_.restore_position(pos);
                     tokens.emplace_back(vertical_edge_part());
                 }
-                else if (accept(slash))
+                else if (p_.accept(slash))
                 {
-                    restore_position_(pos);
+                    p_.restore_position(pos);
                     tokens.emplace_back(ascending_edge_part());
                 }
-                else if (accept(open_paren))
+                else if (p_.accept(open_paren))
                 {
-                    restore_position_(pos);
+                    p_.restore_position(pos);
                     tokens.emplace_back(edge_name());
                 }
                 else
                 {
-                    error_();
+                    p_.error();
                 }
             }
 
