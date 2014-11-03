@@ -45,7 +45,7 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
 
 namespace ascii_tree { namespace spec
 {
-    TEST_CLASS(can_represent_a_grammar)
+    TEST_CLASS(can_recognize_ascii_tree_chars)
     {
     public:
         TEST_METHOD(should_recognize_an_opening_square_brace)

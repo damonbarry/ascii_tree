@@ -24,7 +24,7 @@
     <ClCompile Include="..\spec\can_reject_invalid_char_sequences.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\spec\can_represent_a_grammar.cpp">
+    <ClCompile Include="..\spec\can_recognize_ascii_tree_chars.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
