@@ -50,93 +50,72 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_recognize_a_root_node)
         {
-            auto tokens = tokenize("[*]");
-            _(tokens).should_equal({ root_node() });
-        }
-
-        TEST_METHOD(should_recognize_a_root_node_with_spaces)
-        {
-            auto tokens = tokenize(" [ * ] ");
-            _(tokens).should_equal({ root_node() });
+            grammar g("[*]");
+            token tok = g.root_node();
+            Assert::AreEqual(root_node(), tok);
         }
 
         TEST_METHOD(should_recognize_a_named_node)
         {
-            const string all_chars = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            auto tokens = tokenize("[" + all_chars + "]");
-            _(tokens).should_equal({ named_node(all_chars.c_str()) });
+            grammar g("[abc]");
+            token tok = g.named_node();
+            Assert::AreEqual(named_node("abc"), tok);
         }
 
-        TEST_METHOD(should_recognize_a_named_node_with_spaces)
+        TEST_METHOD(should_reject_an_empty_node_when_it_expects_a_named_node)
         {
-            auto tokens = tokenize(" [ a ] ");
-            _(tokens).should_equal({ named_node("a") });
+            grammar g("[]");
+            should_throw(ascii_tree_parse_exception("[]", 1), [&]{
+                g.named_node();
+            });
         }
 
         TEST_METHOD(should_recognize_an_edge_name)
         {
-            auto tokens = tokenize("(a)");
-            _(tokens).should_equal({ edge_name("a") });
+            grammar g("(abc)");
+            token tok = g.edge_name();
+            Assert::AreEqual(edge_name("abc"), tok);
         }
 
-        TEST_METHOD(should_recognize_an_edge_name_with_spaces)
+        TEST_METHOD(should_reject_an_empty_edge_name)
         {
-            auto tokens = tokenize(" ( a ) ");
-            _(tokens).should_equal({ edge_name("a") });
+            grammar g("()");
+            should_throw(ascii_tree_parse_exception("()", 1), [&]{
+                g.edge_name();
+            });
         }
 
         TEST_METHOD(should_recognize_an_ascending_edge_part)
         {
-            auto tokens = tokenize("/");
-            _(tokens).should_equal({ ascending_edge_part() });
-        }
-
-        TEST_METHOD(should_recognize_an_ascending_edge_part_with_spaces)
-        {
-            auto tokens = tokenize(" / ");
-            _(tokens).should_equal({ ascending_edge_part() });
+            grammar g("/");
+            Assert::AreEqual(ascending_edge_part(), g.ascending_edge_part());
         }
 
         TEST_METHOD(should_recognize_a_descending_edge_part)
         {
-            auto tokens = tokenize("\\");
-            _(tokens).should_equal({ descending_edge_part() });
-        }
-
-        TEST_METHOD(should_recognize_a_descending_edge_part_with_spaces)
-        {
-            auto tokens = tokenize(" \\ ");
-            _(tokens).should_equal({ descending_edge_part() });
+            grammar g("\\");
+            Assert::AreEqual(descending_edge_part(), g.descending_edge_part());
         }
 
         TEST_METHOD(should_recognize_a_vertical_edge_part)
         {
-            auto tokens = tokenize("|");
-            _(tokens).should_equal({ vertical_edge_part() });
-        }
-
-        TEST_METHOD(should_recognize_a_vertical_edge_part_with_spaces)
-        {
-            auto tokens = tokenize(" | ");
-            _(tokens).should_equal({ vertical_edge_part() });
+            grammar g("|");
+            Assert::AreEqual(vertical_edge_part(), g.vertical_edge_part());
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge)
         {
-            auto tokens = tokenize("-(a)-");
-            _(tokens).should_equal({ horizontal_edge("a") });
+            grammar g("---(xyz)--");
+            token tok = g.horizontal_edge();
+            Assert::AreEqual(horizontal_edge("xyz"), tok);
         }
 
-        TEST_METHOD(should_recognize_a_horizontal_edge_with_spaces)
+        TEST_METHOD(should_reject_a_nameless_horizontal_edge)
         {
-            auto tokens = tokenize(" - ( a ) - ");
-            _(tokens).should_equal({ horizontal_edge("a") });
-        }
-
-        TEST_METHOD(should_recognize_a_horizontal_edge_with_uninterrupted_sequences_of_dashes)
-        {
-            auto tokens = tokenize("---(a)--");
-            _(tokens).should_equal({ horizontal_edge("a") });
+            grammar g("--");
+            should_throw(ascii_tree_parse_exception("--", 2), [&]{
+                g.horizontal_edge();
+            });
         }
 
         TEST_METHOD(should_recognize_a_root_node_next_to_a_named_node)
