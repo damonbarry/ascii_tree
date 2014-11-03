@@ -122,6 +122,13 @@ namespace ascii_tree
             return (term == next_term) ? it_++ : s_.end();
         }
 
+        std::string expect_name_chars_()
+        {
+            auto begin = expect(name_char);
+            while (accept(name_char)) {}
+            return std::string(begin, it_);
+        }
+
     public:
         explicit grammar(const std::string& s)
             : s_(s), it_(s_.begin())
@@ -154,21 +161,17 @@ namespace ascii_tree
         token named_node()
         {
             expect(open_square_brace);
-            auto begin = expect(name_char);
-            while (accept(name_char)) {}
-            auto end = it_;
+            auto name = expect_name_chars_();
             expect(close_square_brace);
-            return ascii_tree::named_node(std::string(begin, end));
+            return ascii_tree::named_node(std::move(name));
         }
 
         token edge_name()
         {
             expect(open_paren);
-            auto begin = expect(name_char);
-            while (accept(name_char)) {}
-            auto end = it_;
+            auto name = expect_name_chars_();
             expect(close_paren);
-            return ascii_tree::edge_name(std::string(begin, end));
+            return ascii_tree::edge_name(std::move(name));
         }
 
         token ascending_edge_part()
@@ -194,13 +197,11 @@ namespace ascii_tree
             expect(dash);
             while (accept(dash)) {}
             expect(open_paren);
-            auto begin = expect(name_char);
-            while (accept(name_char)) {}
-            auto end = it_;
+            auto name = expect_name_chars_();
             expect(close_paren);
             expect(dash);
             while (accept(dash)) {}
-            return ascii_tree::horizontal_edge(std::string(begin, end));
+            return ascii_tree::horizontal_edge(std::move(name));
         }
     };
 
