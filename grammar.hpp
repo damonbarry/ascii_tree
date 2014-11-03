@@ -183,9 +183,10 @@ namespace ascii_tree
             return ascii_tree::descending_edge_part();
         }
 
-        void vertical_edge_part()
+        token vertical_edge_part()
         {
             expect(pipe);
+            return ascii_tree::vertical_edge_part();
         }
 
         void horizontal_edge()

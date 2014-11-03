@@ -220,7 +220,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(grammar_should_recognize_a_vertical_edge_part)
         {
             grammar g("|");
-            should_not_throw([&]{ g.vertical_edge_part(); });
+            Assert::AreEqual(vertical_edge_part(), g.vertical_edge_part());
         }
 
         TEST_METHOD(gramar_should_recognize_a_horizontal_edge)
