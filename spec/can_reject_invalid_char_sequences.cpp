@@ -30,7 +30,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_reject_two_open_square_braces_in_a_row)
         {
-            should_throw_({"[[", 1}, [&]
+            should_throw_(parse_exception("[[", 1), [&]
             {
                 tokenize("[[");
             });
