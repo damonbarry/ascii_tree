@@ -39,11 +39,10 @@ namespace ascii_tree
             : s_(s), it_(s_.begin())
         {}
 
-        std::string::const_iterator ignore()
+        void ignore()
         {
-            if (it_ == s_.end()) { return s_.end(); }
+            if (it_ == s_.end()) { return; }
             while (TerminalTraits::to_terminal(*it_) == TerminalTraits::ignore_me && ++it_ != s_.end()) {}
-            return it_;
         }
 
         void unignore()
@@ -71,7 +70,7 @@ namespace ascii_tree
             return accept_(term) != s_.end();
         }
 
-        std::string::const_iterator expect(terminal term)
+        position expect(terminal term)
         {
             auto it = accept_(term);
             if (it == s_.end())
@@ -82,7 +81,7 @@ namespace ascii_tree
             return it;
         }
 
-        std::string substr(std::string::const_iterator start)
+        std::string substr(position start)
         {
             return std::string(start, it_);
         }
