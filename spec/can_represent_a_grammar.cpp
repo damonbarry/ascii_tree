@@ -193,7 +193,8 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(grammar_should_recognize_an_edge_name)
         {
             grammar g("(abc)");
-            should_not_throw([&]{ g.edge_name(); });
+            token tok = g.edge_name();
+            Assert::AreEqual(edge_name("abc"), tok);
         }
 
         TEST_METHOD(grammar_should_reject_an_empty_edge_name)

@@ -161,12 +161,14 @@ namespace ascii_tree
             return ascii_tree::named_node(std::string(begin, end));
         }
 
-        void edge_name()
+        token edge_name()
         {
             expect(open_paren);
-            expect(name_char);
+            auto begin = expect(name_char);
             while (accept(name_char)) {}
+            auto end = it_;
             expect(close_paren);
+            return ascii_tree::edge_name(std::string(begin, end));
         }
 
         void ascending_edge_part()
