@@ -108,6 +108,20 @@ namespace ascii_tree
         const std::string s_;
         std::string::const_iterator it_;
 
+        std::string::const_iterator accept_(terminal term)
+        {
+            if (it_ == s_.end()) { return s_.end(); }
+
+            terminal next_term = to_terminal(*it_);
+            while (next_term == space)
+            {
+                if (++it_ == s_.end()) { return s_.end(); }
+                next_term = to_terminal(*it_);
+            }
+
+            return (term == next_term) ? it_++ : s_.end();
+        }
+
     public:
         explicit grammar(const std::string& s)
             : s_(s), it_(s_.begin())
@@ -115,30 +129,18 @@ namespace ascii_tree
 
         bool accept(terminal term)
         {
-            if (it_ == s_.end()) { return false; }
-
-            terminal next_term = to_terminal(*it_);
-            while (next_term == space)
-            {
-                if (++it_ == s_.end()) { return false; }
-                next_term = to_terminal(*it_);
-            }
-
-            if (term == next_term)
-            {
-                ++it_;
-                return true;
-            }
-
-            return false;
+            return accept_(term) != s_.end();
         }
 
-        void expect(terminal term)
+        std::string::const_iterator expect(terminal term)
         {
-            if (!accept(term))
+            auto it = accept_(term);
+            if (it == s_.end())
             {
                 throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
             }
+
+            return it;
         }
 
         token root_node()
@@ -149,12 +151,14 @@ namespace ascii_tree
             return ascii_tree::root_node();
         }
 
-        void named_node()
+        token named_node()
         {
             expect(open_square_brace);
-            expect(name_char);
+            auto begin = expect(name_char);
             while (accept(name_char)) {}
+            auto end = it_;
             expect(close_square_brace);
+            return ascii_tree::named_node(std::string(begin, end));
         }
 
         void edge_name()

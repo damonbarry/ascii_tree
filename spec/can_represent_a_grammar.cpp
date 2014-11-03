@@ -178,7 +178,8 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(grammar_should_recognize_a_named_node)
         {
             grammar g("[abc]");
-            should_not_throw([&]{ g.named_node(); });
+            token tok = g.named_node();
+            Assert::AreEqual(named_node("abc"), tok);
         }
 
         TEST_METHOD(grammar_should_reject_an_empty_node_when_it_expects_a_named_node)
