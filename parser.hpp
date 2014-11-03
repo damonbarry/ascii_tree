@@ -39,6 +39,10 @@ namespace ascii_tree
             : s_(s), it_(s_.begin())
         {}
 
+        parser(const std::string& s, size_t init_pos)
+            : s_(s), it_(s_.begin() + init_pos)
+        {}
+
         void ignore()
         {
             if (it_ == s_.end()) { return; }
@@ -47,8 +51,11 @@ namespace ascii_tree
 
         void unignore()
         {
-            if (it_ == s_.begin()) { return; }
-            while (TerminalTraits::to_terminal(*(it_ - 1)) == TerminalTraits::ignore_me) { --it_; }
+            while (it_ != s_.begin() && 
+                TerminalTraits::to_terminal(*(it_ - 1)) == TerminalTraits::ignore_me)
+            {
+                --it_;
+            }
         }
 
         position save_position()
@@ -59,6 +66,11 @@ namespace ascii_tree
         void restore_position(const position& pos)
         {
             it_ = pos;
+        }
+
+        bool at_begin()
+        {
+            return it_ == s_.begin();
         }
 
         bool at_end()

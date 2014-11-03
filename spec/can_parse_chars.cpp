@@ -49,6 +49,22 @@ namespace ascii_tree { namespace spec
             Assert::IsTrue(p.at_end());
         }
 
+        TEST_METHOD(unignore_should_rewind_to_the_beginning_of_an_ignored_char_sequence)
+        {
+            string test_str = "1333";
+            parser<test_traits> p(test_str, test_str.size());
+            p.unignore();
+            Assert::AreEqual(test_str.front(), *(p.save_position() - 1));
+        }
+
+        TEST_METHOD(unignore_should_not_try_to_rewind_past_the_beginning_of_the_string)
+        {
+            string test_str = "3333";
+            parser<test_traits> p(test_str, test_str.size());
+            p.unignore();
+            Assert::IsTrue(p.at_begin());
+        }
+
         TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         {
             parser<test_traits> p("1");
