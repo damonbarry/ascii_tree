@@ -25,7 +25,7 @@ namespace ascii_tree
 
         std::string::const_iterator accept_(terminal term)
         {
-            eat_spaces();
+            ignore();
             if (it_ == s_.end()) { return s_.end(); }
 
             terminal next_term = TerminalTraits::to_terminal(*it_);
@@ -39,16 +39,16 @@ namespace ascii_tree
             : s_(s), it_(s_.begin())
         {}
 
-        std::string::const_iterator eat_spaces()
+        std::string::const_iterator ignore()
         {
             if (it_ == s_.end()) { return s_.end(); }
-            while (TerminalTraits::to_terminal(*it_) == terminal::space && ++it_ != s_.end()) {}
+            while (TerminalTraits::to_terminal(*it_) == TerminalTraits::ignore_me && ++it_ != s_.end()) {}
             return it_;
         }
 
-        void uneat_spaces()
+        void unignore()
         {
-            while (TerminalTraits::to_terminal(*(it_ - 1)) == terminal::space) { --it_; }
+            while (TerminalTraits::to_terminal(*(it_ - 1)) == TerminalTraits::ignore_me) { --it_; }
         }
 
         position save_position()

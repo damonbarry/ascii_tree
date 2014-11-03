@@ -8,17 +8,17 @@ using namespace std;
 
 namespace ascii_tree { namespace spec
 {
-    enum test_terminal { none, one, two, space };
+    enum test_terminal { none, one, two, three };
     struct test_traits
     {
         typedef test_terminal type;
-        static const type space = test_terminal::space;
+        static const type ignore_me = three;
 
         static type to_terminal(char ch)
         {
             if (ch == '1') return one;
             else if (ch == '2') return two;
-            else if (ch == ' ') return space;
+            else if (ch == '3') return three;
             return none;
         }
     };
@@ -40,9 +40,9 @@ namespace ascii_tree { namespace spec
             Assert::IsFalse(accepted);
         }
 
-        TEST_METHOD(should_accept_a_terminal_with_preceeding_spaces)
+        TEST_METHOD(should_accept_a_terminal_when_preceeded_by_ignored_chars)
         {
-            parser<test_traits> p("   1");
+            parser<test_traits> p("3331");
             bool accepted = p.accept(one);
             Assert::IsTrue(accepted);
         }

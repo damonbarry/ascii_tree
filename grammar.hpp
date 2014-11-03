@@ -84,7 +84,7 @@ namespace ascii_tree
     {
         typedef terminal type;
 
-        static const type space = terminal::space;
+        static const type ignore_me = space;
 
         static terminal to_terminal(char ch)
         {
@@ -111,7 +111,7 @@ namespace ascii_tree
         {
             auto begin = p_.expect(name_char);
             while (p_.accept(name_char)) {}
-            p_.uneat_spaces();
+            p_.unignore(); // strip trailing spaces
             return p_.substr(begin);
         }
 
@@ -177,7 +177,7 @@ namespace ascii_tree
         std::vector<token> tokens()
         {
             std::vector<token> tokens;
-            while (p_.eat_spaces(), !p_.at_end())
+            while (p_.ignore(), !p_.at_end())
             {
                 auto pos = p_.save_position();
 
