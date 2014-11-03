@@ -171,9 +171,10 @@ namespace ascii_tree
             return ascii_tree::edge_name(std::string(begin, end));
         }
 
-        void ascending_edge_part()
+        token ascending_edge_part()
         {
             expect(slash);
+            return ascii_tree::ascending_edge_part();
         }
 
         void descending_edge_part()

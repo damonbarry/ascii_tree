@@ -208,7 +208,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(grammar_should_recognize_an_ascending_edge_part)
         {
             grammar g("/");
-            should_not_throw([&]{ g.ascending_edge_part(); });
+            Assert::AreEqual(ascending_edge_part(), g.ascending_edge_part());
         }
 
         TEST_METHOD(grammar_should_recognize_a_descending_edge_part)
