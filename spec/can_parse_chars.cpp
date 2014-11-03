@@ -58,7 +58,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(expect_should_throw_when_a_terminal_does_not_match_the_expected_value)
         {
-            should_throw(ascii_tree_parse_exception("1", 0), [&]
+            should_throw(parse_exception("1", 0), [&]
             {
                 parser<test_traits> p("1");
                 p.expect(two);

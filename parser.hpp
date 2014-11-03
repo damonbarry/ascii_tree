@@ -7,12 +7,12 @@
 namespace ascii_tree
 {
 
-    struct ascii_tree_parse_exception
+    struct parse_exception
     {
         const std::string s;
         const size_t pos;
 
-        ascii_tree_parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
+        parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
     };
 
     template<class TerminalTraits>
@@ -76,7 +76,7 @@ namespace ascii_tree
             auto it = accept_(term);
             if (it == s_.end())
             {
-                throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
+                throw parse_exception(s_, std::distance(s_.begin(), it_));
             }
 
             return it;
@@ -89,7 +89,7 @@ namespace ascii_tree
 
         void error()
         {
-            throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
+            throw parse_exception(s_, std::distance(s_.begin(), it_));
         }
     };
 

@@ -14,7 +14,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_reject_an_empty_node)
         {
-            should_throw(ascii_tree_parse_exception("[]", 1), [&]
+            should_throw(parse_exception("[]", 1), [&]
             {
                 tokenize("[]");
             });
@@ -22,7 +22,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_reject_a_node_with_an_invalid_name_char)
         {
-            should_throw(ascii_tree_parse_exception("[!]", 1), [&]
+            should_throw(parse_exception("[!]", 1), [&]
             {
                 tokenize("[!]");
             });

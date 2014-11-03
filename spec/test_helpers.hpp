@@ -42,22 +42,22 @@ namespace ascii_tree { namespace spec
 {
 
     template<typename Fn>
-    void should_throw(const ascii_tree::ascii_tree_parse_exception& expected, Fn fn)
+    void should_throw(const ascii_tree::parse_exception& expected, Fn fn)
     {
         namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
 
-        cpput::Assert::ExpectException<ascii_tree::ascii_tree_parse_exception>([&]
+        cpput::Assert::ExpectException<ascii_tree::parse_exception>([&]
         {
             try
             {
                 fn();
             }
-            catch (ascii_tree::ascii_tree_parse_exception& actual)
+            catch (ascii_tree::parse_exception& actual)
             {
                 cpput::Assert::AreEqual(expected.s.c_str(), actual.s.c_str(),
-                    L"value of ascii_tree_parse_exception::s is wrong");
+                    L"value of parse_exception::s is wrong");
                 cpput::Assert::AreEqual(expected.pos, actual.pos,
-                    L"value of ascii_tree_parse_exception::pos is wrong");
+                    L"value of parse_exception::pos is wrong");
                 throw;
             }
         });
