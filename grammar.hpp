@@ -189,16 +189,18 @@ namespace ascii_tree
             return ascii_tree::vertical_edge_part();
         }
 
-        void horizontal_edge()
+        token horizontal_edge()
         {
             expect(dash);
             while (accept(dash)) {}
             expect(open_paren);
-            expect(name_char);
+            auto begin = expect(name_char);
             while (accept(name_char)) {}
+            auto end = it_;
             expect(close_paren);
             expect(dash);
             while (accept(dash)) {}
+            return ascii_tree::horizontal_edge(std::string(begin, end));
         }
     };
 

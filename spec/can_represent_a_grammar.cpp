@@ -226,7 +226,8 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(gramar_should_recognize_a_horizontal_edge)
         {
             grammar g("---(xyz)--");
-            should_not_throw([&]{ g.horizontal_edge(); });
+            token tok = g.horizontal_edge();
+            Assert::AreEqual(horizontal_edge("xyz"), tok);
         }
 
         TEST_METHOD(grammar_should_reject_a_nameless_horizontal_edge)
