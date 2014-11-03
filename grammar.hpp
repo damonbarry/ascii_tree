@@ -86,7 +86,7 @@ namespace ascii_tree
 
         static const type space = terminal::space;
 
-        static terminal terminal_traits::to_terminal(char ch)
+        static terminal to_terminal(char ch)
         {
             if (ch == '[') return open_square_brace;
             else if (ch == '*') return asterisk;

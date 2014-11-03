@@ -129,44 +129,5 @@ namespace ascii_tree { namespace spec
             Assert::AreEqual(none, term);
         }
 
-        TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
-        {
-            parser<terminal_traits> p("*");
-            bool accepted = p.accept(asterisk);
-            Assert::IsTrue(accepted);
-        }
-
-        TEST_METHOD(should_not_accept_a_terminal_which_does_not_match_the_expected_value)
-        {
-            parser<terminal_traits> p("*");
-            bool accepted = p.accept(pipe);
-            Assert::IsFalse(accepted);
-        }
-
-        TEST_METHOD(should_accept_a_terminal_with_preceeding_spaces)
-        {
-            parser<terminal_traits> p("   *");
-            bool accepted = p.accept(asterisk);
-            Assert::IsTrue(accepted);
-        }
-
-        TEST_METHOD(expect_should_not_throw_when_a_terminal_matches_the_expected_value)
-        {
-            should_not_throw([&]
-            {
-                parser<terminal_traits> p("*");
-                p.expect(asterisk);
-            });
-        }
-
-        TEST_METHOD(expect_should_throw_when_a_terminal_does_not_match_the_expected_value)
-        {
-            should_throw(ascii_tree_parse_exception("*", 0), [&]
-            {
-                parser<terminal_traits> p("*");
-                p.expect(pipe);
-            });
-        }
-
     };
 }}

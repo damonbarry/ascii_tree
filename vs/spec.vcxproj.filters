@@ -27,6 +27,9 @@
     <ClCompile Include="..\spec\can_recognize_ascii_tree_chars.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\spec\can_parse_chars.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\grammar.hpp">
