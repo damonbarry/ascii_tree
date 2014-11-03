@@ -110,5 +110,11 @@ namespace ascii_tree { namespace spec
             string str = p.substr(p.save_position() - 3);
             Assert::AreEqual("212", str.c_str());
         }
+
+        TEST_METHOD(error_should_throw_a_parse_exception)
+        {
+            parser<test_traits> p("");
+            should_throw(parse_exception("", 0), [&]{ p.error(); });
+        }
     };
 }}
