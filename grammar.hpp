@@ -132,6 +132,28 @@ namespace ascii_tree
             return std::string(begin, it_);
         }
 
+        bool at_end_()
+        {
+            return it_ == s_.end();
+        }
+
+        typedef std::string::const_iterator position;
+
+        position save_position_()
+        {
+            return it_;
+        }
+
+        void restore_position_(const position& pos)
+        {
+            it_ = pos;
+        }
+
+        void error_()
+        {
+            throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
+        }
+
     public:
         explicit grammar(const std::string& s)
             : s_(s), it_(s_.begin())
@@ -210,51 +232,51 @@ namespace ascii_tree
         std::vector<token> tokens()
         {
             std::vector<token> tokens;
-            while (eat_spaces_() != s_.end())
+            while (eat_spaces_(), !at_end_())
             {
-                auto save_it = it_;
+                auto pos = save_position_();
 
                 if (accept(open_square_brace))
                 {
                     if (accept(asterisk))
                     {
-                        it_ = save_it;
+                        restore_position_(pos);
                         tokens.emplace_back(root_node());
                     }
                     else
                     {
-                        it_ = save_it;
+                        restore_position_(pos);
                         tokens.emplace_back(named_node());
                     }
                 }
                 else if (accept(dash))
                 {
-                    it_ = save_it;
+                    restore_position_(pos);
                     tokens.emplace_back(horizontal_edge());
                 }
                 else if (accept(backslash))
                 {
-                    it_ = save_it;
+                    restore_position_(pos);
                     tokens.emplace_back(descending_edge_part());
                 }
                 else if (accept(pipe))
                 {
-                    it_ = save_it;
+                    restore_position_(pos);
                     tokens.emplace_back(vertical_edge_part());
                 }
                 else if (accept(slash))
                 {
-                    it_ = save_it;
+                    restore_position_(pos);
                     tokens.emplace_back(ascending_edge_part());
                 }
                 else if (accept(open_paren))
                 {
-                    it_ = save_it;
+                    restore_position_(pos);
                     tokens.emplace_back(edge_name());
                 }
                 else
                 {
-                    throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
+                    error_();
                 }
             }
 
