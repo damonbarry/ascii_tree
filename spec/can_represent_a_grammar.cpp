@@ -214,7 +214,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(grammar_should_recognize_a_descending_edge_part)
         {
             grammar g("\\");
-            should_not_throw([&]{ g.descending_edge_part(); });
+            Assert::AreEqual(descending_edge_part(), g.descending_edge_part());
         }
 
         TEST_METHOD(grammar_should_recognize_a_vertical_edge_part)

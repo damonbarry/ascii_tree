@@ -177,9 +177,10 @@ namespace ascii_tree
             return ascii_tree::ascending_edge_part();
         }
 
-        void descending_edge_part()
+        token descending_edge_part()
         {
             expect(backslash);
+            return ascii_tree::descending_edge_part();
         }
 
         void vertical_edge_part()
