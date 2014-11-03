@@ -108,17 +108,19 @@ namespace ascii_tree
         const std::string s_;
         std::string::const_iterator it_;
 
+        std::string::const_iterator eat_spaces_()
+        {
+            if (it_ == s_.end()) { return s_.end(); }
+            while (to_terminal(*it_) == space && ++it_ != s_.end()) {}
+            return it_;
+        }
+
         std::string::const_iterator accept_(terminal term)
         {
+            eat_spaces_();
             if (it_ == s_.end()) { return s_.end(); }
 
             terminal next_term = to_terminal(*it_);
-            while (next_term == space)
-            {
-                if (++it_ == s_.end()) { return s_.end(); }
-                next_term = to_terminal(*it_);
-            }
-
             return (term == next_term) ? it_++ : s_.end();
         }
 
@@ -126,6 +128,7 @@ namespace ascii_tree
         {
             auto begin = expect(name_char);
             while (accept(name_char)) {}
+            while (to_terminal(*(it_ - 1)) == space) { --it_; } // strip trailing spaces
             return std::string(begin, it_);
         }
 
@@ -203,104 +206,65 @@ namespace ascii_tree
             while (accept(dash)) {}
             return ascii_tree::horizontal_edge(std::move(name));
         }
+
+        std::vector<token> tokens()
+        {
+            std::vector<token> tokens;
+            while (eat_spaces_() != s_.end())
+            {
+                auto save_it = it_;
+
+                if (accept(open_square_brace))
+                {
+                    if (accept(asterisk))
+                    {
+                        it_ = save_it;
+                        tokens.emplace_back(root_node());
+                    }
+                    else
+                    {
+                        it_ = save_it;
+                        tokens.emplace_back(named_node());
+                    }
+                }
+                else if (accept(dash))
+                {
+                    it_ = save_it;
+                    tokens.emplace_back(horizontal_edge());
+                }
+                else if (accept(backslash))
+                {
+                    it_ = save_it;
+                    tokens.emplace_back(descending_edge_part());
+                }
+                else if (accept(pipe))
+                {
+                    it_ = save_it;
+                    tokens.emplace_back(vertical_edge_part());
+                }
+                else if (accept(slash))
+                {
+                    it_ = save_it;
+                    tokens.emplace_back(ascending_edge_part());
+                }
+                else if (accept(open_paren))
+                {
+                    it_ = save_it;
+                    tokens.emplace_back(edge_name());
+                }
+                else
+                {
+                    throw ascii_tree_parse_exception(s_, std::distance(s_.begin(), it_));
+                }
+            }
+
+            return tokens;
+        }
     };
 
     inline std::vector<token> tokenize(const std::string& s)
     {
-        std::vector<token> tokens;
-        terminal prev_ch = none, prev_prev_ch = none;
-        size_t marker = 0, marked_length = 0;
-
-        for (size_t i = 0; i < s.size(); ++i)
-        {
-            auto term = to_terminal(s[i]);
-
-            if (term == open_square_brace)
-            {
-                if (prev_ch == open_square_brace)
-                {
-                    throw ascii_tree_parse_exception(s, i);
-                }
-
-                prev_ch = term;
-            }
-            else if (term == close_square_brace)
-            {
-                if (prev_ch == asterisk)
-                {
-                    tokens.emplace_back(root_node());
-                }
-                else if (prev_ch == open_square_brace)
-                {
-                    throw ascii_tree_parse_exception(s, i);
-                }
-                else
-                {
-                    tokens.emplace_back(named_node(s.substr(marker, marked_length)));
-                }
-
-                prev_ch = term;
-            }
-            else if (term == asterisk)
-            {
-                prev_ch = term;
-            }
-            else if (term == dash)
-            {
-                if (prev_ch == close_paren)
-                {
-                    tokens.emplace_back(horizontal_edge(s.substr(marker, marked_length)));
-                }
-
-                prev_ch = term;
-            }
-            else if (term == slash)
-            {
-                tokens.emplace_back(ascending_edge_part());
-                prev_ch = term;
-            }
-            else if (term == backslash)
-            {
-                tokens.emplace_back(descending_edge_part());
-                prev_ch = term;
-            }
-            else if (term == pipe)
-            {
-                tokens.emplace_back(vertical_edge_part());
-                prev_ch = term;
-            }
-            else if (term == open_paren)
-            {
-                if (prev_ch == dash) { prev_prev_ch = dash; }
-                prev_ch = term;
-            }
-            else if (term == close_paren)
-            {
-                if (prev_prev_ch == none)
-                {
-                    tokens.emplace_back(edge_name(s.substr(marker, marked_length)));
-                }
-
-                prev_ch = term;
-            }
-            else if (term == name_char)
-            {
-                if (prev_ch != name_char)
-                {
-                    marker = i;
-                    marked_length = 0;
-                }
-
-                prev_ch = term;
-                ++marked_length;
-            }
-            else if (term != space)
-            {
-                throw ascii_tree_parse_exception(s, i);
-            }
-        }
-
-        return tokens;
+        return grammar(s).tokens();
     }
 }
 
