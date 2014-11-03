@@ -47,6 +47,7 @@ namespace ascii_tree
 
         void unignore()
         {
+            if (it_ == s_.begin()) { return; }
             while (TerminalTraits::to_terminal(*(it_ - 1)) == TerminalTraits::ignore_me) { --it_; }
         }
 

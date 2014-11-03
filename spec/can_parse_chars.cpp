@@ -42,6 +42,13 @@ namespace ascii_tree { namespace spec
             Assert::IsTrue(p.at_end());
         }
 
+        TEST_METHOD(unignore_should_not_rewind_the_parser_on_an_empty_string)
+        {
+            parser<test_traits> p("");
+            p.unignore();
+            Assert::IsTrue(p.at_end());
+        }
+
         TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         {
             parser<test_traits> p("1");
