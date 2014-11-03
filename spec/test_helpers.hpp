@@ -42,7 +42,7 @@ namespace ascii_tree { namespace spec
 {
 
     template<typename Fn>
-    void should_throw(const ascii_tree::parse_exception& expected, Fn fn)
+    void should_throw_(const ascii_tree::parse_exception& expected, Fn fn)
     {
         namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -64,7 +64,7 @@ namespace ascii_tree { namespace spec
     }
 
     template<typename Fn>
-    void should_not_throw(Fn fn)
+    void should_not_throw_(Fn fn)
     {
         namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
 

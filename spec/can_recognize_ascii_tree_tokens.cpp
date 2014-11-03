@@ -65,7 +65,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_reject_an_empty_node_when_it_expects_a_named_node)
         {
             grammar g("[]");
-            should_throw(parse_exception("[]", 1), [&]{
+            should_throw_(parse_exception("[]", 1), [&]{
                 g.named_node();
             });
         }
@@ -80,7 +80,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_reject_an_empty_edge_name)
         {
             grammar g("()");
-            should_throw(parse_exception("()", 1), [&]{
+            should_throw_(parse_exception("()", 1), [&]{
                 g.edge_name();
             });
         }
@@ -113,7 +113,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_reject_a_nameless_horizontal_edge)
         {
             grammar g("--");
-            should_throw(parse_exception("--", 2), [&]{
+            should_throw_(parse_exception("--", 2), [&]{
                 g.horizontal_edge();
             });
         }

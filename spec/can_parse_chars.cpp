@@ -88,7 +88,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(expect_should_not_throw_when_a_terminal_matches_the_expected_value)
         {
-            should_not_throw([&]
+            should_not_throw_([&]
             {
                 parser<test_traits> p("1");
                 p.expect(one);
@@ -97,7 +97,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(expect_should_throw_when_a_terminal_does_not_match_the_expected_value)
         {
-            should_throw(parse_exception("1", 0), [&]
+            should_throw_(parse_exception("1", 0), [&]
             {
                 parser<test_traits> p("1");
                 p.expect(two);
@@ -114,7 +114,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(error_should_throw_a_parse_exception)
         {
             parser<test_traits> p("");
-            should_throw(parse_exception("", 0), [&]{ p.error(); });
+            should_throw_(parse_exception("", 0), [&]{ p.error(); });
         }
     };
 }}
