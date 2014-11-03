@@ -141,11 +141,12 @@ namespace ascii_tree
             }
         }
 
-        void root_node()
+        token root_node()
         {
             expect(open_square_brace);
             expect(asterisk);
             expect(close_square_brace);
+            return ascii_tree::root_node();
         }
 
         void named_node()

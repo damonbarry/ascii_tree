@@ -171,7 +171,8 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(grammar_should_recognize_a_root_node)
         {
             grammar g("[*]");
-            should_not_throw([&]{ g.root_node(); });
+            token tok = g.root_node();
+            Assert::AreEqual(root_node(), tok);
         }
 
         TEST_METHOD(grammar_should_recognize_a_named_node)
@@ -233,5 +234,6 @@ namespace ascii_tree { namespace spec
                 g.horizontal_edge();
             });
         }
+
     };
 }}

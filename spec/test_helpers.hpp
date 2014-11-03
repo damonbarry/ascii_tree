@@ -2,6 +2,42 @@
 #include <CppUnitTest.h>
 #include <string>
 
+namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
+{
+    using namespace ascii_tree;
+
+    template<>
+    inline std::wstring ToString<token::toktype>(const token::toktype& type)
+    {
+        switch (type)
+        {
+        case token::root_node:
+            return L"root_node";
+        case token::named_node:
+            return L"named_node";
+        case token::edge_name:
+            return L"edge_name";
+        case token::horizontal_edge:
+            return L"horizontal_edge";
+        case token::ascending_edge_part:
+            return L"ascending_edge_part";
+        case token::descending_edge_part:
+            return L"descending_edge_part";
+        case token::vertical_edge_part:
+            return L"vertical_edge_part";
+        default:
+            return L"unknown token";
+        }
+    }
+
+    template<>
+    inline std::wstring ToString<token>(const token& tok)
+    {
+        std::wstring name(tok.name.begin(), tok.name.end());
+        return ToString(tok.type) + L" " + name;
+    }
+}}}
+
 namespace ascii_tree { namespace spec
 {
 
