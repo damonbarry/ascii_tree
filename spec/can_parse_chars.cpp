@@ -26,6 +26,22 @@ namespace ascii_tree { namespace spec
     TEST_CLASS(can_parse_chars)
     {
     public:
+        TEST_METHOD(ignore_should_not_advance_the_parser_on_an_empty_string)
+        {
+            parser<test_traits> p("");
+            p.ignore();
+            Assert::IsTrue(p.at_end());
+        }
+
+        TEST_METHOD(ignore_should_ignore_chars)
+        {
+            parser<test_traits> p("33313");
+            p.ignore();
+            p.expect(one);
+            p.ignore();
+            Assert::IsTrue(p.at_end());
+        }
+
         TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         {
             parser<test_traits> p("1");
