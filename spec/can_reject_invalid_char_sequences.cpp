@@ -52,5 +52,29 @@ namespace ascii_tree { namespace spec
             });
         }
 
+        TEST_METHOD(should_reject_a_nameless_horizontal_edge)
+        {
+            should_throw_(parse_exception("[*]--[a]", 5), [&]
+            {
+                tokenize("[*]--[a]");
+            });
+        }
+
+        TEST_METHOD(should_reject_a_root_horizontal_edge)
+        {
+            should_throw_(parse_exception("--(*)--", 3), [&]
+            {
+                tokenize("--(*)--");
+            });
+        }
+
+        TEST_METHOD(should_reject_a_nearly_valid_edge_name)
+        {
+            should_throw_(parse_exception("(abAB12')", 7), [&]
+            {
+                tokenize("(abAB12')");
+            });
+        }
+
     };
 }}
