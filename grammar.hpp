@@ -28,6 +28,16 @@ root-node:              '[' '*' ']'
 
 named-node:             '[' name-chars ']'
 
+horizontal-edge:        edge-chars edge-name edge-chars
+
+descending-edge-part    '\'
+
+vertical-edge-part      '|'
+
+ascending-edge-part     '/'
+
+edge-name:              '(' name-chars ')'
+
 name-chars:             name-char
                         name-chars name-char
 
@@ -36,16 +46,8 @@ name-char:              alnum
 
 alnum:                  one of: [A-Za-z0-9]
 
-horizontal-edge:        edge-chars edge-name edge-chars
-
 edge-chars:             '-'
                         edge-chars '-'
-
-descending-edge-part    '\'
-vertical-edge-part      '|'
-ascending-edge-part     '/'
-edge-name:              '(' name-chars ')'
-
 
 #endif
 
