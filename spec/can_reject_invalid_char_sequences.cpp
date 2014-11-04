@@ -16,7 +16,7 @@ namespace ascii_tree { namespace spec
         {
             should_throw_(parse_exception("[]", 1), [&]
             {
-                tokenize("[]");
+                grammar("[]").tokens();
             });
         }
 
@@ -24,7 +24,7 @@ namespace ascii_tree { namespace spec
         {
             should_throw_(parse_exception("[!]", 1), [&]
             {
-                tokenize("[!]");
+                grammar("[!]").tokens();
             });
         }
 
@@ -32,7 +32,7 @@ namespace ascii_tree { namespace spec
         {
             should_throw_(parse_exception("[[", 1), [&]
             {
-                tokenize("[[");
+                grammar("[[").tokens();
             });
         }
 
@@ -40,7 +40,7 @@ namespace ascii_tree { namespace spec
         {
             should_throw_(parse_exception("]", 0), [&]
             {
-                tokenize("]");
+                grammar("]").tokens();
             });
         }
 
@@ -48,7 +48,7 @@ namespace ascii_tree { namespace spec
         {
             should_throw_(parse_exception("[*]]", 3), [&]
             {
-                tokenize("[*]]");
+                grammar("[*]]").tokens();
             });
         }
 
@@ -56,7 +56,7 @@ namespace ascii_tree { namespace spec
         {
             should_throw_(parse_exception("[*]--[a]", 5), [&]
             {
-                tokenize("[*]--[a]");
+                grammar("[*]--[a]").tokens();
             });
         }
 
@@ -64,7 +64,7 @@ namespace ascii_tree { namespace spec
         {
             should_throw_(parse_exception("--(*)--", 3), [&]
             {
-                tokenize("--(*)--");
+                grammar("--(*)--").tokens();
             });
         }
 
@@ -72,7 +72,7 @@ namespace ascii_tree { namespace spec
         {
             should_throw_(parse_exception("(abAB12')", 7), [&]
             {
-                tokenize("(abAB12')");
+                grammar("(abAB12')").tokens();
             });
         }
 
