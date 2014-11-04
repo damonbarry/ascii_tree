@@ -161,8 +161,24 @@ namespace ascii_tree { namespace spec
         }
     };
 
+    class bool_assertions
+    {
+        const bool val_;
+    public:
+        explicit bool_assertions(bool val) : val_(val) {}
+        void should_be_true()
+        {
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsTrue(val_);
+        }
+        void should_be_false()
+        {
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsFalse(val_);
+        }
+    };
+
     inline tokens_assertions _(const std::vector<token>& tokens) { return tokens_assertions(tokens); }
     inline token_assertions _(const token& token) { return token_assertions(token); }
     inline terminal_assertions _(const terminal& term) { return terminal_assertions(term); }
+    inline bool_assertions _(bool val) { return bool_assertions(val); }
 
 }}

@@ -26,20 +26,23 @@ namespace ascii_tree { namespace spec
     TEST_CLASS(can_parse_chars)
     {
     public:
-        TEST_METHOD(should_be_able_to_copy_the_parser)
+        TEST_METHOD(a_parser_copy_should_be_independent_from_the_original)
         {
-            parser<test_traits> p("12", 1);
-            auto pcopy = p;
-            pcopy.expect(two);
-            Assert::IsFalse(p.at_end());
-            Assert::IsTrue(pcopy.at_end());
+            parser<test_traits> original("12");
+            original.expect(one);
+
+            auto copy = original;
+            copy.expect(two);
+
+            _(original.at_end()).should_be_false();
+            _(copy.at_end()).should_be_true();
         }
 
         TEST_METHOD(ignore_should_not_advance_the_parser_on_an_empty_string)
         {
             parser<test_traits> p("");
             p.ignore();
-            Assert::IsTrue(p.at_end());
+            _(p.at_end()).should_be_true();
         }
 
         TEST_METHOD(ignore_should_ignore_chars)
@@ -48,14 +51,14 @@ namespace ascii_tree { namespace spec
             p.ignore();
             p.expect(one);
             p.ignore();
-            Assert::IsTrue(p.at_end());
+            _(p.at_end()).should_be_true();
         }
 
         TEST_METHOD(unignore_should_not_rewind_the_parser_on_an_empty_string)
         {
             parser<test_traits> p("");
             p.unignore();
-            Assert::IsTrue(p.at_end());
+            _(p.at_end()).should_be_true();
         }
 
         TEST_METHOD(unignore_should_rewind_to_the_beginning_of_an_ignored_char_sequence)
@@ -71,45 +74,40 @@ namespace ascii_tree { namespace spec
             string test_str = "3333";
             parser<test_traits> p(test_str, test_str.size());
             p.unignore();
-            Assert::IsTrue(p.at_begin());
+            _(p.at_begin()).should_be_true();
         }
 
         TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         {
             parser<test_traits> p("1");
-            bool accepted = p.accept(one);
-            Assert::IsTrue(accepted);
+            _(p.accept(one)).should_be_true();
         }
 
         TEST_METHOD(should_not_accept_a_terminal_which_does_not_match_the_expected_value)
         {
             parser<test_traits> p("1");
-            bool accepted = p.accept(two);
-            Assert::IsFalse(accepted);
+            _(p.accept(two)).should_be_false();
         }
 
         TEST_METHOD(should_accept_a_terminal_when_preceeded_by_ignored_chars)
         {
             parser<test_traits> p("3331");
-            bool accepted = p.accept(one);
-            Assert::IsTrue(accepted);
+            _(p.accept(one)).should_be_true();
         }
 
         TEST_METHOD(expect_should_not_throw_when_a_terminal_matches_the_expected_value)
         {
-            should_not_throw_([&]
+            should_not_throw_([]
             {
-                parser<test_traits> p("1");
-                p.expect(one);
+                parser<test_traits>("1").expect(one);
             });
         }
 
         TEST_METHOD(expect_should_throw_when_a_terminal_does_not_match_the_expected_value)
         {
-            should_throw_(parse_exception("1", 0), [&]
+            should_throw_(parse_exception("1", 0), []
             {
-                parser<test_traits> p("1");
-                p.expect(two);
+                parser<test_traits>("1").expect(two);
             });
         }
 
@@ -122,8 +120,10 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(error_should_throw_a_parse_exception)
         {
-            parser<test_traits> p("");
-            should_throw_(parse_exception("", 0), [&]{ p.error(); });
+            should_throw_(parse_exception("", 0), []
+            {
+                parser<test_traits>("").error();
+            });
         }
     };
 }}
