@@ -33,7 +33,16 @@ namespace
         }
     };
 
+    class token_assertions
+    {
+        const token& token_;
+    public:
+        explicit token_assertions(const token& token) : token_(token) {}
+        void should_be(const token& other) { Assert::AreEqual(other, token_); }
+    };
+
     tokens_assertions _(const vector<token>& tokens) { return tokens_assertions(tokens); }
+    token_assertions _(const token& token) { return token_assertions(token); }
 }
 
 namespace ascii_tree { namespace spec
@@ -50,71 +59,64 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_recognize_a_root_node)
         {
-            grammar g("[*]");
-            token tok = g.root_node();
-            Assert::AreEqual(root_node(), tok);
+            token tok = grammar("[*]").root_node();
+            _(tok).should_be(root_node());
         }
 
         TEST_METHOD(should_recognize_a_named_node)
         {
-            grammar g("[abc]");
-            token tok = g.named_node();
-            Assert::AreEqual(named_node("abc"), tok);
+            token tok = grammar("[abc]").named_node();
+            _(tok).should_be(named_node("abc"));
         }
 
         TEST_METHOD(should_reject_an_empty_node_when_it_expects_a_named_node)
         {
-            grammar g("[]");
-            should_throw_(parse_exception("[]", 1), [&]{
-                g.named_node();
+            should_throw_(parse_exception("[]", 1), []{
+                grammar("[]").named_node();
             });
         }
 
         TEST_METHOD(should_recognize_an_edge_name)
         {
-            grammar g("(abc)");
-            token tok = g.edge_name();
-            Assert::AreEqual(edge_name("abc"), tok);
+            token tok = grammar("(abc)").edge_name();
+            _(tok).should_be(edge_name("abc"));
         }
 
         TEST_METHOD(should_reject_an_empty_edge_name)
         {
-            grammar g("()");
-            should_throw_(parse_exception("()", 1), [&]{
-                g.edge_name();
+            should_throw_(parse_exception("()", 1), []{
+                grammar("()").edge_name();
             });
         }
 
         TEST_METHOD(should_recognize_an_ascending_edge_part)
         {
-            grammar g("/");
-            Assert::AreEqual(ascending_edge_part(), g.ascending_edge_part());
+            token tok = grammar("/").ascending_edge_part();
+            _(tok).should_be(ascending_edge_part());
         }
 
         TEST_METHOD(should_recognize_a_descending_edge_part)
         {
-            grammar g("\\");
-            Assert::AreEqual(descending_edge_part(), g.descending_edge_part());
+            token tok = grammar("\\").descending_edge_part();
+            _(tok).should_be(descending_edge_part());
         }
 
         TEST_METHOD(should_recognize_a_vertical_edge_part)
         {
-            grammar g("|");
-            Assert::AreEqual(vertical_edge_part(), g.vertical_edge_part());
+            token tok = grammar("|").vertical_edge_part();
+            _(tok).should_be(vertical_edge_part());
         }
 
         TEST_METHOD(should_recognize_a_horizontal_edge)
         {
-            grammar g("---(xyz)--");
-            token tok = g.horizontal_edge();
-            Assert::AreEqual(horizontal_edge("xyz"), tok);
+            token tok = grammar("---(xyz)--").horizontal_edge();
+            _(tok).should_be(horizontal_edge("xyz"));
         }
 
         TEST_METHOD(should_reject_a_nameless_horizontal_edge)
         {
-            grammar g("--");
-            should_throw_(parse_exception("--", 2), [&]{
-                g.horizontal_edge();
+            should_throw_(parse_exception("--", 2), []{
+                grammar("--").horizontal_edge();
             });
         }
 
