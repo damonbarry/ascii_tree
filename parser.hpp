@@ -63,14 +63,9 @@ namespace ascii_tree
             }
         }
 
-        position save_position()
+        position current_position()
         {
             return it_;
-        }
-
-        void restore_position(const position& pos)
-        {
-            it_ = pos;
         }
 
         bool at_begin()

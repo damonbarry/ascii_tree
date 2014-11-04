@@ -63,7 +63,7 @@ namespace ascii_tree { namespace spec
             string test_str = "1333";
             parser<test_traits> p(test_str, test_str.size());
             p.unignore();
-            Assert::AreEqual(test_str.front(), *(p.save_position() - 1));
+            Assert::AreEqual(test_str.front(), *(p.current_position() - 1));
         }
 
         TEST_METHOD(unignore_should_not_try_to_rewind_past_the_beginning_of_the_string)
@@ -116,7 +116,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(substr_should_return_the_string_starting_from_the_given_position)
         {
             parser<test_traits> p("12121", 4);
-            string str = p.substr(p.save_position() - 3);
+            string str = p.substr(p.current_position() - 3);
             Assert::AreEqual("212", str.c_str());
         }
 
