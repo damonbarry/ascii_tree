@@ -26,6 +26,15 @@ namespace ascii_tree { namespace spec
     TEST_CLASS(can_parse_chars)
     {
     public:
+        TEST_METHOD(should_be_able_to_copy_the_parser)
+        {
+            parser<test_traits> p("12", 1);
+            auto pcopy = p;
+            pcopy.expect(two);
+            Assert::IsFalse(p.at_end());
+            Assert::IsTrue(pcopy.at_end());
+        }
+
         TEST_METHOD(ignore_should_not_advance_the_parser_on_an_empty_string)
         {
             parser<test_traits> p("");
