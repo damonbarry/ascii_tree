@@ -94,7 +94,7 @@ namespace ascii_tree
             return it;
         }
 
-        std::string substr(position start)
+        std::string substring(position start)
         {
             return std::string(start, it_);
         }

@@ -114,7 +114,7 @@ namespace ascii_tree
             auto begin = p_.expect(name_char);
             while (p_.accept(name_char)) {}
             p_.unignore(); // strip trailing spaces
-            return p_.substr(begin);
+            return p_.substring(begin);
         }
 
     public:

@@ -116,7 +116,7 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(substr_should_return_the_string_starting_from_the_given_position)
         {
             parser<test_traits> p("12121", 4);
-            string str = p.substr(p.current_position() - 3);
+            string str = p.substring(p.current_position() - 3);
             Assert::AreEqual("212", str.c_str());
         }
 
