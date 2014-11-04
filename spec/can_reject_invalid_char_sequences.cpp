@@ -36,5 +36,21 @@ namespace ascii_tree { namespace spec
             });
         }
 
+        TEST_METHOD(should_reject_an_orphaned_close_square_brace)
+        {
+            should_throw_(parse_exception("]", 0), [&]
+            {
+                tokenize("]");
+            });
+        }
+
+        TEST_METHOD(should_reject_a_close_square_brace_following_a_root_node)
+        {
+            should_throw_(parse_exception("[*]]", 3), [&]
+            {
+                tokenize("[*]]");
+            });
+        }
+
     };
 }}
