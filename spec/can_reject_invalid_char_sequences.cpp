@@ -1,9 +1,6 @@
 #include "grammar.hpp"
 #include "test_helpers.hpp"
-#include <CppUnitTest.h>
-#include <string>
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
 
 namespace ascii_tree { namespace spec

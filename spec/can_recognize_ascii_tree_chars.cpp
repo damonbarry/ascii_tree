@@ -1,23 +1,8 @@
 #include "grammar.hpp"
 #include "test_helpers.hpp"
-#include <CppUnitTest.h>
 #include <string>
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
-
-namespace
-{
-    class terminal_assertions
-    {
-        const terminal& term_;
-    public:
-        explicit terminal_assertions(const terminal& term) : term_(term) {}
-        void should_be(const terminal& other, const wchar_t* message = nullptr) { Assert::AreEqual(other, term_, message); }
-    };
-
-    terminal_assertions _(const terminal& term) { return terminal_assertions(term); }
-}
 
 namespace ascii_tree { namespace spec
 {

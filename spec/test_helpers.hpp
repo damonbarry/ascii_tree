@@ -1,5 +1,6 @@
 #include "grammar.hpp"
 #include <CppUnitTest.h>
+#include <algorithm>
 #include <string>
 
 namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
@@ -109,5 +110,59 @@ namespace ascii_tree { namespace spec
             cpput::Assert::Fail(L"Shouldn't have thrown an exception, but it did.");
         }
     }
+
+    class tokens_assertions
+    {
+        const std::vector<token>& tokens_;
+    public:
+        explicit tokens_assertions(const std::vector<token>& tokens) : tokens_(tokens) {}
+        void should_be_empty()
+        {
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsTrue(tokens_.empty());
+        }
+        void should_equal(std::initializer_list<token> expected)
+        {
+            namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
+
+            auto mismatch_pair = std::mismatch(expected.begin(), expected.end(), tokens_.begin());
+
+            if (mismatch_pair.first != expected.end() || mismatch_pair.second != tokens_.end())
+            {
+                std::wstring expectedName(mismatch_pair.first->name.begin(), mismatch_pair.first->name.end());
+                std::wstring actualName(mismatch_pair.second->name.begin(), mismatch_pair.second->name.end());
+
+                std::wstring message = L"Expected: " + cpput::ToString(mismatch_pair.first->type) + L" \"" + expectedName + L"\" "
+                    + L"Actual: " + cpput::ToString(mismatch_pair.second->type) + L" \"" + actualName + L"\"";
+
+                cpput::Assert::Fail(message.c_str());
+            }
+        }
+    };
+
+    class token_assertions
+    {
+        const token& token_;
+    public:
+        explicit token_assertions(const token& token) : token_(token) {}
+        void should_be(const token& other)
+        {
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(other, token_);
+        }
+    };
+
+    class terminal_assertions
+    {
+        const terminal& term_;
+    public:
+        explicit terminal_assertions(const terminal& term) : term_(term) {}
+        void should_be(const terminal& other, const wchar_t* message = nullptr)
+        {
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(other, term_, message);
+        }
+    };
+
+    inline tokens_assertions _(const std::vector<token>& tokens) { return tokens_assertions(tokens); }
+    inline token_assertions _(const token& token) { return token_assertions(token); }
+    inline terminal_assertions _(const terminal& term) { return terminal_assertions(term); }
 
 }}

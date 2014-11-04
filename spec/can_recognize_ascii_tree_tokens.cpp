@@ -1,49 +1,7 @@
 #include "grammar.hpp"
 #include "test_helpers.hpp"
-#include <CppUnitTest.h>
-#include <algorithm>
-#include <string>
-#include <vector>
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
-
-namespace
-{
-    class tokens_assertions
-    {
-        const vector<token>& tokens_;
-    public:
-        explicit tokens_assertions(const vector<token>& tokens) : tokens_(tokens) {}
-        void should_be_empty() { Assert::IsTrue(tokens_.empty()); }
-        void should_equal(std::initializer_list<token> expected)
-        {
-            auto mismatch_pair = std::mismatch(expected.begin(), expected.end(), tokens_.begin());
-
-            if (mismatch_pair.first != expected.end() || mismatch_pair.second != tokens_.end())
-            {
-                wstring expectedName(mismatch_pair.first->name.begin(), mismatch_pair.first->name.end());
-                wstring actualName(mismatch_pair.second->name.begin(), mismatch_pair.second->name.end());
-
-                wstring message = L"Expected: " + ToString(mismatch_pair.first->type) + L" \"" + expectedName + L"\" "
-                    + L"Actual: " + ToString(mismatch_pair.second->type) + L" \"" + actualName + L"\"";
-
-                Assert::Fail(message.c_str());
-            }
-        }
-    };
-
-    class token_assertions
-    {
-        const token& token_;
-    public:
-        explicit token_assertions(const token& token) : token_(token) {}
-        void should_be(const token& other) { Assert::AreEqual(other, token_); }
-    };
-
-    tokens_assertions _(const vector<token>& tokens) { return tokens_assertions(tokens); }
-    token_assertions _(const token& token) { return token_assertions(token); }
-}
 
 namespace ascii_tree { namespace spec
 {
