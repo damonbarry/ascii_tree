@@ -181,44 +181,37 @@ namespace ascii_tree
             std::vector<token> tokens;
             while (p_.ignore(), !p_.at_end())
             {
-                auto pos = p_.save_position();
+                auto peek = p_;
 
-                if (p_.accept(open_square_brace))
+                if (peek.accept(open_square_brace))
                 {
-                    if (p_.accept(asterisk))
+                    if (peek.accept(asterisk))
                     {
-                        p_.restore_position(pos);
                         tokens.emplace_back(root_node());
                     }
                     else
                     {
-                        p_.restore_position(pos);
                         tokens.emplace_back(named_node());
                     }
                 }
-                else if (p_.accept(dash))
+                else if (peek.accept(dash))
                 {
-                    p_.restore_position(pos);
                     tokens.emplace_back(horizontal_edge());
                 }
-                else if (p_.accept(backslash))
+                else if (peek.accept(backslash))
                 {
-                    p_.restore_position(pos);
                     tokens.emplace_back(descending_edge_part());
                 }
-                else if (p_.accept(pipe))
+                else if (peek.accept(pipe))
                 {
-                    p_.restore_position(pos);
                     tokens.emplace_back(vertical_edge_part());
                 }
-                else if (p_.accept(slash))
+                else if (peek.accept(slash))
                 {
-                    p_.restore_position(pos);
                     tokens.emplace_back(ascending_edge_part());
                 }
-                else if (p_.accept(open_paren))
+                else if (peek.accept(open_paren))
                 {
-                    p_.restore_position(pos);
                     tokens.emplace_back(edge_name());
                 }
                 else
