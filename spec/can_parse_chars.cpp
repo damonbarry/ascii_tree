@@ -1,9 +1,7 @@
 #include "parser.hpp"
 #include "test_helpers.hpp"
-#include <CppUnitTest.h>
 #include <string>
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
 
 namespace ascii_tree { namespace spec
@@ -117,13 +115,12 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(substring_should_return_the_chars_from_the_given_position_to_the_current_position)
         {
-            test_parser p("1212");
-            p.expect(one);
+            test_parser p("1212", 1);   // position is here: "1>212"
             position start = p.current_position();
             p.expect(two);
-            p.expect(one);
+            p.expect(one);              // moves to here:    "121>2"
             string str = p.substring(start);
-            Assert::AreEqual("21", str.c_str());
+            _(str).should_be("21");
         }
 
         TEST_METHOD(error_should_throw_a_parse_exception)
