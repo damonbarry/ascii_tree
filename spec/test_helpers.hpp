@@ -1,4 +1,5 @@
 #include "grammar.hpp"
+#include "syntax_tree.hpp"
 #include <CppUnitTest.h>
 #include <algorithm>
 #include <string>
@@ -79,24 +80,40 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
 
 namespace ascii_tree { namespace spec
 {
-
-    template<typename Fn>
-    void should_throw_(const ascii_tree::parse_exception& expected, Fn fn)
+    inline void exception_contents_should_match_(
+        const ascii_tree::parse_exception& expected, const ascii_tree::parse_exception& actual)
     {
         namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
 
-        cpput::Assert::ExpectException<ascii_tree::parse_exception>([&]
+        cpput::Assert::AreEqual(expected.s.c_str(), actual.s.c_str(),
+            L"value of parse_exception::s is wrong");
+        cpput::Assert::AreEqual(expected.pos, actual.pos,
+            L"value of parse_exception::pos is wrong");
+    }
+
+    inline void exception_contents_should_match_(
+        const ascii_tree::analyze_exception& expected, const ascii_tree::analyze_exception& actual)
+    {
+        namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
+
+        cpput::Assert::AreEqual(expected.reason.c_str(), actual.reason.c_str(),
+            L"value of analyze_exception::reason is wrong");
+    }
+
+    template<typename Ex, typename Fn>
+    void should_throw_(const Ex& expected, Fn fn)
+    {
+        namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
+
+        cpput::Assert::ExpectException<Ex>([&]
         {
             try
             {
                 fn();
             }
-            catch (ascii_tree::parse_exception& actual)
+            catch (const Ex& actual)
             {
-                cpput::Assert::AreEqual(expected.s.c_str(), actual.s.c_str(),
-                    L"value of parse_exception::s is wrong");
-                cpput::Assert::AreEqual(expected.pos, actual.pos,
-                    L"value of parse_exception::pos is wrong");
+                exception_contents_should_match_(expected, actual);
                 throw;
             }
         });

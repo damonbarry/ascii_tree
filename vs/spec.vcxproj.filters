@@ -27,6 +27,9 @@
     <ClCompile Include="..\spec\can_parse_chars.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\spec\can_generate_a_syntax_tree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\grammar.hpp">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parser.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\syntax_tree.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

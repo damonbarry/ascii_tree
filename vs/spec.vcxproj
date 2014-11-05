@@ -82,6 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\spec\can_generate_a_syntax_tree.cpp" />
     <ClCompile Include="..\spec\can_parse_chars.cpp" />
     <ClCompile Include="..\spec\can_recognize_ascii_tree_tokens.cpp" />
     <ClCompile Include="..\spec\can_reject_invalid_char_sequences.cpp" />
@@ -91,6 +92,7 @@
     <ClInclude Include="..\grammar.hpp" />
     <ClInclude Include="..\parser.hpp" />
     <ClInclude Include="..\spec\test_helpers.hpp" />
+    <ClInclude Include="..\syntax_tree.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
