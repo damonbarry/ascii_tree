@@ -16,6 +16,32 @@ namespace ascii_tree
         parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
     };
 
+    class position
+    {
+        std::shared_ptr<const std::string> s_;
+        std::string::const_iterator it_;
+
+        position(std::shared_ptr<const std::string>& s, std::string::const_iterator it) : s_(s), it_(it) {}
+
+        template<class T>
+        friend class parser;
+
+        friend bool operator==(const position& lhs, const position& rhs)
+        {
+            return lhs.s_ == rhs.s_ &&
+                lhs.it_ == rhs.it_;
+        }
+
+    public:
+        std::wstring to_string() const
+        {
+            return std::wstring(L"position=") + 
+                std::to_wstring(std::distance(s_->begin(), it_)) + L"/" + 
+                std::to_wstring(s_->length()) + L" (" +
+                (it_ == s_->end() ? L"<end>" : std::wstring(1, *it_)) + L")";
+        }
+    };
+
     template<class TerminalTraits>
     class parser
     {
@@ -34,8 +60,6 @@ namespace ascii_tree
         }
 
     public:
-        typedef std::string::const_iterator position;
-
         explicit parser(const std::string& s)
             : parser(s, 0)
         {}
@@ -65,7 +89,7 @@ namespace ascii_tree
 
         position current_position()
         {
-            return it_;
+            return position(s_, it_);
         }
 
         bool at_begin()
@@ -91,12 +115,12 @@ namespace ascii_tree
                 throw parse_exception(*s_, std::distance(s_->begin(), it_));
             }
 
-            return it;
+            return position(s_, it);
         }
 
         std::string substring(position start)
         {
-            return std::string(start, it_);
+            return std::string(start.it_, it_);
         }
 
         void error()

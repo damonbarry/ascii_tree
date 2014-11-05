@@ -69,6 +69,12 @@ namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
         std::wstring name(tok.name.begin(), tok.name.end());
         return ToString(tok.type) + L" " + name;
     }
+
+    template<>
+    inline std::wstring ToString<position>(const position& pos)
+    {
+        return pos.to_string();
+    }
 }}}
 
 namespace ascii_tree { namespace spec
@@ -139,17 +145,6 @@ namespace ascii_tree { namespace spec
         }
     };
 
-    class token_assertions
-    {
-        const token& token_;
-    public:
-        explicit token_assertions(const token& token) : token_(token) {}
-        void should_be(const token& other)
-        {
-            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(other, token_);
-        }
-    };
-
     class terminal_assertions
     {
         const terminal& term_;
@@ -176,9 +171,23 @@ namespace ascii_tree { namespace spec
         }
     };
 
+    template<class ValType>
+    class value_assertions
+    {
+        const ValType val_;
+    public:
+        value_assertions(ValType val) : val_(val) {}
+        void should_be(ValType other)
+        {
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(other, val_);
+        }
+    };
+
     inline tokens_assertions _(const std::vector<token>& tokens) { return tokens_assertions(tokens); }
-    inline token_assertions _(const token& token) { return token_assertions(token); }
     inline terminal_assertions _(const terminal& term) { return terminal_assertions(term); }
     inline bool_assertions _(bool val) { return bool_assertions(val); }
+
+    template<class ValType>
+    value_assertions<ValType> _(ValType val) { return value_assertions<ValType>(val); }
 
 }}

@@ -65,10 +65,12 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(unignore_should_rewind_to_the_beginning_of_an_ignored_char_sequence)
         {
-            string test_str = "1333";
-            test_parser p(test_str, test_str.size());
-            p.unignore();
-            Assert::AreEqual(test_str.front(), *(p.current_position() - 1));
+            string test_str = "1332";
+            test_parser p(test_str, 1); // position is here: "1>332"
+            position expected_pos = p.current_position();
+            p.accept(one);              // moves to here:    "133>2"
+            p.unignore();               // rewinds to here:  "1>332"
+            _(p.current_position()).should_be(expected_pos);
         }
 
         TEST_METHOD(unignore_should_not_try_to_rewind_past_the_beginning_of_the_string)
@@ -113,11 +115,15 @@ namespace ascii_tree { namespace spec
             });
         }
 
-        TEST_METHOD(substr_should_return_the_string_starting_from_the_given_position)
+        TEST_METHOD(substring_should_return_the_chars_from_the_given_position_to_the_current_position)
         {
-            test_parser p("12121", 4);
-            string str = p.substring(p.current_position() - 3);
-            Assert::AreEqual("212", str.c_str());
+            test_parser p("1212");
+            p.expect(one);
+            position start = p.current_position();
+            p.expect(two);
+            p.expect(one);
+            string str = p.substring(start);
+            Assert::AreEqual("21", str.c_str());
         }
 
         TEST_METHOD(error_should_throw_a_parse_exception)
