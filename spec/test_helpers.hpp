@@ -145,17 +145,6 @@ namespace ascii_tree { namespace spec
         }
     };
 
-    class terminal_assertions
-    {
-        const terminal& term_;
-    public:
-        explicit terminal_assertions(const terminal& term) : term_(term) {}
-        void should_be(const terminal& other, const wchar_t* message = nullptr)
-        {
-            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(other, term_, message);
-        }
-    };
-
     class bool_assertions
     {
         const bool val_;
@@ -177,14 +166,13 @@ namespace ascii_tree { namespace spec
         const ValType val_;
     public:
         value_assertions(ValType val) : val_(val) {}
-        void should_be(ValType other)
+        void should_be(ValType other, const wchar_t* message = nullptr)
         {
-            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(other, val_);
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(other, val_, message);
         }
     };
 
     inline tokens_assertions _(const std::vector<token>& tokens) { return tokens_assertions(tokens); }
-    inline terminal_assertions _(const terminal& term) { return terminal_assertions(term); }
     inline bool_assertions _(bool val) { return bool_assertions(val); }
 
     template<class ValType>
