@@ -223,11 +223,6 @@ namespace ascii_tree
             return tokens;
         }
     };
-
-    inline std::vector<token> tokenize(const std::string& s)
-    {
-        return grammar(s).tokens();
-    }
 }
 
 #endif // ASCII_TREE_GRAMMAR_H
