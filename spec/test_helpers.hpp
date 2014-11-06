@@ -1,6 +1,7 @@
 #include "grammar.hpp"
 #include "syntax_tree.hpp"
 #include <CppUnitTest.h>
+#include <type_traits>
 #include <algorithm>
 #include <string>
 
@@ -177,22 +178,39 @@ namespace ascii_tree { namespace spec
         }
     };
 
-    template<class ValType>
+    template<class T>
     class value_assertions
     {
-        const ValType val_;
+        const T val_;
     public:
-        value_assertions(ValType val) : val_(val) {}
-        void should_be(ValType other, const wchar_t* message = nullptr)
+        value_assertions(T val) : val_(val) {}
+        void should_be(T other, const wchar_t* message = nullptr)
         {
             Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(other, val_, message);
+        }
+    };
+
+    template<class T>
+    class pointer_assertions
+    {
+        const T ptr_;
+    public:
+        pointer_assertions(T ptr) : ptr_(ptr) {}
+        void should_not_be_null()
+        {
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsNotNull(ptr_);
         }
     };
 
     inline tokens_assertions _(const std::vector<token>& tokens) { return tokens_assertions(tokens); }
     inline bool_assertions _(bool val) { return bool_assertions(val); }
 
-    template<class ValType>
-    value_assertions<ValType> _(ValType val) { return value_assertions<ValType>(val); }
+    template<class T,
+        typename std::enable_if<!std::is_pointer<T>::value>::type* = nullptr>
+    value_assertions<T> _(T val) { return value_assertions<T>(val); }
+
+    template<class T,
+        typename std::enable_if<std::is_pointer<T>::value>::type* = nullptr>
+    pointer_assertions<T> _(T ptr) { return pointer_assertions<T>(ptr); }
 
 }}
