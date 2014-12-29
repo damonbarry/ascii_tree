@@ -17,16 +17,26 @@ namespace ascii_tree
     class syntax_tree
     {
         const std::vector<token> tokens_;
+        typedef std::vector<token>::const_iterator token_iterator;
+
+        token_iterator find_root_node_(token_iterator begin)
+        {
+            return std::find_if(begin, tokens_.end(), [](const token& tok){
+                return tok.type == token::root_node;
+            });
+        }
+
     public:
         explicit syntax_tree(const std::vector<token>& tokens) : tokens_(tokens) { }
 
         const token& analyze()
         {
-            auto root_it = std::find_if(tokens_.begin(), tokens_.end(), [](const token& tok){
-                return tok.type == token::root_node;
-            });
-
+            auto root_it = find_root_node_(tokens_.begin());
             if (root_it == tokens_.end()) { throw analyze_exception("missing root node"); }
+
+            auto dup_it = find_root_node_(root_it + 1);
+            if (dup_it != tokens_.end()) { throw analyze_exception("more than one root node"); }
+
             return *root_it;
         }
     };

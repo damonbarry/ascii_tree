@@ -23,5 +23,12 @@ namespace ascii_tree { namespace spec
             auto result = tree.analyze();
             _(result).should_be(root_node());
         }
+
+        TEST_METHOD(should_throw_if_more_than_one_root_node_is_present)
+        {
+            should_throw_(analyze_exception("more than one root node"), []{
+                syntax_tree({ { root_node(), root_node() } }).analyze();
+            });
+        }
     };
 }}
