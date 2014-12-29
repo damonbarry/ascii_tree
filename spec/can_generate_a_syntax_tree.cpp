@@ -21,7 +21,7 @@ namespace ascii_tree { namespace spec
         {
             syntax_tree tree(vector<token>{ root_node() });
             auto result = tree.analyze();
-            _(*result).should_be(root_node());
+            _(result).should_be(root_node());
         }
     };
 }}

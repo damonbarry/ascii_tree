@@ -19,10 +19,10 @@ namespace ascii_tree
     public:
         explicit syntax_tree(const std::vector<token>& tokens) : tokens_(tokens) { }
 
-        const token* analyze()
+        const token& analyze()
         {
             if (tokens_.empty()) { throw analyze_exception("missing root node"); }
-            return &tokens_.front();
+            return tokens_.front();
         }
     };
 }
