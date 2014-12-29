@@ -22,10 +22,11 @@ namespace ascii_tree
 
         const token& analyze()
         {
-            if (tokens_.empty()) { throw analyze_exception("missing root node"); }
             auto root_it = std::find_if(tokens_.begin(), tokens_.end(), [](const token& tok){
                 return tok.type == token::root_node;
             });
+
+            if (root_it == tokens_.end()) { throw analyze_exception("missing root node"); }
             return *root_it;
         }
     };
