@@ -13,18 +13,16 @@ namespace ascii_tree
         analyze_exception(const std::string& reason) : reason(reason) {}
     };
 
-    struct node {};
-
     class syntax_tree
     {
         const std::vector<token> tokens_;
     public:
         explicit syntax_tree(const std::vector<token>& tokens) : tokens_(tokens) { }
 
-        const node* analyze()
+        const token* analyze()
         {
             if (tokens_.empty()) { throw analyze_exception("missing root node"); }
-            return new node();
+            return &tokens_.front();
         }
     };
 }

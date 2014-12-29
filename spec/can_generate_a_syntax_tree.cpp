@@ -20,8 +20,8 @@ namespace ascii_tree { namespace spec
         TEST_METHOD(should_point_to_the_root_node_when_it_is_present)
         {
             syntax_tree tree(vector<token>{ root_node() });
-            auto root = tree.analyze();
-            _(root).should_not_be_null();
+            auto result = tree.analyze();
+            _(*result).should_be(root_node());
         }
     };
 }}
