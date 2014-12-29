@@ -4,6 +4,7 @@
 #include "grammar.hpp"
 #include <string>
 #include <vector>
+#include <algorithm>
 
 namespace ascii_tree
 {
@@ -22,7 +23,10 @@ namespace ascii_tree
         const token& analyze()
         {
             if (tokens_.empty()) { throw analyze_exception("missing root node"); }
-            return tokens_.front();
+            auto root_it = std::find_if(tokens_.begin(), tokens_.end(), [](const token& tok){
+                return tok.type == token::root_node;
+            });
+            return *root_it;
         }
     };
 }

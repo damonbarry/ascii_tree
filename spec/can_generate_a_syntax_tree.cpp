@@ -19,7 +19,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(should_point_to_the_root_node_when_it_is_present)
         {
-            syntax_tree tree(vector<token>{ root_node() });
+            syntax_tree tree(vector < token > { { named_node("b"), horizontal_edge("a"), root_node() } });
             auto result = tree.analyze();
             _(result).should_be(root_node());
         }
