@@ -3,6 +3,7 @@
 
 #include "grammar.hpp"
 #include <string>
+#include <memory>
 #include <vector>
 #include <algorithm>
 
@@ -14,8 +15,15 @@ namespace ascii_tree
         analyze_exception(const std::string& reason) : reason(reason) {}
     };
 
+    struct node
+    {
+        token tok;
+        explicit node(const token& tok) : tok(tok) {}
+    };
+
     class syntax_tree
     {
+        std::unique_ptr<node> root_;
         const std::vector<token> tokens_;
         typedef std::vector<token>::const_iterator token_iterator;
 
@@ -29,7 +37,7 @@ namespace ascii_tree
     public:
         explicit syntax_tree(const std::vector<token>& tokens) : tokens_(tokens) { }
 
-        const token& analyze()
+        const node& analyze()
         {
             auto root_it = find_root_node_(tokens_.begin());
             if (root_it == tokens_.end()) { throw analyze_exception("missing root node"); }
@@ -37,7 +45,8 @@ namespace ascii_tree
             auto dup_it = find_root_node_(root_it + 1);
             if (dup_it != tokens_.end()) { throw analyze_exception("more than one root node"); }
 
-            return *root_it;
+            root_ = std::make_unique<node>(*root_it);
+            return *root_;
         }
     };
 }

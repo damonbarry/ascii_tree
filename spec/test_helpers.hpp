@@ -178,6 +178,17 @@ namespace ascii_tree { namespace spec
         }
     };
 
+    class node_assertions
+    {
+        const node& node_;
+    public:
+        node_assertions(const node& n) : node_(n) {}
+        void should_be(const token& tok, const wchar_t* message = nullptr)
+        {
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(tok, node_.tok, message);
+        }
+    };
+
     template<class T>
     class value_assertions
     {
@@ -192,8 +203,9 @@ namespace ascii_tree { namespace spec
 
     inline tokens_assertions _(const std::vector<token>& tokens) { return tokens_assertions(tokens); }
     inline bool_assertions _(bool val) { return bool_assertions(val); }
+    inline node_assertions _(const node& n) { return node_assertions(n); }
 
     template<class T,
         typename std::enable_if<!std::is_pointer<T>::value>::type* = nullptr>
-    value_assertions<T> _(T val) { return value_assertions<T>(val); }
+        value_assertions<T> _(T val) { return value_assertions<T>(val); }
 }}
