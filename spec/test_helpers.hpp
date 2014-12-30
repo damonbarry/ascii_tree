@@ -187,6 +187,16 @@ namespace ascii_tree { namespace spec
         {
             Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(tok, node_.tok, message);
         }
+        void should_have_node_along_edge(const std::string& node_name, const std::string& edge_name, const wchar_t* message = nullptr)
+        {
+            auto edge_it = std::find_if(node_.edges.begin(), node_.edges.end(), [&edge_name](const edge& e){
+                return (edge_name == e.tok.name);
+            });
+
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsTrue(edge_it != node_.edges.end(), message);
+
+            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(node_name, edge_it->node.tok.name, message);
+        }
     };
 
     template<class T>

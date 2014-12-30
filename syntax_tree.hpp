@@ -15,10 +15,19 @@ namespace ascii_tree
         analyze_exception(const std::string& reason) : reason(reason) {}
     };
 
+    struct edge;
     struct node
     {
         token tok;
+        std::vector<edge> edges;
         explicit node(const token& tok) : tok(tok) {}
+    };
+
+    struct edge
+    {
+        token tok;
+        node node;
+        edge(const token& tok, const ascii_tree::node& n) : tok(tok), node(n) {}
     };
 
     class syntax_tree
@@ -35,7 +44,7 @@ namespace ascii_tree
         }
 
     public:
-        explicit syntax_tree(const std::vector<token>& tokens) : tokens_(tokens) { }
+        explicit syntax_tree(const std::vector<token>& tokens) : tokens_(tokens) {}
 
         const node& analyze()
         {
@@ -46,6 +55,7 @@ namespace ascii_tree
             if (dup_it != tokens_.end()) { throw analyze_exception("more than one root node"); }
 
             root_ = std::make_unique<node>(*root_it);
+            root_->edges.emplace_back(*(root_it + 1), node(*(root_it + 2)));
             return *root_;
         }
     };
