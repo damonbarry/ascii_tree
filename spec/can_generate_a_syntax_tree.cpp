@@ -72,5 +72,19 @@ namespace ascii_tree { namespace spec
             auto result = tree.analyze();
             _(result).should_have_node_along_edge("n", "e");
         }
+
+        TEST_METHOD(should_generate_a_tree_with_root_descending_edge_leaf)
+        {
+            syntax_tree tree({ { root_node(), descending_edge_part(), edge_name("e"), descending_edge_part(), named_node("n") } });
+            auto result = tree.analyze();
+            _(result).should_have_node_along_edge("n", "e");
+        }
+
+        TEST_METHOD(should_generate_a_tree_with_leaf_descending_edge_root)
+        {
+            syntax_tree tree({ { named_node("n"), descending_edge_part(), edge_name("e"), descending_edge_part(), root_node() } });
+            auto result = tree.analyze();
+            _(result).should_have_node_along_edge("n", "e");
+        }
     };
 }}
