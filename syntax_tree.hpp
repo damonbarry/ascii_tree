@@ -55,7 +55,25 @@ namespace ascii_tree
             if (dup_it != tokens_.end()) { throw analyze_exception("more than one root node"); }
 
             root_ = std::make_unique<node>(*root_it);
-            root_->edges.emplace_back(*(root_it + 1), node(*(root_it + 2)));
+
+            if (root_it != tokens_.begin())
+            {
+                auto prev_it = root_it - 1;
+                if (prev_it->type == token::horizontal_edge)
+                {
+                    root_->edges.emplace_back(*prev_it, node(*(prev_it - 1)));
+                }
+            }
+
+            if (root_it + 1 != tokens_.end())
+            {
+                auto next_it = root_it + 1;
+                if (next_it->type == token::horizontal_edge)
+                {
+                    root_->edges.emplace_back(*next_it, node(*(next_it + 1)));
+                }
+            }
+
             return *root_;
         }
     };

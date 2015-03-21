@@ -31,11 +31,18 @@ namespace ascii_tree { namespace spec
             });
         }
 
-        TEST_METHOD(should_generate_a_simple_tree_with_root_edge_leaf)
+        TEST_METHOD(should_generate_a_tree_with_root_horizontal_edge_leaf)
         {
-            syntax_tree tree({ { root_node(), horizontal_edge("a"), named_node("b") } });
+            syntax_tree tree({ { root_node(), horizontal_edge("e"), named_node("n") } });
             auto result = tree.analyze();
-            _(result).should_have_node_along_edge("b", "a");
+            _(result).should_have_node_along_edge("n", "e");
+        }
+
+        TEST_METHOD(should_generate_a_tree_with_leaf_horizontal_edge_root)
+        {
+            syntax_tree tree({ { named_node("n"), horizontal_edge("e"), root_node() } });
+            auto result = tree.analyze();
+            _(result).should_have_node_along_edge("n", "e");
         }
     };
 }}
