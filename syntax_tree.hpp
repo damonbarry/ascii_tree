@@ -63,6 +63,10 @@ namespace ascii_tree
                 {
                     root_->edges.emplace_back(*prev_it, node(*(prev_it - 1)));
                 }
+                else if (prev_it->type == token::vertical_edge_part) // vertical_edge_part + edge_name + vertical_edge_part + node
+                {
+                    root_->edges.emplace_back(*(prev_it - 1), node(*(prev_it - 3)));
+                }
             }
 
             if (root_it + 1 != tokens_.end())

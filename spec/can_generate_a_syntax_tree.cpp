@@ -51,5 +51,12 @@ namespace ascii_tree { namespace spec
             auto result = tree.analyze();
             _(result).should_have_node_along_edge("n", "e");
         }
+
+        TEST_METHOD(should_generate_a_tree_with_leaf_vertical_edge_root)
+        {
+            syntax_tree tree({ { named_node("n"), vertical_edge_part(), edge_name("e"), vertical_edge_part(), root_node() } });
+            auto result = tree.analyze();
+            _(result).should_have_node_along_edge("n", "e");
+        }
     };
 }}
