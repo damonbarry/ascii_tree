@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include <iterator>
 
 namespace ascii_tree
@@ -46,17 +47,19 @@ namespace ascii_tree
     class parser
     {
         typedef typename TerminalTraits::type terminal;
+        typedef std::vector<std::shared_ptr<const std::string>> vector_type;
 
-        std::shared_ptr<const std::string> s_;
-        std::string::const_iterator it_;
+        vector_type rows_;
+        vector_type::iterator which_row_;
+        std::string::const_iterator which_char_;
 
         std::string::const_iterator accept_(terminal term)
         {
             ignore();
-            if (at_end()) { return s_->end(); }
+            if (at_end()) { return (*which_row_)->end(); }
 
-            terminal next_term = TerminalTraits::to_terminal(*it_);
-            return (term == next_term) ? it_++ : s_->end();
+            terminal next_term = TerminalTraits::to_terminal(*which_char_);
+            return (term == next_term) ? which_char_++ : (*which_row_)->end();
         }
 
     public:
@@ -64,68 +67,71 @@ namespace ascii_tree
             : parser(s, 0)
         {}
 
-        parser(const std::string& s, size_t init_pos)
-            : s_(std::make_shared<const std::string>(s)), it_(s_->begin() + init_pos)
+        parser(const std::string& s, size_t init_pos) :
+            rows_(vector_type(1, std::make_shared<const std::string>(s))),
+            which_row_(rows_.begin()),
+            which_char_((*which_row_)->begin() + init_pos)
         {}
 
         parser(const parser& other)
-            : s_(other.s_), it_(other.it_)
+            : rows_(other.rows_), which_row_(other.which_row_), which_char_(other.which_char_)
         {}
 
         void ignore()
         {
             if (at_end()) { return; }
-            while (TerminalTraits::to_terminal(*it_) == TerminalTraits::ignore_me && ++it_ != s_->end()) {}
+            while (TerminalTraits::to_terminal(*which_char_) == TerminalTraits::ignore_me &&
+                ++which_char_ != (*which_row_)->end()) {}
         }
 
         void unignore()
         {
             while (!at_begin() &&
-                TerminalTraits::to_terminal(*(it_ - 1)) == TerminalTraits::ignore_me)
+                TerminalTraits::to_terminal(*(which_char_ - 1)) == TerminalTraits::ignore_me)
             {
-                --it_;
+                --which_char_;
             }
         }
 
         position current_position()
         {
-            return position(s_, it_);
+            return position(*which_row_, which_char_);
         }
 
         bool at_begin()
         {
-            return it_ == s_->begin();
+            return which_char_ == (*which_row_)->begin();
         }
 
         bool at_end()
         {
-            return it_ == s_->end();
+            return which_char_ == (*which_row_)->end();
         }
 
         bool accept(terminal term)
         {
-            return accept_(term) != s_->end();
+            return accept_(term) != (*which_row_)->end();
         }
 
         position expect(terminal term)
         {
             auto it = accept_(term);
-            if (it == s_->end())
+            if (it == (*which_row_)->end())
             {
-                throw parse_exception(*s_, std::distance(s_->begin(), it_));
+                throw parse_exception(**which_row_, std::distance((*which_row_)->begin(), which_char_));
             }
 
-            return position(s_, it);
+            return position(*which_row_, it);
         }
 
         std::string substring(position start)
         {
-            return std::string(start.it_, it_);
+            return std::string(start.it_, which_char_);
         }
 
         void error()
         {
-            throw parse_exception(*s_, std::distance(s_->begin(), it_));
+            throw parse_exception(**which_row_, std::distance((*which_row_)->begin(), which_char_));
         }
     };
 
