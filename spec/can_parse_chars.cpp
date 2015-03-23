@@ -47,9 +47,7 @@ namespace ascii_tree { namespace spec
 
         TEST_METHOD(ignore_should_ignore_chars)
         {
-            test_parser p("33313");
-            p.ignore();
-            p.expect(one);
+            test_parser p("333");
             p.ignore();
             _(p.at_end()).should_be_true();
         }
