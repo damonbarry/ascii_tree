@@ -133,6 +133,16 @@ namespace ascii_tree { namespace spec
             });
         }
 
+        TEST_METHOD(expect_should_throw_when_a_terminal_matches_on_the_next_row)
+        {
+            should_throw_(parse_exception("1", 1), []
+            {
+                test_parser p({ "1", "2" });
+                p.accept(one);
+                p.expect(two);
+            });
+        }
+
         TEST_METHOD(substring_should_return_the_chars_from_the_given_position_to_the_current_position)
         {
             test_parser p("1212", 1);   // position is here: "1>212"
