@@ -86,9 +86,7 @@ namespace ascii_tree
         {}
 
         parser(std::initializer_list<std::string> l) :
-            rows_(make_vector_of_shared_ptrs_(l)),
-            which_row_(rows_.begin()),
-            which_char_((*which_row_)->begin())
+            parser(l, 0, 0)
         {}
 
         parser(std::initializer_list<std::string> l, size_t init_row, size_t init_pos) :
