@@ -54,7 +54,7 @@ namespace ascii_tree
         vector_type::iterator which_row_;
         std::string::const_iterator which_char_;
 
-        vector_type make_vector_of_shared_ptrs(std::initializer_list<std::string> l)
+        vector_type make_vector_of_shared_ptrs_(std::initializer_list<std::string> l)
         {
             vector_type vec;
             for (const auto& elem : l)
@@ -74,6 +74,16 @@ namespace ascii_tree
             return (term == next_term) ? which_char_++ : (*which_row_)->end();
         }
 
+        bool at_line_begin_()
+        {
+            return which_char_ == (*which_row_)->begin();
+        }
+
+        bool at_line_end_()
+        {
+            return which_char_ == (*which_row_)->end();
+        }
+
     public:
         explicit parser(const std::string& s)
             : parser(s, 0)
@@ -86,7 +96,7 @@ namespace ascii_tree
         {}
 
         parser(std::initializer_list<std::string> l) :
-            rows_(make_vector_of_shared_ptrs(l)),
+            rows_(make_vector_of_shared_ptrs_(l)),
             which_row_(rows_.begin()),
             which_char_((*which_row_)->begin())
         {}
@@ -101,17 +111,17 @@ namespace ascii_tree
         {
             while (which_row_ != rows_.end())
             {
-                if (at_end())
+                if (at_line_end_())
                 {
                     if (which_row_ + 1 == rows_.end()) { return; }
                     ++which_row_;
                     which_char_ = (*which_row_)->begin();
-                    if (at_end()) { return; }
+                    if (at_line_end_()) { return; }
                 }
                 while (TerminalTraits::to_terminal(*which_char_) == TerminalTraits::ignore_me &&
                     ++which_char_ != (*which_row_)->end())
                 {}
-                if (!at_end()) { return; }
+                if (!at_line_end_()) { return; }
             }
         }
 
@@ -131,12 +141,12 @@ namespace ascii_tree
 
         bool at_begin()
         {
-            return which_char_ == (*which_row_)->begin();
+            return which_row_ == rows_.begin() && at_line_begin_();
         }
 
         bool at_end()
         {
-            return which_char_ == (*which_row_)->end();
+            return which_row_ + 1 == rows_.end() && at_line_end_();
         }
 
         bool accept(terminal term)
