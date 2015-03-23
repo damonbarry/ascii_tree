@@ -74,16 +74,6 @@ namespace ascii_tree
             return (term == next_term) ? which_char_++ : (*which_row_)->end();
         }
 
-        bool at_line_begin_()
-        {
-            return which_char_ == (*which_row_)->begin();
-        }
-
-        bool at_line_end_()
-        {
-            return which_char_ == (*which_row_)->end();
-        }
-
     public:
         explicit parser(const std::string& s)
             : parser(s, 0)
@@ -101,6 +91,12 @@ namespace ascii_tree
             which_char_((*which_row_)->begin())
         {}
 
+        parser(std::initializer_list<std::string> l, size_t init_row, size_t init_pos) :
+            rows_(make_vector_of_shared_ptrs_(l)),
+            which_row_(rows_.begin() + init_row),
+            which_char_((*which_row_)->begin() + init_pos)
+        {}
+
         parser(const parser& other) :
             rows_(other.rows_),
             which_row_(rows_.begin() + std::distance<vector_type::const_iterator>(other.rows_.begin(), other.which_row_)),
@@ -111,23 +107,23 @@ namespace ascii_tree
         {
             while (which_row_ != rows_.end())
             {
-                if (at_line_end_())
+                if (at_line_end())
                 {
                     if (which_row_ + 1 == rows_.end()) { return; }
                     ++which_row_;
                     which_char_ = (*which_row_)->begin();
-                    if (at_line_end_()) { return; }
+                    if (at_line_end()) { return; }
                 }
                 while (TerminalTraits::to_terminal(*which_char_) == TerminalTraits::ignore_me &&
                     ++which_char_ != (*which_row_)->end())
                 {}
-                if (!at_line_end_()) { return; }
+                if (!at_line_end()) { return; }
             }
         }
 
         void unignore()
         {
-            while (!at_begin() &&
+            while (!at_line_begin() &&
                 TerminalTraits::to_terminal(*(which_char_ - 1)) == TerminalTraits::ignore_me)
             {
                 --which_char_;
@@ -139,14 +135,24 @@ namespace ascii_tree
             return position(*which_row_, which_char_);
         }
 
+        bool at_line_begin()
+        {
+            return which_char_ == (*which_row_)->begin();
+        }
+
+        bool at_line_end()
+        {
+            return which_char_ == (*which_row_)->end();
+        }
+
         bool at_begin()
         {
-            return which_row_ == rows_.begin() && at_line_begin_();
+            return which_row_ == rows_.begin() && at_line_begin();
         }
 
         bool at_end()
         {
-            return which_row_ + 1 == rows_.end() && at_line_end_();
+            return which_row_ + 1 == rows_.end() && at_line_end();
         }
 
         bool accept(terminal term)

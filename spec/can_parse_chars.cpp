@@ -87,6 +87,14 @@ namespace ascii_tree { namespace spec
             _(p.at_begin()).should_be_true();
         }
 
+        TEST_METHOD(unignore_should_not_try_to_rewind_to_a_previous_string)
+        {
+            test_parser p({ "33", "31" }, 1, 1);
+            p.unignore();
+            _(p.at_begin()).should_be_false();
+            _(p.at_line_begin()).should_be_true();
+        }
+
         TEST_METHOD(should_accept_a_terminal_when_it_matches_the_expected_value)
         {
             test_parser p("1");
