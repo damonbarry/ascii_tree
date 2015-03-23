@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
+#include <initializer_list>
 
 namespace ascii_tree
 {
@@ -53,6 +54,17 @@ namespace ascii_tree
         vector_type::iterator which_row_;
         std::string::const_iterator which_char_;
 
+        vector_type make_vector_of_shared_ptrs(std::initializer_list<std::string> l)
+        {
+            vector_type vec;
+            for (const auto& elem : l)
+            {
+                vec.emplace_back(make_shared<const std::string>(elem));
+            }
+
+            return vec;
+        }
+
         std::string::const_iterator accept_(terminal term)
         {
             ignore();
@@ -73,15 +85,34 @@ namespace ascii_tree
             which_char_((*which_row_)->begin() + init_pos)
         {}
 
-        parser(const parser& other)
-            : rows_(other.rows_), which_row_(other.which_row_), which_char_(other.which_char_)
+        parser(std::initializer_list<std::string> l) :
+            rows_(make_vector_of_shared_ptrs(l)),
+            which_row_(rows_.begin()),
+            which_char_((*which_row_)->begin())
+        {}
+
+        parser(const parser& other) :
+            rows_(other.rows_),
+            which_row_(rows_.begin() + std::distance<vector_type::const_iterator>(other.rows_.begin(), other.which_row_)),
+            which_char_((*which_row_)->begin() + std::distance((*other.which_row_)->begin(), other.which_char_))
         {}
 
         void ignore()
         {
-            if (at_end()) { return; }
-            while (TerminalTraits::to_terminal(*which_char_) == TerminalTraits::ignore_me &&
-                ++which_char_ != (*which_row_)->end()) {}
+            while (which_row_ != rows_.end())
+            {
+                if (at_end())
+                {
+                    if (which_row_ + 1 == rows_.end()) { return; }
+                    ++which_row_;
+                    which_char_ = (*which_row_)->begin();
+                    if (at_end()) { return; }
+                }
+                while (TerminalTraits::to_terminal(*which_char_) == TerminalTraits::ignore_me &&
+                    ++which_char_ != (*which_row_)->end())
+                {}
+                if (!at_end()) { return; }
+            }
         }
 
         void unignore()

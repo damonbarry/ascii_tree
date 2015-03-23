@@ -54,6 +54,14 @@ namespace ascii_tree { namespace spec
             _(p.at_end()).should_be_true();
         }
 
+        TEST_METHOD(ignore_should_ignore_through_multiple_lines)
+        {
+            test_parser p({ "33", "31" });
+            p.ignore();
+            p.expect(one);
+            _(p.at_end()).should_be_true();
+        }
+
         TEST_METHOD(unignore_should_not_rewind_the_parser_on_an_empty_string)
         {
             test_parser p("");
