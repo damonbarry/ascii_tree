@@ -103,20 +103,11 @@ namespace ascii_tree
 
         void ignore()
         {
-            while (which_row_ != rows_.end())
-            {
-                if (at_line_end())
-                {
-                    if (which_row_ + 1 == rows_.end()) { return; }
-                    ++which_row_;
-                    which_char_ = (*which_row_)->begin();
-                    if (at_line_end()) { return; }
-                }
-                while (TerminalTraits::to_terminal(*which_char_) == TerminalTraits::ignore_me &&
-                    ++which_char_ != (*which_row_)->end())
-                {}
-                if (!at_line_end()) { return; }
-            }
+            if (at_line_end()) { return; }
+
+            while (TerminalTraits::to_terminal(*which_char_) == TerminalTraits::ignore_me &&
+                ++which_char_ != (*which_row_)->end())
+            {}
         }
 
         void unignore()
@@ -131,6 +122,12 @@ namespace ascii_tree
         position current_position()
         {
             return position(*which_row_, which_char_);
+        }
+
+        position position_at(size_t row, size_t column)
+        {
+            auto row_ptr = *(rows_.begin() + row);
+            return position(row_ptr, row_ptr->begin() + column);
         }
 
         bool at_line_begin()
