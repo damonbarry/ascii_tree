@@ -119,6 +119,15 @@ namespace ascii_tree
             }
         }
 
+        void maybe_advance_row()
+        {
+            if (at_line_end() && which_row_ + 1 != rows_.end())
+            {
+                ++which_row_;
+                which_char_ = (*which_row_)->begin();
+            }
+        }
+
         position current_position()
         {
             return position(*which_row_, which_char_);

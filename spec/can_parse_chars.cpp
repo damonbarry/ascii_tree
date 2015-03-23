@@ -160,5 +160,19 @@ namespace ascii_tree { namespace spec
                 test_parser("").error();
             });
         }
+
+        TEST_METHOD(should_advance_to_the_next_row_when_finished_parsing_this_row)
+        {
+            test_parser p({ "1", "2" }, 0, 1); // starting position is the end of the first row
+            p.maybe_advance_row();
+            _(p.current_position()).should_be(p.position_at(1, 0));
+        }
+
+        TEST_METHOD(should_not_advance_to_the_next_row_if_not_finished_parsing_this_row)
+        {
+            test_parser p({ "1", "2" });
+            p.maybe_advance_row();
+            _(p.at_begin()).should_be_true();
+        }
     };
 }}
