@@ -110,6 +110,13 @@ namespace ascii_tree { namespace spec
             _(p.accept(one)).should_be_true();
         }
 
+        TEST_METHOD(should_not_accept_a_terminal_on_the_next_row)
+        {
+            test_parser p({ "1", "2" });
+            p.accept(one);
+            _(p.accept(two)).should_be_false();
+        }
+
         TEST_METHOD(expect_should_not_throw_when_a_terminal_matches_the_expected_value)
         {
             should_not_throw_([]

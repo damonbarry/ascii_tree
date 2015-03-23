@@ -68,7 +68,7 @@ namespace ascii_tree
         std::string::const_iterator accept_(terminal term)
         {
             ignore();
-            if (at_end()) { return (*which_row_)->end(); }
+            if (at_line_end()) { return (*which_row_)->end(); }
 
             terminal next_term = TerminalTraits::to_terminal(*which_char_);
             return (term == next_term) ? which_char_++ : (*which_row_)->end();
