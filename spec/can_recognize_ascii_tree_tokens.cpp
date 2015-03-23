@@ -312,5 +312,10 @@ namespace ascii_tree { namespace spec
             _(tokens).should_equal({ edge_name("a"), edge_name("b") });
         }
 
+        TEST_METHOD(should_recognize_tokens_across_multiple_lines)
+        {
+            auto tokens = grammar({ "(a)", "(b)" }).tokens();
+            _(tokens).should_equal({ edge_name("a"), edge_name("b") });
+        }
     };
 }}

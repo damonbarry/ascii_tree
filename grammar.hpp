@@ -1,6 +1,7 @@
 #if !defined(ASCII_TREE_GRAMMAR_H)
 #define ASCII_TREE_GRAMMAR_H
 
+#include <initializer_list>
 #include <iterator>
 #include <utility>
 #include <cctype>
@@ -118,9 +119,8 @@ namespace ascii_tree
         }
 
     public:
-        explicit grammar(const std::string& s)
-            : p_(s)
-        {}
+        explicit grammar(const std::string& s) : p_(s) {}
+        grammar(std::initializer_list<std::string> l) : p_(l) {}
 
         token root_node()
         {
@@ -179,7 +179,7 @@ namespace ascii_tree
         std::vector<token> tokens()
         {
             std::vector<token> tokens;
-            while (p_.ignore(), !p_.at_end())
+            while (p_.maybe_advance_row(), !p_.at_end())
             {
                 auto peek = p_;
 
