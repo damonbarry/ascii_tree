@@ -5,73 +5,67 @@ using namespace std;
 
 namespace ascii_tree { namespace spec
 {
-    TEST_CLASS(can_reject_invalid_char_sequences)
+    TEST_CASE("should reject an empty node", "[can reject invalid char sequences]")
     {
-    public:
-
-        TEST_METHOD(should_reject_an_empty_node)
+        should_throw_(parse_exception("[]", 1), [&]
         {
-            should_throw_(parse_exception("[]", 1), [&]
-            {
-                grammar("[]").tokens();
-            });
-        }
+            grammar("[]").tokens();
+        });
+    }
 
-        TEST_METHOD(should_reject_a_node_with_an_invalid_name_char)
+    TEST_CASE("should reject a node with an invalid name char", "[can reject invalid char sequences]")
+    {
+        should_throw_(parse_exception("[!]", 1), [&]
         {
-            should_throw_(parse_exception("[!]", 1), [&]
-            {
-                grammar("[!]").tokens();
-            });
-        }
+            grammar("[!]").tokens();
+        });
+    }
 
-        TEST_METHOD(should_reject_two_open_square_braces_in_a_row)
+    TEST_CASE("should reject two open square braces in a row", "[can reject invalid char sequences]")
+    {
+        should_throw_(parse_exception("[[", 1), [&]
         {
-            should_throw_(parse_exception("[[", 1), [&]
-            {
-                grammar("[[").tokens();
-            });
-        }
+            grammar("[[").tokens();
+        });
+    }
 
-        TEST_METHOD(should_reject_an_orphaned_close_square_brace)
+    TEST_CASE("should reject an orphaned close square brace", "[can reject invalid char sequences]")
+    {
+        should_throw_(parse_exception("]", 0), [&]
         {
-            should_throw_(parse_exception("]", 0), [&]
-            {
-                grammar("]").tokens();
-            });
-        }
+            grammar("]").tokens();
+        });
+    }
 
-        TEST_METHOD(should_reject_a_close_square_brace_following_a_root_node)
+    TEST_CASE("should reject a close square brace following a root node", "[can reject invalid char sequences]")
+    {
+        should_throw_(parse_exception("[*]]", 3), [&]
         {
-            should_throw_(parse_exception("[*]]", 3), [&]
-            {
-                grammar("[*]]").tokens();
-            });
-        }
+            grammar("[*]]").tokens();
+        });
+    }
 
-        TEST_METHOD(should_reject_a_nameless_horizontal_edge)
+    TEST_CASE("should reject a nameless horizontal edge between nodes", "[can reject invalid char sequences]")
+    {
+        should_throw_(parse_exception("[*]--[a]", 5), [&]
         {
-            should_throw_(parse_exception("[*]--[a]", 5), [&]
-            {
-                grammar("[*]--[a]").tokens();
-            });
-        }
+            grammar("[*]--[a]").tokens();
+        });
+    }
 
-        TEST_METHOD(should_reject_a_root_horizontal_edge)
+    TEST_CASE("should reject a root horizontal edge", "[can reject invalid char sequences]")
+    {
+        should_throw_(parse_exception("--(*)--", 3), [&]
         {
-            should_throw_(parse_exception("--(*)--", 3), [&]
-            {
-                grammar("--(*)--").tokens();
-            });
-        }
+            grammar("--(*)--").tokens();
+        });
+    }
 
-        TEST_METHOD(should_reject_a_nearly_valid_edge_name)
+    TEST_CASE("should reject a nearly valid edge name", "[can reject invalid char sequences]")
+    {
+        should_throw_(parse_exception("(abAB12')", 7), [&]
         {
-            should_throw_(parse_exception("(abAB12')", 7), [&]
-            {
-                grammar("(abAB12')").tokens();
-            });
-        }
-
-    };
+            grammar("(abAB12')").tokens();
+        });
+    }
 }}

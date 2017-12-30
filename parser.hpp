@@ -35,12 +35,12 @@ namespace ascii_tree
         }
 
     public:
-        std::wstring to_string() const
+        std::string to_string() const
         {
-            return std::wstring(L"position=") + 
-                std::to_wstring(std::distance(s_->begin(), it_)) + L"/" + 
-                std::to_wstring(s_->length()) + L" (" +
-                (it_ == s_->end() ? L"<end>" : std::wstring(1, *it_)) + L")";
+            return std::string("position=") + 
+                std::to_string(std::distance(s_->begin(), it_)) + "/" + 
+                std::to_string(s_->length()) + " (" +
+                (it_ == s_->end() ? "<end>" : std::string(1, *it_)) + ")";
         }
     };
 
@@ -59,7 +59,7 @@ namespace ascii_tree
             vector_type vec;
             for (const auto& elem : l)
             {
-                vec.emplace_back(make_shared<const std::string>(elem));
+                vec.emplace_back(std::make_shared<const std::string>(elem));
             }
 
             return vec;

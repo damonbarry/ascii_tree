@@ -1,138 +1,136 @@
 #include "grammar.hpp"
 #include "syntax_tree.hpp"
-#include <CppUnitTest.h>
+#include "catch.hpp"
 #include <type_traits>
 #include <algorithm>
 #include <string>
 
-namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework
-{
-    using namespace ascii_tree;
-
-    template<>
-    inline std::wstring ToString<terminal>(const terminal& term)
-    {
-        switch (term)
-        {
-        case none:
-            return L"none";
-        case open_square_brace:
-            return L"open_square_brace";
-        case close_square_brace:
-            return L"close_square_brace";
-        case asterisk:
-            return L"asterisk";
-        case dash:
-            return L"dash";
-        case open_paren:
-            return L"open_paren";
-        case close_paren:
-            return L"close_paren";
-        case name_char:
-            return L"name_char";
-        case slash:
-            return L"slash";
-        case backslash:
-            return L"backslash";
-        case pipe:
-            return L"pipe";
-        default:
-            return L"unknown char";
-        }
-    }
-
-    template<>
-    inline std::wstring ToString<token::toktype>(const token::toktype& type)
-    {
-        switch (type)
-        {
-        case token::root_node:
-            return L"root_node";
-        case token::named_node:
-            return L"named_node";
-        case token::edge_name:
-            return L"edge_name";
-        case token::horizontal_edge:
-            return L"horizontal_edge";
-        case token::ascending_edge_part:
-            return L"ascending_edge_part";
-        case token::descending_edge_part:
-            return L"descending_edge_part";
-        case token::vertical_edge_part:
-            return L"vertical_edge_part";
-        default:
-            return L"unknown token";
-        }
-    }
-
-    template<>
-    inline std::wstring ToString<token>(const token& tok)
-    {
-        std::wstring name(tok.name.begin(), tok.name.end());
-        return ToString(tok.type) + L" " + name;
-    }
-
-    template<>
-    inline std::wstring ToString<position>(const position& pos)
-    {
-        return pos.to_string();
-    }
-}}}
-
 namespace ascii_tree { namespace spec
 {
-    inline void exception_contents_should_match_(
-        const ascii_tree::parse_exception& expected, const ascii_tree::parse_exception& actual)
+    namespace details
     {
-        namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
+        inline std::string to_string(const terminal& term)
+        {
+            switch (term)
+            {
+            case none:
+                return "none";
+            case open_square_brace:
+                return "open_square_brace";
+            case close_square_brace:
+                return "close_square_brace";
+            case asterisk:
+                return "asterisk";
+            case dash:
+                return "dash";
+            case open_paren:
+                return "open_paren";
+            case close_paren:
+                return "close_paren";
+            case name_char:
+                return "name_char";
+            case slash:
+                return "slash";
+            case backslash:
+                return "backslash";
+            case pipe:
+                return "pipe";
+            default:
+                return "unknown char";
+            }
+        }
 
-        cpput::Assert::AreEqual(expected.s.c_str(), actual.s.c_str(),
-            L"value of parse_exception::s is wrong");
-        cpput::Assert::AreEqual(expected.pos, actual.pos,
-            L"value of parse_exception::pos is wrong");
-    }
+        inline std::string to_string(const token::toktype& type)
+        {
+            switch (type)
+            {
+            case token::root_node:
+                return "root_node";
+            case token::named_node:
+                return "named_node";
+            case token::edge_name:
+                return "edge_name";
+            case token::horizontal_edge:
+                return "horizontal_edge";
+            case token::ascending_edge_part:
+                return "ascending_edge_part";
+            case token::descending_edge_part:
+                return "descending_edge_part";
+            case token::vertical_edge_part:
+                return "vertical_edge_part";
+            default:
+                return "unknown token";
+            }
+        }
 
-    inline void exception_contents_should_match_(
-        const ascii_tree::analyze_exception& expected, const ascii_tree::analyze_exception& actual)
-    {
-        namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
+        inline std::string to_string(const token& tok)
+        {
+            std::string name(tok.name.begin(), tok.name.end());
+            return to_string(tok.type) + " " + name;
+        }
 
-        cpput::Assert::AreEqual(expected.reason.c_str(), actual.reason.c_str(),
-            L"value of analyze_exception::reason is wrong");
+        inline std::string to_string(const position& pos)
+        {
+            return pos.to_string();
+        }
+
+        inline void exception_contents_should_match_(
+            const ascii_tree::parse_exception& expected, const ascii_tree::parse_exception& actual)
+        {
+            REQUIRE(expected.s == actual.s);
+            REQUIRE(expected.pos == actual.pos);
+        }
+
+        inline void exception_contents_should_match_(
+            const ascii_tree::analyze_exception& expected, const ascii_tree::analyze_exception& actual)
+        {
+            REQUIRE(expected.reason == actual.reason);
+        }
+
+        class matches_tokens : public Catch::MatcherBase<std::vector<token>>
+        {
+            const std::vector<token>& expected_;
+        public:
+            explicit matches_tokens(const std::vector<token>& expected) : expected_(expected) {}
+            virtual bool match(const std::vector<token>& tokens) const override
+            {
+                auto mismatch_pair = std::mismatch(expected_.begin(), expected_.end(), tokens.begin());
+                return mismatch_pair.first == expected_.end() && mismatch_pair.second == tokens.end();
+            }
+            virtual std::string describe() const override {
+                std::ostringstream ss;
+                std::string separator = "equals { ";
+                for (auto& token : expected_)
+                {
+                    ss << separator << details::to_string(token.type) << "(\"" << token.name << "\")";
+                    separator = ", ";
+                }
+                ss << " }";
+                return ss.str();
+            }
+        };
     }
 
     template<typename Ex, typename Fn>
     void should_throw_(const Ex& expected, Fn fn)
     {
-        namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
-
-        cpput::Assert::ExpectException<Ex>([&]
-        {
+        REQUIRE_THROWS_AS([&]{
             try
             {
                 fn();
             }
-            catch (const Ex& actual)
+            catch (Ex& actual)
             {
-                exception_contents_should_match_(expected, actual);
+                details::exception_contents_should_match_(expected, actual);
                 throw;
             }
-        });
+        }(), Ex);
     }
 
     template<typename Fn>
     void should_not_throw_(Fn fn)
     {
-        namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
-
-        try
-        {
-            fn();
-        }
-        catch (...)
-        {
-            cpput::Assert::Fail(L"Shouldn't have thrown an exception, but it did.");
-        }
+        REQUIRE_NOTHROW(fn());
     }
 
     class tokens_assertions
@@ -142,24 +140,11 @@ namespace ascii_tree { namespace spec
         explicit tokens_assertions(const std::vector<token>& tokens) : tokens_(tokens) {}
         void should_be_empty()
         {
-            Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsTrue(tokens_.empty());
+            REQUIRE(tokens_.empty() == true);
         }
         void should_equal(std::initializer_list<token> expected)
         {
-            namespace cpput = Microsoft::VisualStudio::CppUnitTestFramework;
-
-            auto mismatch_pair = std::mismatch(expected.begin(), expected.end(), tokens_.begin());
-
-            if (mismatch_pair.first != expected.end() || mismatch_pair.second != tokens_.end())
-            {
-                std::wstring expectedName(mismatch_pair.first->name.begin(), mismatch_pair.first->name.end());
-                std::wstring actualName(mismatch_pair.second->name.begin(), mismatch_pair.second->name.end());
-
-                std::wstring message = L"Expected: " + cpput::ToString(mismatch_pair.first->type) + L" \"" + expectedName + L"\" "
-                    + L"Actual: " + cpput::ToString(mismatch_pair.second->type) + L" \"" + actualName + L"\"";
-
-                cpput::Assert::Fail(message.c_str());
-            }
+            REQUIRE_THAT(tokens_, details::matches_tokens(expected));
         }
     };
 
@@ -170,11 +155,11 @@ namespace ascii_tree { namespace spec
         explicit bool_assertions(bool val) : val_(val) {}
         void should_be_true()
         {
-            Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsTrue(val_);
+            REQUIRE(val_ == true);
         }
         void should_be_false()
         {
-            Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsFalse(val_);
+            REQUIRE(val_ == false);
         }
     };
 
@@ -183,19 +168,18 @@ namespace ascii_tree { namespace spec
         const node& node_;
     public:
         node_assertions(const node& n) : node_(n) {}
-        void should_be(const token& tok, const wchar_t* message = nullptr)
+        void should_be(const token& tok/*, const wchar_t* message = nullptr*/)
         {
-            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(tok, node_.tok, message);
+            REQUIRE(tok == node_.tok);
         }
-        void should_have_node_along_edge(const std::string& node_name, const std::string& edge_name, const wchar_t* message = nullptr)
+        void should_have_node_along_edge(const std::string& node_name, const std::string& edge_name/*, const wchar_t* message = nullptr*/)
         {
             auto edge_it = std::find_if(node_.edges.begin(), node_.edges.end(), [&edge_name](const edge& e){
                 return (edge_name == e.tok.name);
             });
 
-            Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsTrue(edge_it != node_.edges.end(), message);
-
-            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(node_name, edge_it->node.tok.name, message);
+            REQUIRE(edge_it != node_.edges.end());
+            REQUIRE(node_name == edge_it->node.tok.name);
         }
     };
 
@@ -205,9 +189,9 @@ namespace ascii_tree { namespace spec
         const T val_;
     public:
         value_assertions(T val) : val_(val) {}
-        void should_be(T other, const wchar_t* message = nullptr)
+        void should_be(T other/*, const wchar_t* message = nullptr*/)
         {
-            Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(other, val_, message);
+            REQUIRE(other == val_);
         }
     };
 
@@ -216,6 +200,6 @@ namespace ascii_tree { namespace spec
     inline node_assertions _(const node& n) { return node_assertions(n); }
 
     template<class T,
-        typename std::enable_if<!std::is_pointer<T>::value>::type* = nullptr>
-        value_assertions<T> _(T val) { return value_assertions<T>(val); }
+    typename std::enable_if<!std::is_pointer<T>::value>::type* = nullptr>
+    value_assertions<T> _(T val) { return value_assertions<T>(val); }
 }}
