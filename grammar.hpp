@@ -59,8 +59,10 @@ namespace ascii_tree
         enum toktype { root_node, named_node, edge_name, horizontal_edge, ascending_edge_part, descending_edge_part, vertical_edge_part };
         toktype type;
         std::string name;
+        position position;
 
-        token(toktype type, std::string&& name) : type(type), name(std::move(name)) {}
+        token(toktype type, std::string&& name) : type(type), name(std::move(name)), position() {}
+        token(toktype type, std::string&& name, const class position& pos) : type(type), name(std::move(name)), position(pos) {}
     };
 
     inline bool operator==(const token& lhs, const token& rhs)
@@ -69,13 +71,13 @@ namespace ascii_tree
             && lhs.name == rhs.name;
     }
 
-    inline token root_node() { return token(token::root_node, ""); }
-    inline token named_node(std::string&& name) { return token(token::named_node, std::move(name)); }
-    inline token edge_name(std::string&& name) { return token(token::edge_name, std::move(name)); }
-    inline token horizontal_edge(std::string&& name) { return token(token::horizontal_edge, std::move(name)); }
-    inline token ascending_edge_part() { return token(token::ascending_edge_part, ""); }
-    inline token descending_edge_part() { return token(token::descending_edge_part, ""); }
-    inline token vertical_edge_part() { return token(token::vertical_edge_part, ""); }
+    inline token root_node(position p = position()) { return token(token::root_node, "", p); }
+    inline token named_node(std::string&& name, position p = position()) { return token(token::named_node, std::move(name), p); }
+    inline token edge_name(std::string&& name, position p = position()) { return token(token::edge_name, std::move(name), p); }
+    inline token horizontal_edge(std::string&& name, position p = position()) { return token(token::horizontal_edge, std::move(name), p); }
+    inline token ascending_edge_part(position p = position()) { return token(token::ascending_edge_part, "", p); }
+    inline token descending_edge_part(position p = position()) { return token(token::descending_edge_part, "", p); }
+    inline token vertical_edge_part(position p = position()) { return token(token::vertical_edge_part, "", p); }
 
     enum terminal
     {
@@ -121,59 +123,60 @@ namespace ascii_tree
     public:
         explicit grammar(const std::string& s) : p_(s) {}
         grammar(std::initializer_list<std::string> l) : p_(l) {}
+        grammar(const std::vector<std::string>& v) : p_(v) {}
 
         token root_node()
         {
-            p_.expect(open_square_brace);
+            auto begin = p_.expect(open_square_brace);
             p_.expect(asterisk);
             p_.expect(close_square_brace);
-            return ascii_tree::root_node();
+            return ascii_tree::root_node(begin);
         }
 
         token named_node()
         {
-            p_.expect(open_square_brace);
+            auto begin = p_.expect(open_square_brace);
             auto name = expect_name_chars_();
             p_.expect(close_square_brace);
-            return ascii_tree::named_node(std::move(name));
+            return ascii_tree::named_node(std::move(name), begin);
         }
 
         token edge_name()
         {
-            p_.expect(open_paren);
+            auto begin = p_.expect(open_paren);
             auto name = expect_name_chars_();
             p_.expect(close_paren);
-            return ascii_tree::edge_name(std::move(name));
+            return ascii_tree::edge_name(std::move(name), begin);
         }
 
         token ascending_edge_part()
         {
-            p_.expect(slash);
-            return ascii_tree::ascending_edge_part();
+            auto begin = p_.expect(slash);
+            return ascii_tree::ascending_edge_part(begin);
         }
 
         token descending_edge_part()
         {
-            p_.expect(backslash);
-            return ascii_tree::descending_edge_part();
+            auto begin = p_.expect(backslash);
+            return ascii_tree::descending_edge_part(begin);
         }
 
         token vertical_edge_part()
         {
-            p_.expect(pipe);
-            return ascii_tree::vertical_edge_part();
+            auto begin = p_.expect(pipe);
+            return ascii_tree::vertical_edge_part(begin);
         }
 
         token horizontal_edge()
         {
-            p_.expect(dash);
+            auto begin = p_.expect(dash);
             while (p_.accept(dash)) {}
             p_.expect(open_paren);
             auto name = expect_name_chars_();
             p_.expect(close_paren);
             p_.expect(dash);
             while (p_.accept(dash)) {}
-            return ascii_tree::horizontal_edge(std::move(name));
+            return ascii_tree::horizontal_edge(std::move(name), begin);
         }
 
         std::vector<token> tokens()

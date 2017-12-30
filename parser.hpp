@@ -23,18 +23,24 @@ namespace ascii_tree
         std::shared_ptr<const std::string> s_;
         std::string::const_iterator it_;
 
+    public:
+        position() : s_(std::make_shared<const std::string>("")), it_(s_->cbegin()) {}
         position(std::shared_ptr<const std::string>& s, std::string::const_iterator it) : s_(s), it_(it) {}
+
+        position(const std::string& s, std::string::const_iterator it) :
+            s_(std::make_shared<const std::string>(std::string(s))),
+            it_(s_->begin() + std::distance(s.begin(), it))
+        {}
 
         template<class T>
         friend class parser;
 
         friend bool operator==(const position& lhs, const position& rhs)
         {
-            return lhs.s_ == rhs.s_ &&
-                lhs.it_ == rhs.it_;
+            return *lhs.s_ == *rhs.s_ &&
+                std::distance(lhs.s_->cbegin(), lhs.it_) == std::distance(rhs.s_->cbegin(), rhs.it_);
         }
 
-    public:
         std::string to_string() const
         {
             return std::string("position=") + 
@@ -54,10 +60,11 @@ namespace ascii_tree
         vector_type::iterator which_row_;
         std::string::const_iterator which_char_;
 
-        vector_type make_vector_of_shared_ptrs_(std::initializer_list<std::string> l)
+        template<typename T>
+        vector_type make_vector_of_shared_ptrs_(T range)
         {
             vector_type vec;
-            for (const auto& elem : l)
+            for (const auto& elem : range)
             {
                 vec.emplace_back(std::make_shared<const std::string>(elem));
             }
@@ -82,6 +89,16 @@ namespace ascii_tree
         parser(const std::string& s, size_t init_pos) :
             rows_(vector_type(1, std::make_shared<const std::string>(s))),
             which_row_(rows_.begin()),
+            which_char_((*which_row_)->begin() + init_pos)
+        {}
+
+        parser(const std::vector<std::string>& v) :
+            parser(v, 0, 0)
+        {}
+
+        parser(const std::vector<std::string>& v, size_t init_row, size_t init_pos) :
+            rows_(make_vector_of_shared_ptrs_(v)),
+            which_row_(rows_.begin() + init_row),
             which_char_((*which_row_)->begin() + init_pos)
         {}
 

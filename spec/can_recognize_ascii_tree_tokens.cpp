@@ -313,4 +313,38 @@ namespace ascii_tree { namespace spec
         auto tokens = grammar({ "(a)", "(b)" }).tokens();
         _(tokens).should_equal({ edge_name("a"), edge_name("b") });
     }
+
+    TEST_CASE("tokens should know their position", "[can recognize ascii tree tokens]")
+    {
+        std::string::iterator it;
+        std::vector<std::string> text {
+            "[*]"                                       // root node
+            "[a]"                                       // named node
+            "(b)",                                      // edge name
+            "-(c)-"                                     // horizontal edge
+            "/"                                         // ascending edge part
+            "\\"                                        // descending edge part
+            "|"                                         // vertical edge part
+            };
+        std::vector<position> expected_positions({
+            position(text[0], it = text[0].begin()),    // root node
+            position(text[0], it += 3),                 // named node
+            position(text[0], it += 3),                 // edge name
+            position(text[1], it = text[1].begin()),    // horizontal edge
+            position(text[1], it += 5),                 // ascending edge part
+            position(text[1], it += 1),                 // descending edge part
+            position(text[1], it += 1)                  // vertical edge part
+        });
+
+        auto tokens = grammar(text).tokens();
+
+        auto mismatch_pair = std::mismatch(
+            expected_positions.begin(), expected_positions.end(),
+            tokens.begin(), tokens.end(),
+            [] (const position& p, const token& t) { return p == t.position; });
+        auto all_positions_match = [&]{
+            return mismatch_pair.first == expected_positions.end() && mismatch_pair.second == tokens.end();
+        };
+        REQUIRE(all_positions_match());
+    }
 }}
