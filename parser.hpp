@@ -28,7 +28,11 @@ namespace ascii_tree
         position(std::shared_ptr<const std::string>& s, std::string::const_iterator it) : s_(s), it_(it) {}
         position(const std::string& s, std::string::difference_type pos) :
             s_(std::make_shared<const std::string>(std::string(s))),
-            it_(s_->begin() + pos)
+            it_(s_->cbegin() + pos)
+        {}
+        position(std::string::difference_type pos) :
+            s_(std::make_shared<const std::string>("")),
+            it_(s_->cbegin() + pos)
         {}
 
         template<class T>
