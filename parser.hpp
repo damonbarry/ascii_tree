@@ -26,10 +26,9 @@ namespace ascii_tree
     public:
         position() : s_(std::make_shared<const std::string>("")), it_(s_->cbegin()) {}
         position(std::shared_ptr<const std::string>& s, std::string::const_iterator it) : s_(s), it_(it) {}
-
-        position(const std::string& s, std::string::const_iterator it) :
+        position(const std::string& s, std::string::difference_type pos) :
             s_(std::make_shared<const std::string>(std::string(s))),
-            it_(s_->begin() + std::distance(s.begin(), it))
+            it_(s_->begin() + pos)
         {}
 
         template<class T>

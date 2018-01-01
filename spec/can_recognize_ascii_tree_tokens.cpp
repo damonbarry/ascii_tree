@@ -316,35 +316,21 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("tokens should know their position", "[can recognize ascii tree tokens]")
     {
-        std::string::iterator it;
         std::vector<std::string> text {
-            "[*]"                                       // root node
-            "[a]"                                       // named node
-            "(b)",                                      // edge name
-            "-(c)-"                                     // horizontal edge
-            "/"                                         // ascending edge part
-            "\\"                                        // descending edge part
-            "|"                                         // vertical edge part
-            };
-        std::vector<position> expected_positions({
-            position(text[0], it = text[0].begin()),    // root node
-            position(text[0], it += 3),                 // named node
-            position(text[0], it += 3),                 // edge name
-            position(text[1], it = text[1].begin()),    // horizontal edge
-            position(text[1], it += 5),                 // ascending edge part
-            position(text[1], it += 1),                 // descending edge part
-            position(text[1], it += 1)                  // vertical edge part
-        });
+            "[*][a](b)",    // root node, named node, edge name
+            "-(c)-/\\|"     // hor. edge, asc. edge part, desc. edge part, vert. edge part
+        };
 
         auto tokens = grammar(text).tokens();
 
-        auto mismatch_pair = std::mismatch(
-            expected_positions.begin(), expected_positions.end(),
-            tokens.begin(), tokens.end(),
-            [] (const position& p, const token& t) { return p == t.position; });
-        auto all_positions_match = [&]{
-            return mismatch_pair.first == expected_positions.end() && mismatch_pair.second == tokens.end();
-        };
-        REQUIRE(all_positions_match());
+        _(positions_from(tokens)).should_equal({
+            { text[0], 0 }, // root node
+            { text[0], 3 }, // named node
+            { text[0], 6 }, // edge name
+            { text[1], 0 }, // horizontal edge
+            { text[1], 5 }, // ascending edge part
+            { text[1], 6 }, // descending edge part
+            { text[1], 7 }  // vertical edge part
+        });
     }
 }}

@@ -97,7 +97,8 @@ namespace ascii_tree { namespace spec
                 auto mismatch_pair = std::mismatch(expected_.begin(), expected_.end(), tokens.begin());
                 return mismatch_pair.first == expected_.end() && mismatch_pair.second == tokens.end();
             }
-            virtual std::string describe() const override {
+            virtual std::string describe() const override
+            {
                 std::ostringstream ss;
                 std::string separator = "equals { ";
                 for (auto& token : expected_)
@@ -109,6 +110,37 @@ namespace ascii_tree { namespace spec
                 return ss.str();
             }
         };
+
+        class matches_positions : public Catch::MatcherBase<std::vector<position>>
+        {
+            const std::vector<position>& expected_;
+        public:
+            explicit matches_positions(const std::vector<position>& expected) : expected_(expected) {}
+            virtual bool match(const std::vector<position>& actual) const override
+            {
+                auto mismatch_pair = std::mismatch(expected_.begin(), expected_.end(), actual.begin());
+                return mismatch_pair.first == expected_.end() && mismatch_pair.second == actual.end();
+            }
+            virtual std::string describe() const override
+            {
+                std::ostringstream ss;
+                std::string separator = "equals { ";
+                for(auto& position : expected_)
+                {
+                    ss << separator << position.to_string();
+                    separator = ", ";
+                }
+                ss << " }";
+                return ss.str();
+            }
+        };
+    }
+
+    inline std::vector<position> positions_from(const std::vector<token>& tokens)
+    {
+        std::vector<position> positions;
+        std::for_each(tokens.begin(), tokens.end(), [&](const token& t){ positions.push_back(t.position); });
+        return positions;
     }
 
     template<typename Ex, typename Fn>
@@ -145,6 +177,17 @@ namespace ascii_tree { namespace spec
         void should_equal(std::initializer_list<token> expected)
         {
             REQUIRE_THAT(tokens_, details::matches_tokens(expected));
+        }
+    };
+
+    class positions_assertions
+    {
+        const std::vector<position>& positions_;
+    public:
+        explicit positions_assertions(const std::vector<position>& positions) : positions_(positions) {}
+        void should_equal(std::initializer_list<position> expected)
+        {
+            REQUIRE_THAT(positions_, details::matches_positions(expected));
         }
     };
 
@@ -196,6 +239,7 @@ namespace ascii_tree { namespace spec
     };
 
     inline tokens_assertions _(const std::vector<token>& tokens) { return tokens_assertions(tokens); }
+    inline positions_assertions _(const std::vector<position>& positions) { return positions_assertions(positions); }
     inline bool_assertions _(bool val) { return bool_assertions(val); }
     inline node_assertions _(const node& n) { return node_assertions(n); }
 
