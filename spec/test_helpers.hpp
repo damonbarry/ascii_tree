@@ -215,6 +215,10 @@ namespace ascii_tree { namespace spec
         {
             REQUIRE(tok == node_.tok);
         }
+        void should_equal(const node& expected)
+        {
+            REQUIRE(node_ == expected);
+        }
         void should_have_node_along_edge(const std::string& node_name, const std::string& edge_name/*, const wchar_t* message = nullptr*/)
         {
             auto edge_it = std::find_if(node_.edges.begin(), node_.edges.end(), [&edge_name](const edge& e){

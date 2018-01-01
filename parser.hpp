@@ -25,7 +25,7 @@ namespace ascii_tree
 
     public:
         position() : s_(std::make_shared<const std::string>("")), it_(s_->cbegin()) {}
-        position(std::shared_ptr<const std::string>& s, std::string::const_iterator it) : s_(s), it_(it) {}
+        position(const std::shared_ptr<const std::string>& s, std::string::const_iterator it) : s_(s), it_(it) {}
         position(const std::string& s, std::string::difference_type pos) :
             s_(std::make_shared<const std::string>(std::string(s))),
             it_(s_->cbegin() + pos)
@@ -34,6 +34,11 @@ namespace ascii_tree
             s_(std::make_shared<const std::string>("")),
             it_(s_->cbegin() + pos)
         {}
+
+        static position from(const position& other, std::ptrdiff_t horizontal_offset)
+        {
+            return position(other.s_, other.it_ + horizontal_offset);
+        }
 
         template<class T>
         friend class parser;

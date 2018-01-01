@@ -23,12 +23,22 @@ namespace ascii_tree
         explicit node(const token& tok) : tok(tok) {}
     };
 
+    inline bool operator==(const node& lhs, const node& rhs)
+    {
+        return lhs.tok == rhs.tok && lhs.edges == rhs.edges;
+    }
+
     struct edge
     {
         token tok;
         node node;
         edge(const token& tok, const ascii_tree::node& n) : tok(tok), node(n) {}
     };
+
+    inline bool operator==(const edge& lhs, const edge& rhs)
+    {
+        return lhs.tok == rhs.tok && lhs.node == rhs.node;
+    }
 
     class syntax_tree
     {
@@ -56,47 +66,41 @@ namespace ascii_tree
 
             root_ = std::make_unique<node>(*root_it);
 
-            if (root_it != tokens_.begin())
+            // look left for edge + node
+            std::vector<const token*> horizontal_edges;
+            std::vector<const token*> named_nodes;
+            for (const auto& token : tokens_)
             {
-                auto prev_it = root_it - 1;
-                if (prev_it->type == token::horizontal_edge)
+                if (token.type == token::horizontal_edge)
                 {
-                    root_->edges.emplace_back(*prev_it, node(*(prev_it - 1)));
+                    horizontal_edges.push_back(&token);
                 }
-                else if (prev_it->type == token::vertical_edge_part) // vertical_edge_part + edge_name + vertical_edge_part + node
+
+                if (token.type == token::named_node)
                 {
-                    root_->edges.emplace_back(*(prev_it - 1), node(*(prev_it - 3)));
-                }
-                else if (prev_it->type == token::ascending_edge_part) // ascending_edge_part + edge_name + ascending_edge_part + node
-                {
-                    root_->edges.emplace_back(*(prev_it - 1), node(*(prev_it - 3)));
-                }
-                else if (prev_it->type == token::descending_edge_part) // descending_edge_part + edge_name + descending_edge_part + node
-                {
-                    root_->edges.emplace_back(*(prev_it - 1), node(*(prev_it - 3)));
+                    named_nodes.push_back(&token);
                 }
             }
 
-            if (root_it + 1 != tokens_.end())
+            position candidate_position = position::from(root_it->position, 1);
+            auto candidate_horizontal_edge_it = std::find_if(horizontal_edges.begin(), horizontal_edges.end(),
+                [&](const token* t){ return t->position == candidate_position; });
+            if (candidate_horizontal_edge_it == horizontal_edges.end())
             {
-                auto next_it = root_it + 1;
-                if (next_it->type == token::horizontal_edge)
-                {
-                    root_->edges.emplace_back(*next_it, node(*(next_it + 1)));
-                }
-                else if (next_it->type == token::vertical_edge_part) // vertical_edge_part + edge_name + vertical_edge_part + node
-                {
-                    root_->edges.emplace_back(*(next_it + 1), node(*(next_it + 3)));
-                }
-                else if (next_it->type == token::ascending_edge_part) // ascending_edge_part + edge_name + ascending_edge_part + node
-                {
-                    root_->edges.emplace_back(*(next_it + 1), node(*(next_it + 3)));
-                }
-                else if (next_it->type == token::descending_edge_part) // descending_edge_part + edge_name + descending_edge_part + node
-                {
-                    root_->edges.emplace_back(*(next_it + 1), node(*(next_it + 3)));
-                }
+                return *root_;
             }
+
+            // found an edge, now find the node at the other end of it
+            candidate_position = position::from(candidate_position, 1);
+            auto candidate_named_node_it = std::find_if(named_nodes.begin(), named_nodes.end(),
+                [&](const token* t){ return t->position == candidate_position; });
+            if (candidate_named_node_it == named_nodes.end())
+            {
+                // no node at the other end of the edge
+                throw analyze_exception("missing named_node at the end of a horizontal edge");
+            }
+
+            root_->edges.emplace_back(**candidate_horizontal_edge_it, node(**candidate_named_node_it));
 
             return *root_;
         }
