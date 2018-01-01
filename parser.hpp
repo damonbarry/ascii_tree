@@ -2,6 +2,7 @@
 #define ASCII_TREE_PARSER_H
 
 #include "position.hpp"
+#include "grid.hpp"
 
 #include <memory>
 #include <string>
@@ -23,32 +24,15 @@ namespace ascii_tree
     template<class TerminalTraits>
     class parser
     {
-        typedef typename TerminalTraits::type terminal;
-        typedef std::vector<std::shared_ptr<const std::string>> vector_type;
+        grid grid_;
 
-        vector_type rows_;
-        vector_type::iterator which_row_;
-        std::string::const_iterator which_char_;
-
-        template<typename T>
-        vector_type make_vector_of_shared_ptrs_(T range)
-        {
-            vector_type vec;
-            for (const auto& elem : range)
-            {
-                vec.emplace_back(std::make_shared<const std::string>(elem));
-            }
-
-            return vec;
-        }
-
-        std::string::const_iterator accept_(terminal term)
+        std::string::const_iterator accept_(typename TerminalTraits::type term)
         {
             ignore();
-            if (at_line_end()) { return (*which_row_)->end(); }
+            if (at_line_end()) { return (*grid_.which_row_)->end(); }
 
-            terminal next_term = TerminalTraits::to_terminal(*which_char_);
-            return (term == next_term) ? which_char_++ : (*which_row_)->end();
+            typename TerminalTraits::type next_term = TerminalTraits::to_terminal(*grid_.which_char_);
+            return (term == next_term) ? grid_.which_char_++ : (*grid_.which_row_)->end();
         }
 
     public:
@@ -56,120 +40,95 @@ namespace ascii_tree
             : parser(s, 0)
         {}
 
-        parser(const std::string& s, size_t init_pos) :
-            rows_(vector_type(1, std::make_shared<const std::string>(s))),
-            which_row_(rows_.begin()),
-            which_char_((*which_row_)->begin() + init_pos)
-        {}
-
-        parser(const std::vector<std::string>& v) :
-            parser(v, 0, 0)
-        {}
-
-        parser(const std::vector<std::string>& v, size_t init_row, size_t init_pos) :
-            rows_(make_vector_of_shared_ptrs_(v)),
-            which_row_(rows_.begin() + init_row),
-            which_char_((*which_row_)->begin() + init_pos)
-        {}
-
-        parser(std::initializer_list<std::string> l) :
-            parser(l, 0, 0)
-        {}
-
-        parser(std::initializer_list<std::string> l, size_t init_row, size_t init_pos) :
-            rows_(make_vector_of_shared_ptrs_(l)),
-            which_row_(rows_.begin() + init_row),
-            which_char_((*which_row_)->begin() + init_pos)
-        {}
-
-        parser(const parser& other) :
-            rows_(other.rows_),
-            which_row_(rows_.begin() + std::distance<vector_type::const_iterator>(other.rows_.begin(), other.which_row_)),
-            which_char_((*which_row_)->begin() + std::distance((*other.which_row_)->begin(), other.which_char_))
-        {}
+        parser(const std::string& s, size_t init_pos) : grid_(s, init_pos) {}
+        parser(const std::vector<std::string>& v) : parser(v, 0, 0) {}
+        parser(const std::vector<std::string>& v, size_t init_row, size_t init_pos) : grid_(v, init_row, init_pos) {}
+        parser(std::initializer_list<std::string> l) : parser(l, 0, 0) {}
+        parser(std::initializer_list<std::string> l, size_t init_row, size_t init_pos) : grid_(l, init_row, init_pos) {}
+        parser(const parser& other) : grid_(other.grid_) {}
 
         void ignore()
         {
             if (at_line_end()) { return; }
 
-            while (TerminalTraits::to_terminal(*which_char_) == TerminalTraits::ignore_me &&
-                ++which_char_ != (*which_row_)->end())
+            while (TerminalTraits::to_terminal(*grid_.which_char_) == TerminalTraits::ignore_me &&
+                ++grid_.which_char_ != (*grid_.which_row_)->end())
             {}
         }
 
         void unignore()
         {
             while (!at_line_begin() &&
-                TerminalTraits::to_terminal(*(which_char_ - 1)) == TerminalTraits::ignore_me)
+                TerminalTraits::to_terminal(*(grid_.which_char_ - 1)) == TerminalTraits::ignore_me)
             {
-                --which_char_;
+                --grid_.which_char_;
             }
         }
 
         void maybe_advance_row()
         {
-            if (at_line_end() && which_row_ + 1 != rows_.end())
+            if (at_line_end() && grid_.which_row_ + 1 != grid_.rows_.end())
             {
-                ++which_row_;
-                which_char_ = (*which_row_)->begin();
+                ++grid_.which_row_;
+                grid_.which_char_ = (*grid_.which_row_)->begin();
             }
         }
 
         position current_position()
         {
-            return position(*which_row_, which_char_);
+            return position(*grid_.which_row_, grid_.which_char_);
         }
 
         position position_at(size_t row, size_t column)
         {
-            auto row_ptr = *(rows_.begin() + row);
+            auto row_ptr = *(grid_.rows_.begin() + row);
             return position(row_ptr, row_ptr->begin() + column);
         }
 
         bool at_line_begin()
         {
-            return which_char_ == (*which_row_)->begin();
+            return grid_.which_char_ == (*grid_.which_row_)->begin();
         }
 
         bool at_line_end()
         {
-            return which_char_ == (*which_row_)->end();
+            return grid_.which_char_ == (*grid_.which_row_)->end();
         }
 
         bool at_begin()
         {
-            return which_row_ == rows_.begin() && at_line_begin();
+            return grid_.which_row_ == grid_.rows_.begin() && at_line_begin();
         }
 
         bool at_end()
         {
-            return which_row_ + 1 == rows_.end() && at_line_end();
+            return grid_.which_row_ + 1 == grid_.rows_.end() && at_line_end();
         }
 
-        bool accept(terminal term)
+        bool accept(typename TerminalTraits::type term)
         {
-            return accept_(term) != (*which_row_)->end();
+            return accept_(term) != (*grid_.which_row_)->end();
         }
 
-        position expect(terminal term)
+        position expect(typename TerminalTraits::type term)
         {
             auto it = accept_(term);
-            if (it == (*which_row_)->end())
+            if (it == (*grid_.which_row_)->end())
             {
-                throw parse_exception(**which_row_, std::distance((*which_row_)->begin(), which_char_));
+                throw parse_exception(**grid_.which_row_, std::distance((*grid_.which_row_)->begin(), grid_.which_char_));
             }
 
-            return position(*which_row_, it);
+            return position(*grid_.which_row_, it);
         }
 
         std::string substring(position start)
         {
-            return std::string(start.it_, which_char_);
+            return std::string(start.it_, grid_.which_char_);
         }
 
         void error()
         {
-            throw parse_exception(**which_row_, std::distance((*which_row_)->begin(), which_char_));
+            throw parse_exception(**grid_.which_row_, std::distance((*grid_.which_row_)->begin(), grid_.which_char_));
         }
     };
 
