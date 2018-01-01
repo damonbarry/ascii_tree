@@ -1,6 +1,8 @@
 #if !defined(ASCII_TREE_GRID_H)
 #define ASCII_TREE_GRID_H
 
+#include "position.hpp"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -66,6 +68,17 @@ namespace ascii_tree
             which_row_(rows_.begin() + std::distance<details::vector_type::const_iterator>(other.rows_.begin(), other.which_row_)),
             which_char_((*which_row_)->begin() + std::distance((*other.which_row_)->begin(), other.which_char_))
         {}
+
+        position current_position()
+        {
+            return position(*which_row_, which_char_);
+        }
+
+        position position_at(size_t row, size_t column)
+        {
+            auto row_ptr = *(rows_.begin() + row);
+            return position(row_ptr, row_ptr->begin() + column);
+        }
     };
 
 }

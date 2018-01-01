@@ -76,13 +76,12 @@ namespace ascii_tree
 
         position current_position()
         {
-            return position(*grid_.which_row_, grid_.which_char_);
+            return grid_.current_position();
         }
-
+        
         position position_at(size_t row, size_t column)
         {
-            auto row_ptr = *(grid_.rows_.begin() + row);
-            return position(row_ptr, row_ptr->begin() + column);
+            return grid_.position_at(row, column);
         }
 
         bool at_line_begin()
