@@ -1,13 +1,15 @@
 #if !defined(ASCII_TREE_GRAMMAR_H)
 #define ASCII_TREE_GRAMMAR_H
 
+#include "position.hpp"
+#include "parser.hpp"
+
 #include <initializer_list>
 #include <iterator>
 #include <utility>
 #include <cctype>
 #include <string>
 #include <vector>
-#include "parser.hpp"
 
 #if 0
 
