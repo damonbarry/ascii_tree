@@ -26,10 +26,10 @@ namespace ascii_tree
     {
         grid grid_;
 
-        std::string::const_iterator accept_(typename TerminalTraits::type term)
+        grid_col_iterator accept_(typename TerminalTraits::type term)
         {
             ignore();
-            if (at_line_end()) { return (*grid_.which_row_)->end(); }
+            if (at_line_end()) { return grid_.which_char_; }
 
             typename TerminalTraits::type next_term = TerminalTraits::to_terminal(*grid_.which_char_);
             return (term == next_term) ? grid_.which_char_++ : (*grid_.which_row_)->end();

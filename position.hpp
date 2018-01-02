@@ -1,6 +1,8 @@
 #if !defined(ASCII_TREE_POSITION_H)
 #define ASCII_TREE_POSITION_H
 
+#include "grid_types.hpp"
+
 #include <cstddef>
 #include <string>
 #include <memory>
@@ -10,18 +12,18 @@ namespace ascii_tree
 
     class position
     {
-        std::shared_ptr<const std::string> s_;
-        std::string::const_iterator it_;
+        details::grid_row_type_ s_;
+        grid_col_iterator it_;
 
     public:
-        position() : s_(std::make_shared<const std::string>("")), it_(s_->cbegin()) {}
-        position(const std::shared_ptr<const std::string>& s, std::string::const_iterator it) : s_(s), it_(it) {}
+        position() : s_(details::make_grid_row_("")), it_(s_->cbegin()) {}
+        position(const details::grid_row_type_& s, grid_col_iterator it) : s_(s), it_(it) {}
         position(const std::string& s, std::string::difference_type pos) :
-            s_(std::make_shared<const std::string>(std::string(s))),
+            s_(details::make_grid_row_(std::string(s))),
             it_(s_->cbegin() + pos)
         {}
         position(std::string::difference_type pos) :
-            s_(std::make_shared<const std::string>("")),
+            s_(details::make_grid_row_("")),
             it_(s_->cbegin() + pos)
         {}
 

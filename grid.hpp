@@ -1,6 +1,7 @@
 #if !defined(ASCII_TREE_GRID_H)
 #define ASCII_TREE_GRID_H
 
+#include "grid_types.hpp"
 #include "position.hpp"
 
 #include <memory>
@@ -11,15 +12,13 @@ namespace ascii_tree
 {
     namespace details
     {
-        typedef std::vector<std::shared_ptr<const std::string>> vector_type;
-
         template<typename T>
-        vector_type make_vector_of_shared_ptrs_(T range)
+        grid_vector_type_ make_vector_of_shared_ptrs_(T range)
         {
-            vector_type vec;
+            grid_vector_type_ vec;
             for (const auto& elem : range)
             {
-                vec.emplace_back(std::make_shared<const std::string>(elem));
+                vec.emplace_back(details::make_grid_row_(elem));
             }
 
             return vec;
@@ -29,16 +28,16 @@ namespace ascii_tree
     class grid
     {
     public:
-        details::vector_type rows_;
-        details::vector_type::iterator which_row_;
-        std::string::const_iterator which_char_;
+        details::grid_vector_type_ rows_;
+        grid_row_iterator which_row_;
+        grid_col_iterator which_char_;
 
         explicit grid(const std::string& s)
             : grid(s, 0)
         {}
 
         grid(const std::string& s, size_t init_pos) :
-            rows_(details::vector_type(1, std::make_shared<const std::string>(s))),
+            rows_(details::grid_vector_type_(1, details::make_grid_row_(s))),
             which_row_(rows_.begin()),
             which_char_((*which_row_)->begin() + init_pos)
         {}
@@ -65,7 +64,7 @@ namespace ascii_tree
 
         grid(const grid& other) :
             rows_(other.rows_),
-            which_row_(rows_.begin() + std::distance<details::vector_type::const_iterator>(other.rows_.begin(), other.which_row_)),
+            which_row_(rows_.begin() + std::distance<grid_row_iterator>(other.rows_.begin(), other.which_row_)),
             which_char_((*which_row_)->begin() + std::distance((*other.which_row_)->begin(), other.which_char_))
         {}
 
