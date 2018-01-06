@@ -36,9 +36,18 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should generate the same tree regardless of token order", "[can generate a syntax tree]")
     {
-        syntax_tree tree1({ { root_node(0), horizontal_edge("e", 1), named_node("n", 2) } });
-        syntax_tree tree2({ { named_node("n", 2), root_node(0), horizontal_edge("e", 1) } });
-        _(tree1.analyze()).should_equal(tree2.analyze());
+        syntax_tree tree012({ { root_node(0), horizontal_edge("e", 1), named_node("n", 2) } });
+        syntax_tree tree021({ { root_node(0), named_node("n", 2), horizontal_edge("e", 1) } });
+        syntax_tree tree102({ { horizontal_edge("e", 1), root_node(0), named_node("n", 2) } });
+        syntax_tree tree120({ { horizontal_edge("e", 1), named_node("n", 2), root_node(0) } });
+        syntax_tree tree201({ { named_node("n", 2), root_node(0), horizontal_edge("e", 1) } });
+        syntax_tree tree210({ { named_node("n", 2), horizontal_edge("e", 1), root_node(0) } });
+
+        _(tree012.analyze()).should_equal(tree021.analyze());
+        _(tree012.analyze()).should_equal(tree102.analyze());
+        _(tree012.analyze()).should_equal(tree120.analyze());
+        _(tree012.analyze()).should_equal(tree201.analyze());
+        _(tree012.analyze()).should_equal(tree210.analyze());
     }
 
     // TEST_CASE("should generate a tree with leaf horizontal edge root", "[can generate a syntax tree]")
