@@ -122,7 +122,7 @@ namespace ascii_tree
 
         std::string substring(position start)
         {
-            return std::string(start.it_, grid_.which_char_);
+            return std::string(start.col_, grid_.which_char_);
         }
 
         void error()
