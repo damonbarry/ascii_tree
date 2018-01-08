@@ -53,6 +53,13 @@ namespace ascii_tree
             });
         }
 
+        std::vector<token_iterator>::const_iterator find_token(token_iterator from_it, int32_t offset, const std::vector<token_iterator>& candidates)
+        {
+            position candidate_position = position::from(from_it->position, offset);
+            return std::find_if(candidates.begin(), candidates.end(),
+                [&](const token_iterator& it){ return it->position == candidate_position; });
+        }
+
     public:
         explicit syntax_tree(const std::vector<token>& tokens) : tokens_(tokens) {}
 
@@ -66,41 +73,49 @@ namespace ascii_tree
 
             root_ = std::make_unique<node>(*root_it);
 
+            // build index of tokens by type
+            std::vector<token_iterator> horizontal_edges;
+            std::vector<token_iterator> named_nodes;
+            for (auto token_it = tokens_.begin(); token_it != tokens_.end(); ++token_it)
+            {
+                if (token_it->type == token::horizontal_edge)
+                {
+                    horizontal_edges.push_back(token_it);
+                }
+
+                if (token_it->type == token::named_node)
+                {
+                    named_nodes.push_back(token_it);
+                }
+            }
+
+            // look right for edge + node
+            auto edge_it = find_token(root_it, 1, horizontal_edges);
+            if (edge_it != horizontal_edges.end())
+            {
+                // found an edge, now find the node at the other end of it
+                auto node_it = find_token(*edge_it, 1, named_nodes);
+                if (node_it == named_nodes.end())
+                {
+                    throw analyze_exception("missing named_node at the end of a horizontal edge");
+                }
+
+                root_->edges.emplace_back(**edge_it, node(**node_it));
+            }
+
             // look left for edge + node
-            std::vector<const token*> horizontal_edges;
-            std::vector<const token*> named_nodes;
-            for (const auto& token : tokens_)
+            edge_it = find_token(root_it, -1, horizontal_edges);
+            if (edge_it != horizontal_edges.end())
             {
-                if (token.type == token::horizontal_edge)
+                // found an edge, now find the node at the other end of it
+                auto node_it = find_token(*edge_it, -1, named_nodes);
+                if (node_it == named_nodes.end())
                 {
-                    horizontal_edges.push_back(&token);
+                    throw analyze_exception("missing named_node at the end of a horizontal edge");
                 }
 
-                if (token.type == token::named_node)
-                {
-                    named_nodes.push_back(&token);
-                }
+                root_->edges.emplace_back(**edge_it, node(**node_it));
             }
-
-            position candidate_position = position::from(root_it->position, 1);
-            auto candidate_horizontal_edge_it = std::find_if(horizontal_edges.begin(), horizontal_edges.end(),
-                [&](const token* t){ return t->position == candidate_position; });
-            if (candidate_horizontal_edge_it == horizontal_edges.end())
-            {
-                return *root_;
-            }
-
-            // found an edge, now find the node at the other end of it
-            candidate_position = position::from(candidate_position, 1);
-            auto candidate_named_node_it = std::find_if(named_nodes.begin(), named_nodes.end(),
-                [&](const token* t){ return t->position == candidate_position; });
-            if (candidate_named_node_it == named_nodes.end())
-            {
-                // no node at the other end of the edge
-                throw analyze_exception("missing named_node at the end of a horizontal edge");
-            }
-
-            root_->edges.emplace_back(**candidate_horizontal_edge_it, node(**candidate_named_node_it));
 
             return *root_;
         }

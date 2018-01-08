@@ -50,12 +50,13 @@ namespace ascii_tree { namespace spec
         _(tree012.analyze()).should_equal(tree210.analyze());
     }
 
-    // TEST_CASE("should generate a tree with leaf horizontal edge root", "[can generate a syntax tree]")
-    // {
-    //     syntax_tree tree({ { named_node("n"), horizontal_edge("e"), root_node() } });
-    //     auto result = tree.analyze();
-    //     _(result).should_have_node_along_edge("n", "e");
-    // }
+    TEST_CASE("should generate a tree with leaf horizontal edge root", "[can generate a syntax tree]")
+    {
+        syntax_tree tree({ { named_node("n", 0), horizontal_edge("e", 1), root_node(2) } });
+        auto result = tree.analyze();
+
+        _(result).should_have_node_along_edge("n", "e");
+    }
 
     // TEST_CASE("should generate a tree with root vertical edge leaf", "[can generate a syntax tree]")
     // {
