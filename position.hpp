@@ -9,27 +9,52 @@
 
 namespace ascii_tree
 {
+    namespace details
+    {
+
+        template<typename... T>
+        inline grid_vector_ptr_ make_grid_vector_with_one_string_(const std::string& s)
+        {
+            return make_grid_vector_(1, make_grid_row_(s));
+        }
+
+    }
 
     class position
     {
-        details::grid_row_type_ row_;
-        grid_col_iterator col_;
+        details::grid_vector_ptr_ rows_;
+        grid_row_iterator which_row_;
+        grid_col_iterator which_col_;
 
     public:
-        position() : row_(details::make_grid_row_("")), col_(row_->cbegin()) {}
-        position(const details::grid_row_type_& s, grid_col_iterator it) : row_(s), col_(it) {}
+        position() :
+            position(details::make_grid_vector_with_one_string_(""))
+        {}
+        explicit position(details::grid_vector_ptr_ rows) :
+            rows_(rows),
+            which_row_(rows_->cbegin()),
+            which_col_((*which_row_)->cbegin())
+        {}
+        position(details::grid_vector_ptr_ rows, grid_row_iterator row, grid_col_iterator col) :
+            rows_(rows),
+            which_row_(rows_->cbegin() + std::distance(rows->cbegin(), row)),
+            which_col_((*which_row_)->cbegin() + std::distance((*row)->cbegin(), col))
+        {}
+        position(details::grid_vector_ptr_ rows, std::string::difference_type pos) :
+            rows_(rows),
+            which_row_(rows_->cbegin()),
+            which_col_((*which_row_)->cbegin() + pos)
+        {}
         position(const std::string& s, std::string::difference_type pos) :
-            row_(details::make_grid_row_(std::string(s))),
-            col_(row_->cbegin() + pos)
+            position(details::make_grid_vector_with_one_string_(s), pos)
         {}
         position(std::string::difference_type pos) :
-            row_(details::make_grid_row_("")),
-            col_(row_->cbegin() + pos)
+            position(details::make_grid_vector_with_one_string_(std::string(pos + 1, ' ')), pos)
         {}
 
         static position from(const position& other, std::ptrdiff_t horizontal_offset)
         {
-            return position(other.row_, other.col_ + horizontal_offset);
+            return position(other.rows_, other.which_row_, other.which_col_ + horizontal_offset);
         }
 
         template<class T>
@@ -37,16 +62,19 @@ namespace ascii_tree
 
         friend bool operator==(const position& lhs, const position& rhs)
         {
-            return *lhs.row_ == *rhs.row_ &&
-                std::distance(lhs.row_->cbegin(), lhs.col_) == std::distance(rhs.row_->cbegin(), rhs.col_);
+            const std::string& lhstr = **lhs.which_row_;
+            const std::string& rhstr = **rhs.which_row_;
+            return lhstr == rhstr &&
+                std::distance(lhstr.cbegin(), lhs.which_col_) == std::distance(rhstr.cbegin(), rhs.which_col_);
         }
 
         std::string to_string() const
         {
-            return std::string("position=") + 
-                std::to_string(std::distance(row_->begin(), col_)) + "/" + 
-                std::to_string(row_->length()) + " (" +
-                (col_ == row_->end() ? "<end>" : std::string(1, *col_)) + ")";
+            // '[' {x}
+            return
+                "'" + (which_col_ == (*which_row_)->end() ? "<end>" : std::string(1, *which_col_)) +
+                "' {" + std::to_string(std::distance((*which_row_)->cbegin(), which_col_)) +
+                "}";
         }
     };
 

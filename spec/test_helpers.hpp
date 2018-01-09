@@ -5,6 +5,17 @@
 #include <algorithm>
 #include <string>
 
+namespace Catch
+{
+    template<>
+    struct StringMaker<ascii_tree::position> {
+        static std::string convert(ascii_tree::position p)
+        {
+            return p.to_string();
+        }
+    };
+}
+
 namespace ascii_tree { namespace spec
 {
     namespace details

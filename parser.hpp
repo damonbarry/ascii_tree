@@ -29,10 +29,10 @@ namespace ascii_tree
         grid_col_iterator accept_(typename TerminalTraits::type term)
         {
             ignore();
-            if (at_line_end()) { return grid_.which_char_; }
+            if (at_line_end()) { return grid_.which_col_; }
 
-            typename TerminalTraits::type next_term = TerminalTraits::to_terminal(*grid_.which_char_);
-            return (term == next_term) ? grid_.which_char_++ : (*grid_.which_row_)->end();
+            typename TerminalTraits::type next_term = TerminalTraits::to_terminal(*grid_.which_col_);
+            return (term == next_term) ? grid_.which_col_++ : (*grid_.which_row_)->end();
         }
 
     public:
@@ -51,26 +51,26 @@ namespace ascii_tree
         {
             if (at_line_end()) { return; }
 
-            while (TerminalTraits::to_terminal(*grid_.which_char_) == TerminalTraits::ignore_me &&
-                ++grid_.which_char_ != (*grid_.which_row_)->end())
+            while (TerminalTraits::to_terminal(*grid_.which_col_) == TerminalTraits::ignore_me &&
+                ++grid_.which_col_ != (*grid_.which_row_)->end())
             {}
         }
 
         void unignore()
         {
             while (!at_line_begin() &&
-                TerminalTraits::to_terminal(*(grid_.which_char_ - 1)) == TerminalTraits::ignore_me)
+                TerminalTraits::to_terminal(*(grid_.which_col_ - 1)) == TerminalTraits::ignore_me)
             {
-                --grid_.which_char_;
+                --grid_.which_col_;
             }
         }
 
         void maybe_advance_row()
         {
-            if (at_line_end() && grid_.which_row_ + 1 != grid_.rows_.end())
+            if (at_line_end() && grid_.which_row_ + 1 != grid_.rows_->cend())
             {
                 ++grid_.which_row_;
-                grid_.which_char_ = (*grid_.which_row_)->begin();
+                grid_.which_col_ = (*grid_.which_row_)->begin();
             }
         }
 
@@ -86,22 +86,22 @@ namespace ascii_tree
 
         bool at_line_begin()
         {
-            return grid_.which_char_ == (*grid_.which_row_)->begin();
+            return grid_.which_col_ == (*grid_.which_row_)->begin();
         }
 
         bool at_line_end()
         {
-            return grid_.which_char_ == (*grid_.which_row_)->end();
+            return grid_.which_col_ == (*grid_.which_row_)->end();
         }
 
         bool at_begin()
         {
-            return grid_.which_row_ == grid_.rows_.begin() && at_line_begin();
+            return grid_.which_row_ == grid_.rows_->cbegin() && at_line_begin();
         }
 
         bool at_end()
         {
-            return grid_.which_row_ + 1 == grid_.rows_.end() && at_line_end();
+            return grid_.which_row_ + 1 == grid_.rows_->cend() && at_line_end();
         }
 
         bool accept(typename TerminalTraits::type term)
@@ -111,23 +111,23 @@ namespace ascii_tree
 
         position expect(typename TerminalTraits::type term)
         {
-            auto it = accept_(term);
-            if (it == (*grid_.which_row_)->end())
+            auto col_it = accept_(term);
+            if (col_it == (*grid_.which_row_)->end())
             {
-                throw parse_exception(**grid_.which_row_, std::distance((*grid_.which_row_)->begin(), grid_.which_char_));
+                throw parse_exception(**grid_.which_row_, std::distance((*grid_.which_row_)->begin(), grid_.which_col_));
             }
 
-            return position(*grid_.which_row_, it);
+            return position(grid_.rows_, grid_.which_row_, col_it);
         }
 
         std::string substring(position start)
         {
-            return std::string(start.col_, grid_.which_char_);
+            return std::string(start.which_col_, grid_.which_col_);
         }
 
         void error()
         {
-            throw parse_exception(**grid_.which_row_, std::distance((*grid_.which_row_)->begin(), grid_.which_char_));
+            throw parse_exception(**grid_.which_row_, std::distance((*grid_.which_row_)->begin(), grid_.which_col_));
         }
     };
 
