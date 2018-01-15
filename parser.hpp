@@ -55,15 +55,15 @@ namespace ascii_tree
 
         vector_type rows_;
         vector_type::const_iterator which_row_;
-        std::string::const_iterator which_char_;
+        std::string::const_iterator which_col_;
 
         std::string::const_iterator accept_(terminal term)
         {
             ignore();
             if (at_line_end()) { return which_row_->end(); }
 
-            terminal next_term = TerminalTraits::to_terminal(*which_char_);
-            return (term == next_term) ? which_char_++ : which_row_->end();
+            terminal next_term = TerminalTraits::to_terminal(*which_col_);
+            return (term == next_term) ? which_col_++ : which_row_->end();
         }
 
     public:
@@ -74,13 +74,13 @@ namespace ascii_tree
         parser(const std::string& s, size_t init_pos) :
             rows_(vector_type(1, s)),
             which_row_(rows_.begin()),
-            which_char_(which_row_->begin() + init_pos)
+            which_col_(which_row_->begin() + init_pos)
         {}
 
         parser(vector_type& v, size_t row, size_t column) :
             rows_(v),
             which_row_(rows_.begin() + row),
-            which_char_(which_row_->begin() + column)
+            which_col_(which_row_->begin() + column)
         {}
 
         parser(vector_type& v) :
@@ -94,30 +94,30 @@ namespace ascii_tree
         parser(std::initializer_list<std::string> init, size_t row, size_t column) :
             rows_(init),
             which_row_(rows_.begin() + row),
-            which_char_(which_row_->begin() + column)
+            which_col_(which_row_->begin() + column)
         {}
 
         parser(const parser& other) :
             rows_(other.rows_),
             which_row_(rows_.begin() + std::distance(other.rows_.begin(), other.which_row_)),
-            which_char_(which_row_->begin() + std::distance(other.which_row_->begin(), other.which_char_))
+            which_col_(which_row_->begin() + std::distance(other.which_row_->begin(), other.which_col_))
         {}
 
         void ignore()
         {
             if (at_line_end()) { return; }
 
-            while (TerminalTraits::to_terminal(*which_char_) == TerminalTraits::ignore_me &&
-                ++which_char_ != which_row_->end())
+            while (TerminalTraits::to_terminal(*which_col_) == TerminalTraits::ignore_me &&
+                ++which_col_ != which_row_->end())
             {}
         }
 
         void unignore()
         {
             while (!at_line_begin() &&
-                TerminalTraits::to_terminal(*(which_char_ - 1)) == TerminalTraits::ignore_me)
+                TerminalTraits::to_terminal(*(which_col_ - 1)) == TerminalTraits::ignore_me)
             {
-                --which_char_;
+                --which_col_;
             }
         }
 
@@ -126,13 +126,13 @@ namespace ascii_tree
             if (at_line_end() && which_row_ + 1 != rows_.end())
             {
                 ++which_row_;
-                which_char_ = which_row_->begin();
+                which_col_ = which_row_->begin();
             }
         }
 
         position current_position()
         {
-            return position(*which_row_, std::distance(which_row_->cbegin(), which_char_));
+            return position(*which_row_, std::distance(which_row_->cbegin(), which_col_));
         }
 
         position position_at(size_t row, size_t column)
@@ -143,12 +143,12 @@ namespace ascii_tree
 
         bool at_line_begin()
         {
-            return which_char_ == which_row_->begin();
+            return which_col_ == which_row_->begin();
         }
 
         bool at_line_end()
         {
-            return which_char_ == which_row_->end();
+            return which_col_ == which_row_->end();
         }
 
         bool at_begin()
@@ -171,7 +171,7 @@ namespace ascii_tree
             auto it = accept_(term);
             if (it == which_row_->end())
             {
-                throw parse_exception(*which_row_, std::distance(which_row_->begin(), which_char_));
+                throw parse_exception(*which_row_, std::distance(which_row_->begin(), which_col_));
             }
 
             return position(*which_row_, std::distance(which_row_->cbegin(), it));
@@ -179,12 +179,12 @@ namespace ascii_tree
 
         std::string substring(const position& start)
         {
-            return std::string(which_row_->cbegin() + std::distance(start.s_.cbegin(), start.it_), which_char_);
+            return std::string(which_row_->cbegin() + std::distance(start.s_.cbegin(), start.it_), which_col_);
         }
 
         void error()
         {
-            throw parse_exception(*which_row_, std::distance(which_row_->begin(), which_char_));
+            throw parse_exception(*which_row_, std::distance(which_row_->begin(), which_col_));
         }
     };
 
