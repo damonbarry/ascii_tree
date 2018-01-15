@@ -67,12 +67,25 @@ namespace ascii_tree { namespace spec
         _(result).should_have_node_along_edge("n", "e");
     }
 
-    // TEST_CASE("should generate a tree with root vertical edge leaf", "[can generate a syntax tree]")
-    // {
-    //     syntax_tree tree({ { root_node(), vertical_edge_part(), edge_name("e"), vertical_edge_part(), named_node("n") } });
-    //     auto result = tree.analyze();
-    //     _(result).should_have_node_along_edge("n", "e");
-    // }
+    TEST_CASE("should generate a tree with root vertical edge leaf", "[can generate a syntax tree]")
+    {
+        auto p0 = position(0, 0),
+             p1 = position::from(p0, 0, -1),
+             p2 = position::from(p1, 0, -1),
+             p3 = position::from(p2, 0, -1),
+             p4 = position::from(p3, 0, -1);
+        syntax_tree tree{
+            {
+                root_node(p0),
+                vertical_edge_part(p1),
+                edge_name("e", p2),
+                vertical_edge_part(p3),
+                named_node("n", p4)
+            }
+        };
+        auto result = tree.analyze();
+        _(result).should_have_node_along_edge("n", "e");
+    }
 
     // TEST_CASE("should generate a tree with leaf vertical edge root", "[can generate a syntax tree]")
     // {

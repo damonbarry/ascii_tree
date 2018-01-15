@@ -15,10 +15,10 @@ namespace ascii_tree
         typedef std::vector<grid_row_type_> grid_vector_type_;
         typedef std::shared_ptr<grid_vector_type_> grid_vector_ptr_;
 
-        template<typename T>
-        inline grid_row_type_ make_grid_row_(T&& s)
+        template<typename... T>
+        inline grid_row_type_ make_grid_row_(T&&... s)
         {
-            return std::make_shared<const std::string>(std::forward<T>(s));
+            return std::make_shared<const std::string>(std::forward<T>(s)...);
         }
 
         template<typename... T>
