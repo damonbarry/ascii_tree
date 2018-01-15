@@ -71,10 +71,10 @@ namespace ascii_tree
             : parser(s, 0)
         {}
 
-        parser(const std::string& s, size_t init_pos) :
+        parser(const std::string& s, size_t pos) :
             rows_(vector_type(1, s)),
             which_row_(rows_.begin()),
-            which_col_(which_row_->begin() + init_pos)
+            which_col_(which_row_->begin() + pos)
         {}
 
         parser(vector_type& v, size_t row, size_t column) :
