@@ -20,27 +20,48 @@ namespace ascii_tree
 
     class position
     {
-        std::string s_;
-        std::string::const_iterator it_;
+    public:
+        typedef std::vector<std::string> vector_type;
+
+    private:
+        vector_type rows_;
+        vector_type::const_iterator which_row_;
+        std::string::const_iterator which_col_;
 
     public:
-        position() : s_(""), it_(s_.cbegin()) {}
-        position(std::string s, size_t pos) : s_(s), it_(s_.cbegin() + pos) {}
-        position(const position& other) : s_(other.s_), it_(s_.cbegin() + std::distance(other.s_.cbegin(), other.it_)) {}
+        position(std::string s, size_t pos) :
+            rows_(vector_type(1, s)),
+            which_row_(rows_.cbegin()),
+            which_col_(which_row_->cbegin() + pos)
+        {}
+
+        position() : position("", 0) {}
+
+        position(const position& other) :
+            rows_(other.rows_),
+            which_row_(rows_.cbegin() + std::distance(other.rows_.cbegin(), other.which_row_)),
+            which_col_(which_row_->cbegin() + std::distance(other.which_row_->cbegin(), other.which_col_))
+        {}
 
         template<class T>
         friend class parser;
 
         friend bool operator==(const position& lhs, const position& rhs)
         {
-            return lhs.s_ == rhs.s_ &&
-                std::distance(lhs.s_.cbegin(), lhs.it_) == std::distance(rhs.s_.cbegin(), rhs.it_);
+            return lhs.rows_ == rhs.rows_ &&
+                std::distance(lhs.rows_.cbegin(), lhs.which_row_) == std::distance(rhs.rows_.cbegin(), rhs.which_row_) &&
+                std::distance(lhs.which_row_->cbegin(), lhs.which_col_) == std::distance(rhs.which_row_->cbegin(), rhs.which_col_);
         }
 
         std::string to_string() const
         {
-            return (it_ == s_.cend() ? "<end>" : std::string(1, *it_)) + " [" +
-                std::to_string(std::distance(s_.begin(), it_)) + "]";
+            // format: ch (row, column)
+
+            std::string ch = which_col_ == which_row_->cend() ? "<end>" : std::string(1, *which_col_);
+            size_t row = std::distance(rows_.cbegin(), which_row_);
+            size_t column = std::distance(which_row_->begin(), which_col_);
+
+            return ch + "(" + std::to_string(row) + ", " + std::to_string(column) + ")";
         }
     };
 
@@ -179,7 +200,7 @@ namespace ascii_tree
 
         std::string substring(const position& start)
         {
-            return std::string(which_row_->cbegin() + std::distance(start.s_.cbegin(), start.it_), which_col_);
+            return std::string(which_row_->cbegin() + std::distance(start.which_row_->cbegin(), start.which_col_), which_col_);
         }
 
         void error()
