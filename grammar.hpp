@@ -122,8 +122,8 @@ namespace ascii_tree
 
     public:
         explicit grammar(const std::string& s) : p_(s) {}
+        grammar(std::vector<std::string>& v) : p_(v) {}
         grammar(std::initializer_list<std::string> l) : p_(l) {}
-        grammar(const std::vector<std::string>& v) : p_(v) {}
 
         token root_node()
         {

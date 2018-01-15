@@ -51,7 +51,7 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("ignore should not advance to the next line", "[Can parse chars]")
     {
-        test_parser p({ "12", "32" }, 0, 2); // starting position is the end of the first row
+        test_parser p({ "12", "34" }, 0, 2); // starting position is the end of the first row
         p.ignore();
         _(p.current_position()).should_be(p.position_at(0, 2));
     }

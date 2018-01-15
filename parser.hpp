@@ -20,64 +20,50 @@ namespace ascii_tree
 
     class position
     {
-        std::shared_ptr<const std::string> s_;
+        std::string s_;
         std::string::const_iterator it_;
 
     public:
-        position() : s_(std::make_shared<const std::string>("")), it_(s_->cbegin()) {}
-        position(std::shared_ptr<const std::string>& s, std::string::const_iterator it) : s_(s), it_(it) {}
-        position(const std::string& s, std::string::difference_type pos) :
-            s_(std::make_shared<const std::string>(std::string(s))),
-            it_(s_->begin() + pos)
-        {}
+        position() : s_(""), it_(s_.cbegin()) {}
+        position(std::string s, size_t pos) : s_(s), it_(s_.cbegin() + pos) {}
+        position(const position& other) : s_(other.s_), it_(s_.cbegin() + std::distance(other.s_.cbegin(), other.it_)) {}
 
         template<class T>
         friend class parser;
 
         friend bool operator==(const position& lhs, const position& rhs)
         {
-            return *lhs.s_ == *rhs.s_ &&
-                std::distance(lhs.s_->cbegin(), lhs.it_) == std::distance(rhs.s_->cbegin(), rhs.it_);
+            return lhs.s_ == rhs.s_ &&
+                std::distance(lhs.s_.cbegin(), lhs.it_) == std::distance(rhs.s_.cbegin(), rhs.it_);
         }
 
         std::string to_string() const
         {
-            return std::string("position=") + 
-                std::to_string(std::distance(s_->begin(), it_)) + "/" + 
-                std::to_string(s_->length()) + " (" +
-                (it_ == s_->end() ? "<end>" : std::string(1, *it_)) + ")";
+            return (it_ == s_.cend() ? "<end>" : std::string(1, *it_)) + " [" +
+                std::to_string(std::distance(s_.begin(), it_)) + "]";
         }
     };
 
     template<class TerminalTraits>
     class parser
     {
+    public:
+        typedef std::vector<std::string> vector_type;
+
+    private:
         typedef typename TerminalTraits::type terminal;
-        typedef std::vector<std::shared_ptr<const std::string>> vector_type;
 
         vector_type rows_;
-        vector_type::iterator which_row_;
+        vector_type::const_iterator which_row_;
         std::string::const_iterator which_char_;
-
-        template<typename T>
-        vector_type make_vector_of_shared_ptrs_(T range)
-        {
-            vector_type vec;
-            for (const auto& elem : range)
-            {
-                vec.emplace_back(std::make_shared<const std::string>(elem));
-            }
-
-            return vec;
-        }
 
         std::string::const_iterator accept_(terminal term)
         {
             ignore();
-            if (at_line_end()) { return (*which_row_)->end(); }
+            if (at_line_end()) { return which_row_->end(); }
 
             terminal next_term = TerminalTraits::to_terminal(*which_char_);
-            return (term == next_term) ? which_char_++ : (*which_row_)->end();
+            return (term == next_term) ? which_char_++ : which_row_->end();
         }
 
     public:
@@ -86,35 +72,35 @@ namespace ascii_tree
         {}
 
         parser(const std::string& s, size_t init_pos) :
-            rows_(vector_type(1, std::make_shared<const std::string>(s))),
+            rows_(vector_type(1, s)),
             which_row_(rows_.begin()),
-            which_char_((*which_row_)->begin() + init_pos)
+            which_char_(which_row_->begin() + init_pos)
         {}
 
-        parser(const std::vector<std::string>& v) :
+        parser(vector_type& v, size_t row, size_t column) :
+            rows_(v),
+            which_row_(rows_.begin() + row),
+            which_char_(which_row_->begin() + column)
+        {}
+
+        parser(vector_type& v) :
             parser(v, 0, 0)
         {}
 
-        parser(const std::vector<std::string>& v, size_t init_row, size_t init_pos) :
-            rows_(make_vector_of_shared_ptrs_(v)),
-            which_row_(rows_.begin() + init_row),
-            which_char_((*which_row_)->begin() + init_pos)
+        parser(std::initializer_list<std::string> init) :
+            parser(init, 0, 0)
         {}
 
-        parser(std::initializer_list<std::string> l) :
-            parser(l, 0, 0)
-        {}
-
-        parser(std::initializer_list<std::string> l, size_t init_row, size_t init_pos) :
-            rows_(make_vector_of_shared_ptrs_(l)),
-            which_row_(rows_.begin() + init_row),
-            which_char_((*which_row_)->begin() + init_pos)
+        parser(std::initializer_list<std::string> init, size_t row, size_t column) :
+            rows_(init),
+            which_row_(rows_.begin() + row),
+            which_char_(which_row_->begin() + column)
         {}
 
         parser(const parser& other) :
             rows_(other.rows_),
-            which_row_(rows_.begin() + std::distance<vector_type::const_iterator>(other.rows_.begin(), other.which_row_)),
-            which_char_((*which_row_)->begin() + std::distance((*other.which_row_)->begin(), other.which_char_))
+            which_row_(rows_.begin() + std::distance(other.rows_.begin(), other.which_row_)),
+            which_char_(which_row_->begin() + std::distance(other.which_row_->begin(), other.which_char_))
         {}
 
         void ignore()
@@ -122,7 +108,7 @@ namespace ascii_tree
             if (at_line_end()) { return; }
 
             while (TerminalTraits::to_terminal(*which_char_) == TerminalTraits::ignore_me &&
-                ++which_char_ != (*which_row_)->end())
+                ++which_char_ != which_row_->end())
             {}
         }
 
@@ -140,29 +126,29 @@ namespace ascii_tree
             if (at_line_end() && which_row_ + 1 != rows_.end())
             {
                 ++which_row_;
-                which_char_ = (*which_row_)->begin();
+                which_char_ = which_row_->begin();
             }
         }
 
         position current_position()
         {
-            return position(*which_row_, which_char_);
+            return position(*which_row_, std::distance(which_row_->cbegin(), which_char_));
         }
 
         position position_at(size_t row, size_t column)
         {
-            auto row_ptr = *(rows_.begin() + row);
-            return position(row_ptr, row_ptr->begin() + column);
+            std::string& str = *(rows_.begin() + row);
+            return position(str, column);
         }
 
         bool at_line_begin()
         {
-            return which_char_ == (*which_row_)->begin();
+            return which_char_ == which_row_->begin();
         }
 
         bool at_line_end()
         {
-            return which_char_ == (*which_row_)->end();
+            return which_char_ == which_row_->end();
         }
 
         bool at_begin()
@@ -177,28 +163,28 @@ namespace ascii_tree
 
         bool accept(terminal term)
         {
-            return accept_(term) != (*which_row_)->end();
+            return accept_(term) != which_row_->end();
         }
 
         position expect(terminal term)
         {
             auto it = accept_(term);
-            if (it == (*which_row_)->end())
+            if (it == which_row_->end())
             {
-                throw parse_exception(**which_row_, std::distance((*which_row_)->begin(), which_char_));
+                throw parse_exception(*which_row_, std::distance(which_row_->begin(), which_char_));
             }
 
-            return position(*which_row_, it);
+            return position(*which_row_, std::distance(which_row_->cbegin(), it));
         }
 
-        std::string substring(position start)
+        std::string substring(const position& start)
         {
-            return std::string(start.it_, which_char_);
+            return std::string(which_row_->cbegin() + std::distance(start.s_.cbegin(), start.it_), which_char_);
         }
 
         void error()
         {
-            throw parse_exception(**which_row_, std::distance((*which_row_)->begin(), which_char_));
+            throw parse_exception(*which_row_, std::distance(which_row_->begin(), which_char_));
         }
     };
 
