@@ -22,24 +22,29 @@ namespace ascii_tree
     {
     public:
         typedef std::vector<std::string> vector_type;
+        typedef std::shared_ptr<vector_type> vector_ptr;
 
     private:
-        vector_type rows_;
+        vector_ptr rows_;
         vector_type::const_iterator which_row_;
         std::string::const_iterator which_col_;
 
     public:
+        position(vector_type v, size_t row, size_t column) :
+            rows_(std::make_shared<vector_type>(v)),
+            which_row_(rows_->cbegin() + row),
+            which_col_(which_row_->cbegin() + column)
+        {}
+
         position(std::string s, size_t pos) :
-            rows_(vector_type(1, s)),
-            which_row_(rows_.cbegin()),
-            which_col_(which_row_->cbegin() + pos)
+            position(vector_type(1, s), 0, pos)
         {}
 
         position() : position("", 0) {}
 
         position(const position& other) :
             rows_(other.rows_),
-            which_row_(rows_.cbegin() + std::distance(other.rows_.cbegin(), other.which_row_)),
+            which_row_(rows_->cbegin() + std::distance(other.rows_->cbegin(), other.which_row_)),
             which_col_(which_row_->cbegin() + std::distance(other.which_row_->cbegin(), other.which_col_))
         {}
 
@@ -48,9 +53,14 @@ namespace ascii_tree
 
         friend bool operator==(const position& lhs, const position& rhs)
         {
-            return lhs.rows_ == rhs.rows_ &&
-                std::distance(lhs.rows_.cbegin(), lhs.which_row_) == std::distance(rhs.rows_.cbegin(), rhs.which_row_) &&
+            return *lhs.rows_ == *rhs.rows_ &&
+                std::distance(lhs.rows_->cbegin(), lhs.which_row_) == std::distance(rhs.rows_->cbegin(), rhs.which_row_) &&
                 std::distance(lhs.which_row_->cbegin(), lhs.which_col_) == std::distance(rhs.which_row_->cbegin(), rhs.which_col_);
+        }
+
+        friend bool operator!=(const position& lhs, const position& rhs)
+        {
+            return !(lhs == rhs);
         }
 
         std::string to_string() const
@@ -58,10 +68,10 @@ namespace ascii_tree
             // format: ch (row, column)
 
             std::string ch = which_col_ == which_row_->cend() ? "<end>" : std::string(1, *which_col_);
-            size_t row = std::distance(rows_.cbegin(), which_row_);
+            size_t row = std::distance(rows_->cbegin(), which_row_);
             size_t column = std::distance(which_row_->begin(), which_col_);
 
-            return ch + "(" + std::to_string(row) + ", " + std::to_string(column) + ")";
+            return ch + " (" + std::to_string(row) + ", " + std::to_string(column) + ")";
         }
     };
 
@@ -153,13 +163,12 @@ namespace ascii_tree
 
         position current_position()
         {
-            return position(*which_row_, std::distance(which_row_->cbegin(), which_col_));
+            return position(rows_, std::distance(rows_.cbegin(), which_row_), std::distance(which_row_->cbegin(), which_col_));
         }
 
         position position_at(size_t row, size_t column)
         {
-            std::string& str = *(rows_.begin() + row);
-            return position(str, column);
+            return position(rows_, row, column);
         }
 
         bool at_line_begin()

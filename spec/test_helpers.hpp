@@ -5,6 +5,17 @@
 #include <algorithm>
 #include <string>
 
+namespace Catch
+{
+    template<>
+    struct StringMaker<ascii_tree::position> {
+        static std::string convert(ascii_tree::position p)
+        {
+            return p.to_string();
+        }
+    };
+}
+
 namespace ascii_tree { namespace spec
 {
     namespace details
@@ -110,30 +121,6 @@ namespace ascii_tree { namespace spec
                 return ss.str();
             }
         };
-
-        class matches_positions : public Catch::MatcherBase<std::vector<position>>
-        {
-            const std::vector<position>& expected_;
-        public:
-            explicit matches_positions(const std::vector<position>& expected) : expected_(expected) {}
-            virtual bool match(const std::vector<position>& actual) const override
-            {
-                auto mismatch_pair = std::mismatch(expected_.begin(), expected_.end(), actual.begin());
-                return mismatch_pair.first == expected_.end() && mismatch_pair.second == actual.end();
-            }
-            virtual std::string describe() const override
-            {
-                std::ostringstream ss;
-                std::string separator = "equals { ";
-                for(auto& position : expected_)
-                {
-                    ss << separator << position.to_string();
-                    separator = ", ";
-                }
-                ss << " }";
-                return ss.str();
-            }
-        };
     }
 
     inline std::vector<position> positions_from(const std::vector<token>& tokens)
@@ -185,9 +172,9 @@ namespace ascii_tree { namespace spec
         const std::vector<position>& positions_;
     public:
         explicit positions_assertions(const std::vector<position>& positions) : positions_(positions) {}
-        void should_equal(std::initializer_list<position> expected)
+        void should_equal(const std::vector<position>& expected)
         {
-            REQUIRE_THAT(positions_, details::matches_positions(expected));
+            REQUIRE_THAT(positions_, Catch::Matchers::Equals(expected));
         }
     };
 
