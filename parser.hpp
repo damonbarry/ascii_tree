@@ -158,9 +158,6 @@ namespace ascii_tree
 
         position current_position()
         {
-            // size_t dr = std::distance(pos_.rows_->cbegin(), pos_.which_row_);
-            // size_t dc = std::distance(pos_.which_row_->cbegin(), pos_.which_col_);
-            // return position(rows_, dr, dc);
             return position(rows_, std::distance(pos_.rows_->cbegin(), pos_.which_row_), std::distance(pos_.which_row_->cbegin(), pos_.which_col_));
         }
 
