@@ -85,16 +85,15 @@ namespace ascii_tree
         typedef typename TerminalTraits::type terminal;
 
         vector_type rows_;
-        vector_type::const_iterator which_row_;
-        std::string::const_iterator which_col_;
+        position pos_;
 
         std::string::const_iterator accept_(terminal term)
         {
             ignore();
-            if (at_line_end()) { return which_row_->end(); }
+            if (at_line_end()) { return pos_.which_row_->end(); }
 
-            terminal next_term = TerminalTraits::to_terminal(*which_col_);
-            return (term == next_term) ? which_col_++ : which_row_->end();
+            terminal next_term = TerminalTraits::to_terminal(*pos_.which_col_);
+            return (term == next_term) ? pos_.which_col_++ : pos_.which_row_->cend();
         }
 
     public:
@@ -104,14 +103,12 @@ namespace ascii_tree
 
         parser(const std::string& s, size_t pos) :
             rows_(vector_type(1, s)),
-            which_row_(rows_.begin()),
-            which_col_(which_row_->begin() + pos)
+            pos_(rows_, 0, pos)
         {}
 
         parser(vector_type& v, size_t row, size_t column) :
             rows_(v),
-            which_row_(rows_.begin() + row),
-            which_col_(which_row_->begin() + column)
+            pos_(rows_, row, column)
         {}
 
         parser(vector_type& v) :
@@ -124,46 +121,47 @@ namespace ascii_tree
 
         parser(std::initializer_list<std::string> init, size_t row, size_t column) :
             rows_(init),
-            which_row_(rows_.begin() + row),
-            which_col_(which_row_->begin() + column)
+            pos_(rows_, row, column)
         {}
 
         parser(const parser& other) :
             rows_(other.rows_),
-            which_row_(rows_.begin() + std::distance(other.rows_.begin(), other.which_row_)),
-            which_col_(which_row_->begin() + std::distance(other.which_row_->begin(), other.which_col_))
+            pos_(other.pos_)
         {}
 
         void ignore()
         {
             if (at_line_end()) { return; }
 
-            while (TerminalTraits::to_terminal(*which_col_) == TerminalTraits::ignore_me &&
-                ++which_col_ != which_row_->end())
+            while (TerminalTraits::to_terminal(*pos_.which_col_) == TerminalTraits::ignore_me &&
+                ++pos_.which_col_ != pos_.which_row_->cend())
             {}
         }
 
         void unignore()
         {
             while (!at_line_begin() &&
-                TerminalTraits::to_terminal(*(which_col_ - 1)) == TerminalTraits::ignore_me)
+                TerminalTraits::to_terminal(*(pos_.which_col_ - 1)) == TerminalTraits::ignore_me)
             {
-                --which_col_;
+                --pos_.which_col_;
             }
         }
 
         void maybe_advance_row()
         {
-            if (at_line_end() && which_row_ + 1 != rows_.end())
+            if (at_line_end() && pos_.which_row_ + 1 != pos_.rows_->cend())
             {
-                ++which_row_;
-                which_col_ = which_row_->begin();
+                ++pos_.which_row_;
+                pos_.which_col_ = pos_.which_row_->cbegin();
             }
         }
 
         position current_position()
         {
-            return position(rows_, std::distance(rows_.cbegin(), which_row_), std::distance(which_row_->cbegin(), which_col_));
+            // size_t dr = std::distance(pos_.rows_->cbegin(), pos_.which_row_);
+            // size_t dc = std::distance(pos_.which_row_->cbegin(), pos_.which_col_);
+            // return position(rows_, dr, dc);
+            return position(rows_, std::distance(pos_.rows_->cbegin(), pos_.which_row_), std::distance(pos_.which_row_->cbegin(), pos_.which_col_));
         }
 
         position position_at(size_t row, size_t column)
@@ -173,48 +171,48 @@ namespace ascii_tree
 
         bool at_line_begin()
         {
-            return which_col_ == which_row_->begin();
+            return pos_.which_col_ == pos_.which_row_->cbegin();
         }
 
         bool at_line_end()
         {
-            return which_col_ == which_row_->end();
+            return pos_.which_col_ == pos_.which_row_->cend();
         }
 
         bool at_begin()
         {
-            return which_row_ == rows_.begin() && at_line_begin();
+            return pos_.which_row_ == pos_.rows_->cbegin() && at_line_begin();
         }
 
         bool at_end()
         {
-            return which_row_ + 1 == rows_.end() && at_line_end();
+            return pos_.which_row_ + 1 == pos_.rows_->cend() && at_line_end();
         }
 
         bool accept(terminal term)
         {
-            return accept_(term) != which_row_->end();
+            return accept_(term) != pos_.which_row_->cend();
         }
 
         position expect(terminal term)
         {
             auto it = accept_(term);
-            if (it == which_row_->end())
+            if (it == pos_.which_row_->cend())
             {
-                throw parse_exception(*which_row_, std::distance(which_row_->begin(), which_col_));
+                throw parse_exception(*pos_.which_row_, std::distance(pos_.which_row_->cbegin(), pos_.which_col_));
             }
 
-            return position(*which_row_, std::distance(which_row_->cbegin(), it));
+            return position(*pos_.which_row_, std::distance(pos_.which_row_->cbegin(), it));
         }
 
         std::string substring(const position& start)
         {
-            return std::string(which_row_->cbegin() + std::distance(start.which_row_->cbegin(), start.which_col_), which_col_);
+            return std::string(pos_.which_row_->cbegin() + std::distance(start.which_row_->cbegin(), start.which_col_), pos_.which_col_);
         }
 
         void error()
         {
-            throw parse_exception(*which_row_, std::distance(which_row_->begin(), which_col_));
+            throw parse_exception(*pos_.which_row_, std::distance(pos_.which_row_->cbegin(), pos_.which_col_));
         }
     };
 
