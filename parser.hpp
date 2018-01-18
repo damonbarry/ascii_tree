@@ -18,26 +18,24 @@ namespace ascii_tree
         parse_exception(const std::string& s, size_t pos) : s(s), pos(pos) {}
     };
 
+    typedef std::vector<std::string> grid_type;
+    typedef std::shared_ptr<grid_type> grid_ptr;
+
     class position
     {
-    public:
-        typedef std::vector<std::string> vector_type;
-        typedef std::shared_ptr<vector_type> vector_ptr;
-
-    private:
-        vector_ptr rows_;
-        vector_type::const_iterator which_row_;
+        grid_ptr rows_;
+        grid_type::const_iterator which_row_;
         std::string::const_iterator which_col_;
 
     public:
-        position(vector_type v, size_t row, size_t column) :
-            rows_(std::make_shared<vector_type>(v)),
+        position(grid_ptr grid, size_t row, size_t column) :
+            rows_(grid),
             which_row_(rows_->cbegin() + row),
             which_col_(which_row_->cbegin() + column)
         {}
 
         position(std::string s, size_t pos) :
-            position(vector_type(1, s), 0, pos)
+            position(std::make_shared<grid_type>(1, s), 0, pos)
         {}
 
         position() : position("", 0) {}
@@ -79,12 +77,12 @@ namespace ascii_tree
     class parser
     {
     public:
-        typedef std::vector<std::string> vector_type;
+        typedef std::vector<std::string> grid_type;
 
     private:
         typedef typename TerminalTraits::type terminal;
 
-        vector_type rows_;
+        grid_ptr rows_;
         position pos_;
 
         std::string::const_iterator accept_(terminal term)
@@ -102,26 +100,25 @@ namespace ascii_tree
         {}
 
         parser(const std::string& s, size_t pos) :
-            rows_(vector_type(1, s)),
+            rows_(std::make_shared<grid_type>(1, s)),
             pos_(rows_, 0, pos)
         {}
 
-        parser(vector_type& v, size_t row, size_t column) :
-            rows_(v),
+        parser(const grid_type& grid, size_t row, size_t column) :
+            rows_(std::make_shared<grid_type>(grid)),
             pos_(rows_, row, column)
         {}
 
-        parser(vector_type& v) :
-            parser(v, 0, 0)
+        parser(const grid_type& grid) :
+            parser(grid, 0, 0)
         {}
 
-        parser(std::initializer_list<std::string> init) :
-            parser(init, 0, 0)
+        parser(std::initializer_list<std::string> grid) :
+            parser(grid, 0, 0)
         {}
 
-        parser(std::initializer_list<std::string> init, size_t row, size_t column) :
-            rows_(init),
-            pos_(rows_, row, column)
+        parser(std::initializer_list<std::string> grid, size_t row, size_t column) :
+            parser(grid_type(grid), row, column)
         {}
 
         parser(const parser& other) :
@@ -158,12 +155,12 @@ namespace ascii_tree
 
         position current_position()
         {
-            return position(rows_, std::distance(pos_.rows_->cbegin(), pos_.which_row_), std::distance(pos_.which_row_->cbegin(), pos_.which_col_));
+            return position(pos_.rows_, std::distance(pos_.rows_->cbegin(), pos_.which_row_), std::distance(pos_.which_row_->cbegin(), pos_.which_col_));
         }
 
         position position_at(size_t row, size_t column)
         {
-            return position(rows_, row, column);
+            return position(pos_.rows_, row, column);
         }
 
         bool at_line_begin()
