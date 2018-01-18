@@ -21,6 +21,12 @@ namespace ascii_tree
     typedef std::vector<std::string> grid_type;
     typedef std::shared_ptr<grid_type> grid_ptr;
 
+    template<typename... Args>
+    inline grid_ptr make_grid(Args&&... args)
+    {
+        return std::make_shared<grid_type>(std::forward<Args>(args)...);
+    }
+
     class position
     {
         grid_ptr rows_;
@@ -35,7 +41,7 @@ namespace ascii_tree
         {}
 
         position(std::string s, size_t pos) :
-            position(std::make_shared<grid_type>(1, s), 0, pos)
+            position(make_grid(1, s), 0, pos)
         {}
 
         position() : position("", 0) {}
@@ -76,10 +82,6 @@ namespace ascii_tree
     template<class TerminalTraits>
     class parser
     {
-    public:
-        typedef std::vector<std::string> grid_type;
-
-    private:
         typedef typename TerminalTraits::type terminal;
 
         grid_ptr rows_;
@@ -100,12 +102,12 @@ namespace ascii_tree
         {}
 
         parser(const std::string& s, size_t pos) :
-            rows_(std::make_shared<grid_type>(1, s)),
+            rows_(make_grid(1, s)),
             pos_(rows_, 0, pos)
         {}
 
         parser(const grid_type& grid, size_t row, size_t column) :
-            rows_(std::make_shared<grid_type>(grid)),
+            rows_(make_grid(grid)),
             pos_(rows_, row, column)
         {}
 
