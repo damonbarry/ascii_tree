@@ -22,27 +22,31 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should point to the root node when it is present", "[can generate a syntax tree]")
     {
-        syntax_tree tree({ { root_node(2) } });
+        syntax_tree tree({ { root_node(position(2)) } });
         auto result = tree.analyze();
         _(result).should_be(root_node());
     }
 
     TEST_CASE("should generate a tree with root horizontal edge leaf", "[can generate a syntax tree]")
     {
-        auto p0 = position("012", 0), p1 = position::from(p0, 0, 1), p2 = position::from(p1, 0, 1);
-        syntax_tree tree({ { root_node(p0), horizontal_edge("e", p1), named_node("n", p2) } });
+        auto p1 = position("123", 0), p2 = position::from(p1, 0, 1), p3 = position::from(p2, 0, 1);
+        syntax_tree tree({ { root_node(p1), horizontal_edge("e", p2), named_node("n", p3) } });
         auto result = tree.analyze();
         _(result).should_have_node_along_edge("n", "e");
     }
 
     TEST_CASE("should generate the same tree regardless of token order", "[can generate a syntax tree]")
     {
-        syntax_tree tree012({ { root_node(0), horizontal_edge("e", 1), named_node("n", 2) } });
-        syntax_tree tree021({ { root_node(0), named_node("n", 2), horizontal_edge("e", 1) } });
-        syntax_tree tree102({ { horizontal_edge("e", 1), root_node(0), named_node("n", 2) } });
-        syntax_tree tree120({ { horizontal_edge("e", 1), named_node("n", 2), root_node(0) } });
-        syntax_tree tree201({ { named_node("n", 2), root_node(0), horizontal_edge("e", 1) } });
-        syntax_tree tree210({ { named_node("n", 2), horizontal_edge("e", 1), root_node(0) } });
+        auto root = root_node(position("123", 0));
+        auto edge = horizontal_edge("e", position::from(root.position, 0, 1));
+        auto node = named_node("n", position::from(root.position, 0, 2));
+
+        syntax_tree tree012{ { root, edge, node } };
+        syntax_tree tree021{ { root, node, edge } };
+        syntax_tree tree102{ { edge, root, node } };
+        syntax_tree tree120{ { edge, node, root } };
+        syntax_tree tree201{ { node, root, edge } };
+        syntax_tree tree210{ { node, edge, root } };
 
         _(tree012.analyze()).should_equal(tree021.analyze());
         _(tree012.analyze()).should_equal(tree102.analyze());
