@@ -22,7 +22,7 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should point to the root node when it is present", "[can generate a syntax tree]")
     {
-        syntax_tree tree({ { named_node("b", 0), horizontal_edge("a", 1), root_node(2), horizontal_edge("c", 3), named_node("d", 4) } }); // TODO: remove c and d when analyze isn't hard-coded to require an edge and node after the root
+        syntax_tree tree({ { root_node(2) } });
         auto result = tree.analyze();
         _(result).should_be(root_node());
     }
