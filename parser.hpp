@@ -44,6 +44,10 @@ namespace ascii_tree
             position(make_grid(1, s), 0, pos)
         {}
 
+        position(size_t pos) :
+            position(std::string(pos, ' '), pos)
+        {}
+
         position() : position("", 0) {}
 
         position(const position& other) :
