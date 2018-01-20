@@ -13,18 +13,18 @@ namespace ascii_tree { namespace spec
         });
     }
 
-    TEST_CASE("should point to the root node when it is present", "[can generate a syntax tree]")
-    {
-        syntax_tree tree({ { named_node("b", 0), horizontal_edge("a", 1), root_node(2), horizontal_edge("c", 3), named_node("d", 4) } }); // TODO: remove c and d when analyze isn't hard-coded to require an edge and node after the root
-        auto result = tree.analyze();
-        _(result).should_be(root_node());
-    }
-
     TEST_CASE("should throw if more than one root node is present", "[can generate a syntax tree]")
     {
         should_throw_(analyze_exception("more than one root node"), []{
             syntax_tree({ { root_node(), root_node() } }).analyze();
         });
+    }
+
+    TEST_CASE("should point to the root node when it is present", "[can generate a syntax tree]")
+    {
+        syntax_tree tree({ { named_node("b", 0), horizontal_edge("a", 1), root_node(2), horizontal_edge("c", 3), named_node("d", 4) } }); // TODO: remove c and d when analyze isn't hard-coded to require an edge and node after the root
+        auto result = tree.analyze();
+        _(result).should_be(root_node());
     }
 
     TEST_CASE("should generate a tree with root horizontal edge leaf", "[can generate a syntax tree]")
