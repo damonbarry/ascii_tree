@@ -56,6 +56,14 @@ namespace ascii_tree
             which_col_(which_row_->cbegin() + std::distance(other.which_row_->cbegin(), other.which_col_))
         {}
 
+        static position from(const position& other, std::ptrdiff_t row_offset, std::ptrdiff_t column_offset)
+        {
+            return position(
+                other.rows_,
+                std::distance(other.rows_->cbegin(), other.which_row_) + row_offset,
+                std::distance(other.which_row_->cbegin(), other.which_col_) + column_offset);
+        }
+
         template<class T>
         friend class parser;
 
