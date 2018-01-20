@@ -29,7 +29,7 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should generate a tree with root horizontal edge leaf", "[can generate a syntax tree]")
     {
-        auto p1 = position("123", 0), p2 = position::from(p1, 0, 1), p3 = position::from(p2, 0, 1);
+        position p1 = position("123", 0), p2 = position::from(p1, 0, 1), p3 = position::from(p2, 0, 1);
         syntax_tree tree({ { root_node(p1), horizontal_edge("e", p2), named_node("n", p3) } });
         auto result = tree.analyze();
         _(result).should_have_node_along_edge("n", "e");
@@ -55,12 +55,13 @@ namespace ascii_tree { namespace spec
         _(tree012.analyze()).should_equal(tree210.analyze());
     }
 
-    // TEST_CASE("should generate a tree with leaf horizontal edge root", "[can generate a syntax tree]")
-    // {
-    //     syntax_tree tree({ { named_node("n"), horizontal_edge("e"), root_node() } });
-    //     auto result = tree.analyze();
-    //     _(result).should_have_node_along_edge("n", "e");
-    // }
+    TEST_CASE("should generate a tree with leaf horizontal edge root", "[can generate a syntax tree]")
+    {
+        position p1 = position("123", 0), p2 = position::from(p1, 0, 1), p3 = position::from(p2, 0, 1);
+        syntax_tree tree({ { named_node("n", p1), horizontal_edge("e", p2), root_node(p3) } });
+        auto result = tree.analyze();
+        _(result).should_have_node_along_edge("n", "e");
+    }
 
     // TEST_CASE("should generate a tree with root vertical edge leaf", "[can generate a syntax tree]")
     // {
