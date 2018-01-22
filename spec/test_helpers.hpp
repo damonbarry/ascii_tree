@@ -5,13 +5,30 @@
 #include <algorithm>
 #include <string>
 
+namespace ascii_tree { namespace spec { namespace details
+{
+    std::string to_string(const token&);
+    std::string to_string(const node&);
+}}}
+
 namespace Catch
 {
     template<>
-    struct StringMaker<ascii_tree::position> {
-        static std::string convert(ascii_tree::position p)
+    struct StringMaker<ascii_tree::position>
+    {
+        static std::string convert(const ascii_tree::position& p)
         {
             return p.to_string();
+        }
+    };
+
+    template<>
+    struct StringMaker<ascii_tree::edge>
+    {
+        static std::string convert(const ascii_tree::edge& e)
+        {
+            return ascii_tree::spec::details::to_string(e.tok) +
+                ", node " + ascii_tree::spec::details::to_string(e.node); 
         }
     };
 }
@@ -85,6 +102,11 @@ namespace ascii_tree { namespace spec
             return pos.to_string();
         }
 
+        inline std::string to_string(const node& node)
+        {
+            return node.tok.name;
+        }
+
         inline void exception_contents_should_match_(
             const ascii_tree::parse_exception& expected, const ascii_tree::parse_exception& actual)
         {
@@ -119,6 +141,28 @@ namespace ascii_tree { namespace spec
                 }
                 ss << " }";
                 return ss.str();
+            }
+        };
+
+        class vector_contains_edge_with_node : public Catch::MatcherBase<std::vector<edge>>
+        {
+            const std::string& edge_name_;
+            const std::string& node_name_;
+        public:
+            explicit vector_contains_edge_with_node(const std::string& edge_name, const std::string& node_name) :
+                edge_name_(edge_name),
+                node_name_(node_name)
+            {}
+            bool match(const std::vector<edge>& v) const override {
+                const std::string& edge_name = edge_name_;
+                const std::string& node_name = node_name_;
+                return std::find_if(v.begin(), v.end(), [&](const edge& e) {
+                    return (edge_name == e.tok.name && node_name == e.node.tok.name);
+                }) != v.end();
+            }
+            virtual std::string describe() const override
+            {
+                return "contains edge '" + edge_name_ + "' with node '" + node_name_ + "'";
             }
         };
     }
@@ -208,12 +252,7 @@ namespace ascii_tree { namespace spec
         }
         void should_have_node_along_edge(const std::string& node_name, const std::string& edge_name/*, const wchar_t* message = nullptr*/)
         {
-            auto edge_it = std::find_if(node_.edges.begin(), node_.edges.end(), [&edge_name](const edge& e){
-                return (edge_name == e.tok.name);
-            });
-
-            REQUIRE(edge_it != node_.edges.end());
-            REQUIRE(node_name == edge_it->node.tok.name);
+            REQUIRE_THAT(node_.edges, details::vector_contains_edge_with_node(edge_name, node_name));
         }
     };
 

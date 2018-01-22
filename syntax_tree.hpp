@@ -160,6 +160,35 @@ namespace ascii_tree
                 root_->edges.emplace_back(token((*edge_it)->type, std::string((*name_it)->name), (*edge_it)->position), node(**node_it));
             }
 
+            // look up for edge + node
+            edge_it = find_token_(root_it, 1, 0, vertical_edge_parts);
+            if (edge_it != vertical_edge_parts.end())
+            {
+                // found the start of an edge, now look for the rest of it
+                auto name_it = find_token_(*edge_it, 1, 0, edge_names);
+                if (name_it == edge_names.end())
+                {
+                    throw analyze_exception("expected edge_name");
+                }
+
+                auto edge2_it = find_token_(*name_it, 1, 0, vertical_edge_parts);
+                if (edge2_it == vertical_edge_parts.end())
+                {
+                    throw analyze_exception("expected vertical_edge_part");
+                }
+
+                // found an edge, now find the node at the other end of it
+                auto node_it = find_token_(*edge2_it, 1, 0, named_nodes);
+                if (node_it == named_nodes.end())
+                {
+                    throw analyze_exception("expected named_node");
+                }
+
+                // A vertical edge consists of three pieces: two vertical_edge_parts with an edge_name between them.
+                // For now, represent them within an edge by adding the name to the first vertical_edge_part.
+                root_->edges.emplace_back(token((*edge_it)->type, std::string((*name_it)->name), (*edge_it)->position), node(**node_it));
+            }
+
             return *root_;
         }
     };
