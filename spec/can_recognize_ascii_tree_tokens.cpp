@@ -5,6 +5,11 @@ using namespace std;
 
 namespace ascii_tree { namespace spec
 {
+    inline grid_ptr make_grid(const grid_type& grid)
+    {
+        return std::make_shared<grid_type>(grid);
+    }
+
     TEST_CASE("should not recognize any tokens in an empty string", "[can recognize ascii tree tokens]")
     {
         auto tokens = grammar("").tokens();
@@ -323,14 +328,16 @@ namespace ascii_tree { namespace spec
 
         auto tokens = grammar(text).tokens();
 
+        auto g = make_grid(text);
+
         _(positions_from(tokens)).should_equal({
-            { text[0], 0 }, // root node
-            { text[0], 3 }, // named node
-            { text[0], 6 }, // edge name
-            { text[1], 0 }, // horizontal edge
-            { text[1], 5 }, // ascending edge part
-            { text[1], 6 }, // descending edge part
-            { text[1], 7 }  // vertical edge part
+            { g, 0, 0 }, // root node
+            { g, 0, 3 }, // named node
+            { g, 0, 6 }, // edge name
+            { g, 1, 0 }, // horizontal edge
+            { g, 1, 5 }, // ascending edge part
+            { g, 1, 6 }, // descending edge part
+            { g, 1, 7 }  // vertical edge part
         });
     }
 }}

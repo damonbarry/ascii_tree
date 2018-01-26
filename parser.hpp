@@ -40,15 +40,11 @@ namespace ascii_tree
             which_col_(which_row_->cbegin() + column)
         {}
 
-        position(std::string s, size_t pos) :
-            position(make_grid(1, s), 0, pos)
-        {}
-
         explicit position(size_t pos) :
-            position(std::string(pos, ' '), pos)
+            position(make_grid(1, std::string(pos + 1, ' ')), 0, pos)
         {}
 
-        position() : position("", 0) {}
+        position() : position(make_grid(1, ""), 0, 0) {}
 
         position(const position& other) :
             rows_(other.rows_),
@@ -210,7 +206,7 @@ namespace ascii_tree
                 throw parse_exception(*pos_.which_row_, std::distance(pos_.which_row_->cbegin(), pos_.which_col_));
             }
 
-            return position(*pos_.which_row_, std::distance(pos_.which_row_->cbegin(), it));
+            return position(pos_.rows_, std::distance(pos_.rows_->cbegin(), pos_.which_row_), std::distance(pos_.which_row_->cbegin(), it));
         }
 
         std::string substring(const position& start)

@@ -6,6 +6,11 @@ using namespace std;
 
 namespace ascii_tree { namespace spec
 {
+    inline grid_ptr make_grid(size_t height, size_t width)
+    {
+        return std::make_shared<grid_type>(height, std::string(width, ' '));
+    }
+
     TEST_CASE("should throw when root node is absent", "[can generate a syntax tree]")
     {
         should_throw_(analyze_exception("missing root node"), []{
@@ -29,17 +34,20 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should generate a tree with root horizontal edge leaf", "[can generate a syntax tree]")
     {
-        position p1 = position("123", 0), p2 = position::from(p1, 0, 1), p3 = position::from(p2, 0, 1);
-        syntax_tree tree({ { root_node(p1), horizontal_edge("e", p2), named_node("n", p3) } });
+        grid_ptr g = make_grid(1, 3);
+        syntax_tree tree({ {
+            root_node(position(g, 0, 0)), horizontal_edge("e", position(g, 0, 1)), named_node("n", position(g, 0, 2))
+        } });
         auto result = tree.analyze();
         _(result).should_have_node_along_edge("n", "e");
     }
 
     TEST_CASE("should generate the same tree regardless of token order", "[can generate a syntax tree]")
     {
-        auto root = root_node(position("123", 0));
-        auto edge = horizontal_edge("e", position::from(root.position, 0, 1));
-        auto node = named_node("n", position::from(root.position, 0, 2));
+        grid_ptr g = make_grid(1, 3);
+        auto root = root_node(position(g, 0, 0));
+        auto edge = horizontal_edge("e", position(g, 0, 1));
+        auto node = named_node("n", position(g, 0, 2));
 
         syntax_tree tree012{ { root, edge, node } };
         syntax_tree tree021{ { root, node, edge } };
@@ -57,21 +65,25 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should generate a tree with leaf horizontal edge root", "[can generate a syntax tree]")
     {
-        position p1 = position("123", 0), p2 = position::from(p1, 0, 1), p3 = position::from(p2, 0, 1);
-        syntax_tree tree({ { named_node("n", p1), horizontal_edge("e", p2), root_node(p3) } });
+        grid_ptr g = make_grid(1, 3);
+        syntax_tree tree({ {
+            named_node("n", position(g, 0, 0)),
+            horizontal_edge("e", position(g, 0, 1)),
+            root_node(position(g, 0, 2))
+        } });
         auto result = tree.analyze();
         _(result).should_have_node_along_edge("n", "e");
     }
 
     TEST_CASE("should generate a tree with root vertical edge leaf", "[can generate a syntax tree]")
     {
-        auto grid = make_grid(grid_type { "5", "4", "3", "2", "1" });
+        grid_ptr g = make_grid(5, 1);
         syntax_tree tree({ {
-            root_node(position(grid, 4, 0)),
-            vertical_edge_part(position(grid, 3, 0)),
-            edge_name("e", position(grid, 2, 0)),
-            vertical_edge_part(position(grid, 1, 0)),
-            named_node("n", position(grid, 0, 0))
+            root_node(position(g, 4, 0)),
+            vertical_edge_part(position(g, 3, 0)),
+            edge_name("e", position(g, 2, 0)),
+            vertical_edge_part(position(g, 1, 0)),
+            named_node("n", position(g, 0, 0))
         } });
         auto result = tree.analyze();
         _(result).should_have_node_along_edge("n", "e");
@@ -79,13 +91,13 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should generate a tree with leaf vertical edge root", "[can generate a syntax tree]")
     {
-        auto grid = make_grid(grid_type { "1", "2", "3", "4", "5" });
+        auto g = make_grid(5, 1);
         syntax_tree tree({ {
-            root_node(position(grid, 0, 0)),
-            vertical_edge_part(position(grid, 1, 0)),
-            edge_name("e", position(grid, 2, 0)),
-            vertical_edge_part(position(grid, 3, 0)),
-            named_node("n", position(grid, 4, 0))
+            root_node(position(g, 0, 0)),
+            vertical_edge_part(position(g, 1, 0)),
+            edge_name("e", position(g, 2, 0)),
+            vertical_edge_part(position(g, 3, 0)),
+            named_node("n", position(g, 4, 0))
         } });
         auto result = tree.analyze();
         _(result).should_have_node_along_edge("n", "e");
