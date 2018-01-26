@@ -40,10 +40,6 @@ namespace ascii_tree
             which_col_(which_row_->cbegin() + column)
         {}
 
-        explicit position(size_t pos) :
-            position(make_grid(1, std::string(pos + 1, ' ')), 0, pos)
-        {}
-
         position() : position(make_grid(1, ""), 0, 0) {}
 
         position(const position& other) :

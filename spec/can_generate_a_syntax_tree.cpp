@@ -27,7 +27,7 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should point to the root node when it is present", "[can generate a syntax tree]")
     {
-        syntax_tree tree({ { root_node(position(2)) } });
+        syntax_tree tree({ { root_node(position()) } });
         auto result = tree.analyze();
         _(result).should_be(root_node());
     }
