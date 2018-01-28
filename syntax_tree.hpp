@@ -81,6 +81,7 @@ namespace ascii_tree
             std::vector<token_iterator> horizontal_edges;
             std::vector<token_iterator> vertical_edge_parts;
             std::vector<token_iterator> ascending_edge_parts;
+            std::vector<token_iterator> descending_edge_parts;
             std::vector<token_iterator> edge_names;
             std::vector<token_iterator> named_nodes;
 
@@ -97,6 +98,10 @@ namespace ascii_tree
                 else if (token_it->type == token::ascending_edge_part)
                 {
                     ascending_edge_parts.push_back(token_it);
+                }
+                else if (token_it->type == token::descending_edge_part)
+                {
+                    descending_edge_parts.push_back(token_it);
                 }
                 else if (token_it->type == token::edge_name)
                 {
@@ -206,7 +211,7 @@ namespace ascii_tree
                 }
 
                 auto edge2_it = find_token_(*name_it, 1, 1, ascending_edge_parts);
-                if (edge2_it == vertical_edge_parts.end())
+                if (edge2_it == ascending_edge_parts.end())
                 {
                     throw analyze_exception("expected ascending_edge_parts");
                 }
@@ -219,7 +224,7 @@ namespace ascii_tree
                 }
 
                 // An ascending edge consists of three pieces: two ascending_edge_parts with an edge_name between them.
-                // For now, represent them within an edge by adding the name to the first vertical_edge_part.
+                // For now, represent them within an edge by adding the name to the first ascending_edge_part.
                 root_->edges.emplace_back(token((*edge_it)->type, std::string((*name_it)->name), (*edge_it)->position), node(**node_it));
             }
 
@@ -235,7 +240,7 @@ namespace ascii_tree
                 }
 
                 auto edge2_it = find_token_(*name_it, -1, -1, ascending_edge_parts);
-                if (edge2_it == vertical_edge_parts.end())
+                if (edge2_it == ascending_edge_parts.end())
                 {
                     throw analyze_exception("expected ascending_edge_parts");
                 }
@@ -248,7 +253,36 @@ namespace ascii_tree
                 }
 
                 // An ascending edge consists of three pieces: two ascending_edge_parts with an edge_name between them.
-                // For now, represent them within an edge by adding the name to the first vertical_edge_part.
+                // For now, represent them within an edge by adding the name to the first ascending_edge_part.
+                root_->edges.emplace_back(token((*edge_it)->type, std::string((*name_it)->name), (*edge_it)->position), node(**node_it));
+            }
+
+            // look down & right for edge + node
+            edge_it = find_token_(root_it, -1, 1, descending_edge_parts);
+            if (edge_it != descending_edge_parts.end())
+            {
+                // found the start of an edge, now look for the rest of it
+                auto name_it = find_token_(*edge_it, -1, 1, edge_names);
+                if (name_it == edge_names.end())
+                {
+                    throw analyze_exception("expected edge_name");
+                }
+
+                auto edge2_it = find_token_(*name_it, -1, 1, descending_edge_parts);
+                if (edge2_it == descending_edge_parts.end())
+                {
+                    throw analyze_exception("expected ascending_edge_parts");
+                }
+
+                // found an edge, now find the node at the other end of it
+                auto node_it = find_token_(*edge2_it, -1, 1, named_nodes);
+                if (node_it == named_nodes.end())
+                {
+                    throw analyze_exception("expected named_node");
+                }
+
+                // A descending edge consists of three pieces: two descending_edge_parts with an edge_name between them.
+                // For now, represent them within an edge by adding the name to the first descending_edge_part.
                 root_->edges.emplace_back(token((*edge_it)->type, std::string((*name_it)->name), (*edge_it)->position), node(**node_it));
             }
 
