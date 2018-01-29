@@ -36,10 +36,36 @@ namespace ascii_tree { namespace spec
     {
         grid_ptr g = make_grid(1, 3);
         syntax_tree tree({ {
-            root_node(position(g, 0, 0)), horizontal_edge("e", position(g, 0, 1)), named_node("n", position(g, 0, 2))
+            root_node(position(g, 0, 0)),
+            horizontal_edge("e", position(g, 0, 1)),
+            named_node("n", position(g, 0, 2))
         } });
         auto result = tree.analyze();
         _(result).should_have_node_along_edge("n", "e");
+    }
+
+    TEST_CASE("should generate a tree with leaf horizontal edge root", "[can generate a syntax tree]")
+    {
+        grid_ptr g = make_grid(1, 3);
+        syntax_tree tree({ {
+            named_node("n", position(g, 0, 0)),
+            horizontal_edge("e", position(g, 0, 1)),
+            root_node(position(g, 0, 2))
+        } });
+        auto result = tree.analyze();
+        _(result).should_have_node_along_edge("n", "e");
+    }
+
+    TEST_CASE("should throw when horizontal edge has no node", "[can generate a syntax tree]")
+    {
+        grid_ptr g = make_grid(1, 2);
+        syntax_tree tree({ {
+            root_node(position(g, 0, 0)),
+            horizontal_edge("e", position(g, 0, 1))
+        } });
+        should_throw_(analyze_exception("missing named_node at the end of a horizontal edge"), [&]{
+            tree.analyze();
+        });
     }
 
     TEST_CASE("should generate the same tree regardless of token order", "[can generate a syntax tree]")
@@ -61,18 +87,6 @@ namespace ascii_tree { namespace spec
         _(tree012.analyze()).should_equal(tree120.analyze());
         _(tree012.analyze()).should_equal(tree201.analyze());
         _(tree012.analyze()).should_equal(tree210.analyze());
-    }
-
-    TEST_CASE("should generate a tree with leaf horizontal edge root", "[can generate a syntax tree]")
-    {
-        grid_ptr g = make_grid(1, 3);
-        syntax_tree tree({ {
-            named_node("n", position(g, 0, 0)),
-            horizontal_edge("e", position(g, 0, 1)),
-            root_node(position(g, 0, 2))
-        } });
-        auto result = tree.analyze();
-        _(result).should_have_node_along_edge("n", "e");
     }
 
     TEST_CASE("should generate a tree with root vertical edge leaf", "[can generate a syntax tree]")
