@@ -80,20 +80,20 @@ namespace ascii_tree { namespace spec
     TEST_CASE("should throw when horizontal edge has no node", "[can generate a syntax tree]")
     {
         grid_ptr g = make_grid(1, 2);
-        syntax_tree forwards({ {
+        syntax_tree forward({ {
             root_node(position(g, 0, 0)),
             horizontal_edge("e", position(g, 0, 1))
         } });
         should_throw_(analyze_exception("missing named_node at the end of a horizontal edge"), [&]{
-            forwards.analyze();
+            forward.analyze();
         });
 
-        syntax_tree backwards({ {
+        syntax_tree backward({ {
             horizontal_edge("e", position(g, 0, 0)),
             root_node(position(g, 0, 1))
         } });
         should_throw_(analyze_exception("missing named_node at the end of a horizontal edge"), [&]{
-            backwards.analyze();
+            backward.analyze();
         });
     }
 
@@ -115,11 +115,11 @@ namespace ascii_tree { namespace spec
     {
         auto g = make_grid(5, 1);
         syntax_tree tree({ {
-            root_node(position(g, 0, 0)),
-            vertical_edge_part(position(g, 1, 0)),
-            edge_name("e", position(g, 2, 0)),
+            named_node("n", position(g, 4, 0)),
             vertical_edge_part(position(g, 3, 0)),
-            named_node("n", position(g, 4, 0))
+            edge_name("e", position(g, 2, 0)),
+            vertical_edge_part(position(g, 1, 0)),
+            root_node(position(g, 0, 0))
         } });
         auto result = tree.analyze();
         _(result).should_have_node_along_edge("n", "e");
@@ -128,42 +128,72 @@ namespace ascii_tree { namespace spec
     TEST_CASE("should throw when vertical edge has no name", "[can generate a syntax tree]")
     {
         auto g = make_grid(4, 1);
-        syntax_tree tree({ {
+        syntax_tree forward({ {
             root_node(position(g, 3, 0)),
             vertical_edge_part(position(g, 2, 0)),
             vertical_edge_part(position(g, 1, 0)),
             named_node("n", position(g, 0, 0))
         } });
         should_throw_(analyze_exception("expected edge_name"), [&]{
-            tree.analyze();
+            forward.analyze();
+        });
+
+        syntax_tree backward({ {
+            named_node("n", position(g, 3, 0)),
+            vertical_edge_part(position(g, 2, 0)),
+            vertical_edge_part(position(g, 1, 0)),
+            root_node(position(g, 0, 0))
+        } });
+        should_throw_(analyze_exception("expected edge_name"), [&]{
+            backward.analyze();
         });
     }
 
     TEST_CASE("should throw when vertical edge does not continue after edge_name", "[can generate a syntax tree]")
     {
         auto g = make_grid(4, 1);
-        syntax_tree tree({ {
+        syntax_tree forward({ {
             root_node(position(g, 3, 0)),
             vertical_edge_part(position(g, 2, 0)),
             edge_name("e", position(g, 1, 0)),
             named_node("n", position(g, 0, 0))
         } });
         should_throw_(analyze_exception("expected vertical_edge_part"), [&]{
-            tree.analyze();
+            forward.analyze();
+        });
+
+        syntax_tree backward({ {
+            named_node("n", position(g, 3, 0)),
+            edge_name("e", position(g, 2, 0)),
+            vertical_edge_part(position(g, 1, 0)),
+            root_node(position(g, 0, 0))
+        } });
+        should_throw_(analyze_exception("expected vertical_edge_part"), [&]{
+            backward.analyze();
         });
     }
 
     TEST_CASE("should throw when vertical edge has no node", "[can generate a syntax tree]")
     {
         auto g = make_grid(4, 1);
-        syntax_tree tree({ {
+        syntax_tree forward({ {
             root_node(position(g, 3, 0)),
             vertical_edge_part(position(g, 2, 0)),
             edge_name("e", position(g, 1, 0)),
             vertical_edge_part(position(g, 0, 0))
         } });
         should_throw_(analyze_exception("expected named_node"), [&]{
-            tree.analyze();
+            forward.analyze();
+        });
+
+        syntax_tree backward({ {
+            vertical_edge_part(position(g, 3, 0)),
+            edge_name("e", position(g, 2, 0)),
+            vertical_edge_part(position(g, 1, 0)),
+            root_node(position(g, 0, 0))
+        } });
+        should_throw_(analyze_exception("expected named_node"), [&]{
+            backward.analyze();
         });
     }
 
