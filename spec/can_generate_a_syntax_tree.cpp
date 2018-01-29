@@ -328,42 +328,72 @@ namespace ascii_tree { namespace spec
     TEST_CASE("should throw when descending edge has no name", "[can generate a syntax tree]")
     {
         auto g = make_grid(4, 4);
-        syntax_tree tree({ {
+        syntax_tree forward({ {
             root_node(position(g, 3, 0)),
             descending_edge_part(position(g, 2, 1)),
             descending_edge_part(position(g, 1, 2)),
             named_node("n", position(g, 0, 3))
         } });
         should_throw_(analyze_exception("expected edge_name"), [&]{
-            tree.analyze();
+            forward.analyze();
+        });
+
+        syntax_tree backward({ {
+            named_node("n", position(g, 3, 0)),
+            descending_edge_part(position(g, 2, 1)),
+            descending_edge_part(position(g, 1, 2)),
+            root_node(position(g, 0, 3))
+        } });
+        should_throw_(analyze_exception("expected edge_name"), [&]{
+            backward.analyze();
         });
     }
 
     TEST_CASE("should throw when descending edge does not continue after edge_name", "[can generate a syntax tree]")
     {
         auto g = make_grid(4, 4);
-        syntax_tree tree({ {
+        syntax_tree forward({ {
             root_node(position(g, 3, 0)),
             descending_edge_part(position(g, 2, 1)),
             edge_name("e", position(g, 1, 2)),
             named_node("n", position(g, 0, 3))
         } });
         should_throw_(analyze_exception("expected descending_edge_part"), [&]{
-            tree.analyze();
+            forward.analyze();
+        });
+
+        syntax_tree backward({ {
+            named_node("n", position(g, 3, 0)),
+            edge_name("e", position(g, 2, 1)),
+            descending_edge_part(position(g, 1, 2)),
+            root_node(position(g, 0, 3))
+        } });
+        should_throw_(analyze_exception("expected descending_edge_part"), [&]{
+            backward.analyze();
         });
     }
 
     TEST_CASE("should throw when descending edge has no node", "[can generate a syntax tree]")
     {
         auto g = make_grid(4, 4);
-        syntax_tree tree({ {
+        syntax_tree forward({ {
             root_node(position(g, 3, 0)),
             descending_edge_part(position(g, 2, 1)),
             edge_name("e", position(g, 1, 2)),
             descending_edge_part(position(g, 0, 3))
         } });
         should_throw_(analyze_exception("expected named_node"), [&]{
-            tree.analyze();
+            forward.analyze();
+        });
+
+        syntax_tree backward({ {
+            descending_edge_part(position(g, 3, 0)),
+            edge_name("e", position(g, 2, 1)),
+            descending_edge_part(position(g, 1, 2)),
+            root_node(position(g, 0, 3))
+        } });
+        should_throw_(analyze_exception("expected named_node"), [&]{
+            backward.analyze();
         });
     }
 }}
