@@ -80,12 +80,20 @@ namespace ascii_tree { namespace spec
     TEST_CASE("should throw when horizontal edge has no node", "[can generate a syntax tree]")
     {
         grid_ptr g = make_grid(1, 2);
-        syntax_tree tree({ {
+        syntax_tree forwards({ {
             root_node(position(g, 0, 0)),
             horizontal_edge("e", position(g, 0, 1))
         } });
         should_throw_(analyze_exception("missing named_node at the end of a horizontal edge"), [&]{
-            tree.analyze();
+            forwards.analyze();
+        });
+
+        syntax_tree backwards({ {
+            horizontal_edge("e", position(g, 0, 0)),
+            root_node(position(g, 0, 1))
+        } });
+        should_throw_(analyze_exception("missing named_node at the end of a horizontal edge"), [&]{
+            backwards.analyze();
         });
     }
 
