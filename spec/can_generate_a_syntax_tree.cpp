@@ -117,6 +117,48 @@ namespace ascii_tree { namespace spec
         _(result).should_have_node_along_edge("n", "e");
     }
 
+    TEST_CASE("should throw when vertical edge has no name", "[can generate a syntax tree]")
+    {
+        auto g = make_grid(4, 1);
+        syntax_tree tree({ {
+            root_node(position(g, 3, 0)),
+            vertical_edge_part(position(g, 2, 0)),
+            vertical_edge_part(position(g, 1, 0)),
+            named_node("n", position(g, 0, 0))
+        } });
+        should_throw_(analyze_exception("expected edge_name"), [&]{
+            tree.analyze();
+        });
+    }
+
+    TEST_CASE("should throw when vertical edge does not continue after edge_name", "[can generate a syntax tree]")
+    {
+        auto g = make_grid(4, 1);
+        syntax_tree tree({ {
+            root_node(position(g, 3, 0)),
+            vertical_edge_part(position(g, 2, 0)),
+            edge_name("e", position(g, 1, 0)),
+            named_node("n", position(g, 0, 0))
+        } });
+        should_throw_(analyze_exception("expected vertical_edge_part"), [&]{
+            tree.analyze();
+        });
+    }
+
+    TEST_CASE("should throw when vertical edge has no node", "[can generate a syntax tree]")
+    {
+        auto g = make_grid(4, 1);
+        syntax_tree tree({ {
+            root_node(position(g, 3, 0)),
+            vertical_edge_part(position(g, 2, 0)),
+            edge_name("e", position(g, 1, 0)),
+            vertical_edge_part(position(g, 0, 0))
+        } });
+        should_throw_(analyze_exception("expected named_node"), [&]{
+            tree.analyze();
+        });
+    }
+
     TEST_CASE("should generate a tree with root ascending edge leaf", "[can generate a syntax tree]")
     {
         auto g = make_grid(5,5);
