@@ -213,7 +213,7 @@ namespace ascii_tree
                 auto edge2_it = find_token_(*name_it, 1, 1, ascending_edge_parts);
                 if (edge2_it == ascending_edge_parts.end())
                 {
-                    throw analyze_exception("expected ascending_edge_parts");
+                    throw analyze_exception("expected ascending_edge_part");
                 }
 
                 // found an edge, now find the node at the other end of it

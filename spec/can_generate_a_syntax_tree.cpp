@@ -161,7 +161,7 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should generate a tree with root ascending edge leaf", "[can generate a syntax tree]")
     {
-        auto g = make_grid(5,5);
+        auto g = make_grid(5, 5);
         syntax_tree tree({ {
             root_node(position(g, 0, 0)),
             ascending_edge_part(position(g, 1, 1)),
@@ -175,7 +175,7 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should generate a tree with leaf ascending edge root", "[can generate a syntax tree]")
     {
-        auto g = make_grid(5,5);
+        auto g = make_grid(5, 5);
         syntax_tree tree({ {
             named_node("n", position(g, 0, 0)),
             ascending_edge_part(position(g, 1, 1)),
@@ -187,9 +187,51 @@ namespace ascii_tree { namespace spec
         _(result).should_have_node_along_edge("n", "e");
     }
 
+    TEST_CASE("should throw when ascending edge has no name", "[can generate a syntax tree]")
+    {
+        auto g = make_grid(4, 4);
+        syntax_tree tree({ {
+            root_node(position(g, 0, 0)),
+            ascending_edge_part(position(g, 1, 1)),
+            ascending_edge_part(position(g, 2, 2)),
+            named_node("n", position(g, 3, 3))
+        } });
+        should_throw_(analyze_exception("expected edge_name"), [&]{
+            tree.analyze();
+        });
+    }
+
+    TEST_CASE("should throw when ascending edge does not continue after edge_name", "[can generate a syntax tree]")
+    {
+        auto g = make_grid(4, 4);
+        syntax_tree tree({ {
+            root_node(position(g, 0, 0)),
+            ascending_edge_part(position(g, 1, 1)),
+            edge_name("e", position(g, 2, 2)),
+            named_node("n", position(g, 3, 3))
+        } });
+        should_throw_(analyze_exception("expected ascending_edge_part"), [&]{
+            tree.analyze();
+        });
+    }
+
+    TEST_CASE("should throw when ascending edge has no node", "[can generate a syntax tree]")
+    {
+        auto g = make_grid(4, 4);
+        syntax_tree tree({ {
+            root_node(position(g, 0, 0)),
+            ascending_edge_part(position(g, 1, 1)),
+            edge_name("e", position(g, 2, 2)),
+            ascending_edge_part(position(g, 3, 3))
+        } });
+        should_throw_(analyze_exception("expected named_node"), [&]{
+            tree.analyze();
+        });
+    }
+
     TEST_CASE("should generate a tree with root descending edge leaf", "[can generate a syntax tree]")
     {
-        auto g = make_grid(5,5);
+        auto g = make_grid(5, 5);
         syntax_tree tree({ {
             root_node(position(g, 4, 0)),
             descending_edge_part(position(g, 3, 1)),
@@ -203,7 +245,7 @@ namespace ascii_tree { namespace spec
 
     TEST_CASE("should generate a tree with leaf descending edge root", "[can generate a syntax tree]")
     {
-        auto g = make_grid(5,5);
+        auto g = make_grid(5, 5);
         syntax_tree tree({ {
             named_node("n", position(g, 4, 0)),
             descending_edge_part(position(g, 3, 1)),
